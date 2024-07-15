@@ -1,11 +1,11 @@
-package comatching.comatching3.Users.entity;
+package comatching.comatching3.users.entity;
 
 import java.util.List;
 
-import comatching.comatching3.Users.enums.ContactFrequency;
-import comatching.comatching3.Users.enums.Gender;
-import comatching.comatching3.Users.enums.Hobby;
-import comatching.comatching3.Users.enums.Major;
+import comatching.comatching3.users.enums.ContactFrequency;
+import comatching.comatching3.users.enums.Gender;
+import comatching.comatching3.users.enums.Hobby;
+import comatching.comatching3.users.enums.Major;
 import comatching.comatching3.util.HobbyListConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
