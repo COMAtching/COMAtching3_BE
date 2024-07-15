@@ -16,9 +16,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "point_history")
 public class PointHistory extends BaseEntity {
@@ -32,13 +35,22 @@ public class PointHistory extends BaseEntity {
 	private Users users;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "comatch_history_id")
+	@JoinColumn(name = "match_history_id")
 	private MatchingHistory matchingHistory;
+
 	@Enumerated(EnumType.STRING)
 	private PointHistoryType payType;
-	private Integer beforeWork;
-	private Integer afterWork;
+
 	private Integer pointAmount;
 
-	private Integer addPickMe;
+	private String tid;
+
+	@Builder
+	public PointHistory(Users users, MatchingHistory matchingHistory, PointHistoryType payType, Integer pointAmount, String tid) {
+		this.users = users;
+		this.matchingHistory = matchingHistory;
+		this.payType = payType;
+		this.pointAmount = pointAmount;
+		this.tid = tid;
+	}
 }

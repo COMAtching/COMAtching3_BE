@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,4 +36,11 @@ public class University extends BaseEntity {
 	private String s3Key;
 
 	private String appName;
+
+	@Builder
+	public University(String mailDomain, String s3Key, String appName) {
+		this.mailDomain = mailDomain;
+		this.s3Key = s3Key;
+		this.appName = appName;
+	}
 }
