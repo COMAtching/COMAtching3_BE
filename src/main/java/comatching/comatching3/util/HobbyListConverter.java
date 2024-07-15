@@ -3,7 +3,7 @@ package comatching.comatching3.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import comatching.comatching3.Users.enums.Hobby;
+import comatching.comatching3.users.enums.Hobby;
 import jakarta.persistence.AttributeConverter;
 
 public class HobbyListConverter implements AttributeConverter<List<Hobby>, String> {

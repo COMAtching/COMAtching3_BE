@@ -1,8 +1,9 @@
-package comatching.comatching3.Users.entity;
+package comatching.comatching3.users.entity;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.match_message.entity.MessageMap;
 import jakarta.persistence.CascadeType;
@@ -13,12 +14,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -48,6 +49,10 @@ public class Users {
 
 	@OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MessageMap> receivedMessageMap = new ArrayList<MessageMap>();
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "university_id")
+	private University university;
 
 	private String socialId;
 

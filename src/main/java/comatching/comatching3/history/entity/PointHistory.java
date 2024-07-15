@@ -1,6 +1,6 @@
 package comatching.comatching3.history.entity;
 
-import comatching.comatching3.Users.entity.Users;
+import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.history.enums.PointHistoryType;
 import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.Column;

@@ -2,8 +2,8 @@ package comatching.comatching3.history.entity;
 
 import java.util.List;
 
-import comatching.comatching3.Users.entity.Users;
-import comatching.comatching3.Users.enums.Hobby;
+import comatching.comatching3.users.entity.Users;
+import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.process_ai.AgeOption;
 import comatching.comatching3.process_ai.ContactFrequencyOption;
 import comatching.comatching3.util.HobbyListConverter;
@@ -18,7 +18,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
