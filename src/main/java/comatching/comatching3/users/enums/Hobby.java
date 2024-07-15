@@ -1,4 +1,4 @@
-package comatching.comatching3.Users.enums;
+package comatching.comatching3.users.enums;
 
 import java.util.List;
 
