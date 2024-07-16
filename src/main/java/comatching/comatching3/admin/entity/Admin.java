@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,4 +39,12 @@ public class Admin extends BaseEntity {
 
 	private Boolean universityAuth = false;
 
+	@Builder
+	public Admin(University university, AdminRole adminRole, String accountId, String password, Boolean universityAuth) {
+		this.university = university;
+		this.adminRole = adminRole;
+		this.accountId = accountId;
+		this.password = password;
+		this.universityAuth = universityAuth;
+	}
 }

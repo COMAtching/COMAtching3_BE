@@ -32,7 +32,7 @@ public class MatchingHistory {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "user_info_id")
+	@JoinColumn(name = "applier_info_id")
 	private Users applier;
 
 	@ManyToOne(fetch = FetchType.LAZY)

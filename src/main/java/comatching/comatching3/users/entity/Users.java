@@ -6,6 +6,7 @@ import java.util.List;
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.match_message.entity.MessageMap;
+import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +21,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,7 +34,7 @@ import lombok.NoArgsConstructor;
 		columnNames = "social_id"
 	)
 })
-public class Users {
+public class Users extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "users_id")
@@ -41,7 +43,7 @@ public class Users {
 	@OneToOne(mappedBy = "users", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private UserAiFeature userAiFeature;
 
-	@OneToMany(mappedBy = "userInfo", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "users", fetch = FetchType.LAZY)
 	private List<PointHistory> pointHistoryList = new ArrayList<PointHistory>();
 
 	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -56,8 +58,6 @@ public class Users {
 
 	private String socialId;
 
-	private String contactId;
-
 	private String email;
 
 	private String role;
@@ -66,11 +66,21 @@ public class Users {
 
 	private String song;
 
+	private String word;
+
 	private Integer point;
 
-	private String comment;
 
-
-
-
+	@Builder
+	public Users(UserAiFeature userAiFeature, University university, String socialId, String email, String role, Integer pickMe, String song, String word, Integer point) {
+		this.userAiFeature = userAiFeature;
+		this.university = university;
+		this.socialId = socialId;
+		this.email = email;
+		this.role = role;
+		this.pickMe = pickMe;
+		this.song = song;
+		this.word = word;
+		this.point = point;
+	}
 }
