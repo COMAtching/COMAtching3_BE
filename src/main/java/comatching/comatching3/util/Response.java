@@ -1,0 +1,48 @@
+package comatching.comatching3.util;
+
+import java.util.List;
+
+import javax.swing.text.html.HTML;
+
+import org.springframework.http.HttpStatus;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Response<T> {
+	private Integer status;
+	private String code;
+	private String message;
+	private T data;
+
+	public static Response<Void> ok(){
+		Response<Void> response = new Response<>();
+		response.status = HttpStatus.OK.value();
+		response.code = ResponseCode.SUCCESS.getCode();
+		return response;
+	}
+
+	public static <T> Response<T> ok(T data) {
+		Response<T> response = new Response<>();
+		response.status = HttpStatus.OK.value();
+		response.code = ResponseCode.SUCCESS.getCode();
+		response.data = data;
+		return response;
+	}
+
+	public static <T> Response<T> errorResponse(ResponseCode code) {
+		Response<T> response = new Response<>();
+		response.status = code.getStatus();
+		response.code = code.getCode();
+		response.data = null;
+		response.message = code.getMessage();
+		return response;
+	}
+}
