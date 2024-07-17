@@ -11,11 +11,8 @@ public class HobbyListConverter implements AttributeConverter<List<Hobby>, Strin
 	public String convertToDatabaseColumn(List<Hobby> attribute) {
 		StringBuilder result = new StringBuilder();
 		for (Hobby hobby : attribute) {
-			//System.out.println("[hobbyListConverter] - add >> " + hobby.getValue());
 			result.append(hobby.getValue().toString() + ",");
 		}
-
-		//System.out.println("[hobbyListConverter] - result= " + result);
 		return result.toString();
 	}
 
