@@ -23,7 +23,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
 
-    private String REDIRECT_URI = "http://localhost:8080/social/login/success?token=";
+    // private String REDIRECT_URI = "http://localhost:8080/social/login/success?token=";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
