@@ -1,5 +1,6 @@
-package comatching.comatching3.users.auth.jwt;
+package comatching.comatching3.users.auth.exception;
 
+import comatching.comatching3.admin.exception.AccountIdAlreadyExistsException;
 import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
 import io.jsonwebtoken.JwtException;
@@ -14,7 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Slf4j
-public class JwtExceptionFilter extends OncePerRequestFilter {
+public class AuthExceptionFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -24,7 +25,9 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (JwtException e) {
-            setErrorResponse(HttpStatus.OK, response, e);
+            setErrorResponse(HttpStatus.UNAUTHORIZED, response, e);
+        } catch (AccountIdAlreadyExistsException e) {
+            setErrorResponse(HttpStatus.CONFLICT, response, e);
         }
     }
 
@@ -33,12 +36,18 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         response.setContentType("application/json; charset=UTF-8");
 
         Response<?> res;
-        if ("EXPIRE".equals(ex.getMessage())) {
+        if ("TOKEN_EXPIRE".equals(ex.getMessage())) {
             res = Response.errorResponse(ResponseCode.TOKEN_EXPIRED);
             log.info("[JwtExceptionFilter] - EXPIRE");
-        } else if ("INVALID".equals(ex.getMessage())) {
+        } else if ("TOKEN_INVALID".equals(ex.getMessage())) {
             res = Response.errorResponse(ResponseCode.TOKEN_NOT_AVAILABLE);
             log.info("[JwtExceptionFilter] - INVALID");
+        } else if ("ACCOUNT_ID_DUPLICATED".equals(ex.getMessage())) {
+            res = Response.errorResponse(ResponseCode.ACCOUNT_ID_DUPLICATED);
+            log.info("[JwtExceptionFilter] - ACCOUNT_ID_DUPLICATED");
+        } else if ("INVALID_ADMIN_LOGIN".equals(ex.getMessage())) {
+            res = Response.errorResponse(ResponseCode.INVALID_ADMIN_LOGIN);
+            log.info("[JwtExceptionFilter] - INVALID_ADMIN_LOGIN");
         } else {
             res = Response.errorResponse(ResponseCode.GENERAL_ERROR);
             log.info("[JwtExceptionFilter] - GENERAL_ERROR");
