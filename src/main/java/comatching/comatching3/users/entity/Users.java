@@ -83,4 +83,10 @@ public class Users extends BaseEntity {
 		this.word = word;
 		this.point = point;
 	}
+
+	@Builder
+	public Users(String socialId, String role) {
+		this.socialId = socialId;
+		this.role = role;
+	}
 }
