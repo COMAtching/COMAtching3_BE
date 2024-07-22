@@ -29,12 +29,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomOAuth2User user = (CustomOAuth2User) authentication.getPrincipal();
         String socialId = user.getName();
-
-        // 사용자 권한 추출
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
-        String role = auth.getAuthority(); // 첫 번째 권한 추출
+        String role = user.getRole();
 
         String accessToken = jwtUtil.generateAccessToken(socialId, role);
         String refreshToken = refreshTokenService.getRefreshToken(socialId);
@@ -44,7 +39,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             refreshTokenService.saveRefreshToken(socialId, refreshToken);
         }
 
-        response.addHeader("Authorization", accessToken);
+        response.addHeader("Authorization", "Bearer " + accessToken);
         response.addHeader("Refresh-Token", refreshToken);
 
 //        response.sendRedirect(REDIRECT_URI + accessToken);
