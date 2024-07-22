@@ -5,6 +5,7 @@ import comatching.comatching3.users.auth.oauth2.dto.KakaoUserDto;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,10 +50,13 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         } catch (ExpiredJwtException e) {
             log.info("엑세스 토큰 만료");
+        } catch (SignatureException e) {
+            log.info("엑세스 토큰 무결성 오류");
+            throw new JwtException("TOKEN_INVALID");
         } catch (JwtException e) {
             log.info("엑세스 토큰 오류");
 //            response.sendRedirect("/login");
-            throw new JwtException("INVALID");
+            throw new JwtException("TOKEN_INVALID");
         }
 
         String refreshToken = getRefreshToken(request);
@@ -80,16 +84,19 @@ public class JwtFilter extends OncePerRequestFilter {
                 } else {
                     log.info("레디스와 리프레시 토큰 다름");
 //                    response.sendRedirect("/login");
-                    throw new JwtException("INVALID");
+                    throw new JwtException("TOKEN_INVALID");
                 }
             }
         } catch (ExpiredJwtException e) {
             log.info("리프레시 토큰 만료, 로그인 페이지로 이동");
 //            response.sendRedirect("/login");
-            throw new JwtException("EXPIRED");
+            throw new JwtException("TOKEN_EXPIRED");
+        } catch (SignatureException e) {
+            log.info("리프레시 토큰 무결성 오류");
+            throw new JwtException("TOKEN_INVALID");
         } catch (JwtException e) {
             log.info("리프레시 토큰 오류");
-            throw new JwtException("INVALID");
+            throw new JwtException("TOKEN_INVALID");
         }
 
         filterChain.doFilter(request, response);
@@ -97,12 +104,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private String getAccessToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        log.info("엑세스 토큰 출력 = {}", bearerToken);
-        /*if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
-        return null;*/
-        return bearerToken;
+
+        log.info("엑세스 토큰 출력 = {}", bearerToken);
+        return null;
     }
 
     private String getRefreshToken(HttpServletRequest request) {
