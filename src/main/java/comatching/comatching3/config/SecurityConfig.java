@@ -1,7 +1,11 @@
 package comatching.comatching3.config;
 
-import comatching.comatching3.users.oauth2.handler.OAuth2SuccessHandler;
-import comatching.comatching3.users.oauth2.service.CustomOAuth2UserService;
+import comatching.comatching3.users.auth.jwt.JwtExceptionFilter;
+import comatching.comatching3.users.auth.jwt.JwtFilter;
+import comatching.comatching3.users.auth.jwt.JwtUtil;
+import comatching.comatching3.users.auth.oauth2.handler.OAuth2SuccessHandler;
+import comatching.comatching3.users.auth.oauth2.service.CustomOAuth2UserService;
+import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +27,8 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
@@ -43,21 +49,24 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
 
-//        http
-//                .addFilterAfter(new JwtFilter(jwtUtil, userService), OAuth2LoginAuthenticationFilter.class);
+        http
+                .addFilterAfter(new JwtFilter(jwtUtil, refreshTokenService), OAuth2LoginAuthenticationFilter.class)
+                        .addFilterBefore(new JwtExceptionFilter(), JwtFilter.class);
 
         http
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
+//                        .loginPage("/login-form")
                 );
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login-form").permitAll()
-                        .requestMatchers("/admin/**").hasRole("admin")
-                        .requestMatchers("/social/**").hasRole("social")
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/social/**").hasRole("SOCIAL")
+                        .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().authenticated()
                 );
 
