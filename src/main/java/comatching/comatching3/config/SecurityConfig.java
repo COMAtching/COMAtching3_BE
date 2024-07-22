@@ -1,6 +1,6 @@
 package comatching.comatching3.config;
 
-import comatching.comatching3.users.auth.jwt.JwtExceptionFilter;
+import comatching.comatching3.users.auth.exception.AuthExceptionFilter;
 import comatching.comatching3.users.auth.jwt.JwtFilter;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
 import comatching.comatching3.users.auth.oauth2.handler.OAuth2SuccessHandler;
@@ -14,6 +14,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -51,7 +53,7 @@ public class SecurityConfig {
 
         http
                 .addFilterAfter(new JwtFilter(jwtUtil, refreshTokenService), OAuth2LoginAuthenticationFilter.class)
-                        .addFilterBefore(new JwtExceptionFilter(), JwtFilter.class);
+                        .addFilterBefore(new AuthExceptionFilter(), JwtFilter.class);
 
         http
                 .oauth2Login(oauth2 -> oauth2
@@ -65,6 +67,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/operator/**").hasRole("OPERATOR")
                         .requestMatchers("/social/**").hasRole("SOCIAL")
                         .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().authenticated()
@@ -90,5 +93,10 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
