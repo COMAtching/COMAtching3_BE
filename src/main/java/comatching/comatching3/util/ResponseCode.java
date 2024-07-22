@@ -11,8 +11,13 @@ public enum ResponseCode {
 	SUCCESS(200, "GEN-000", HttpStatus.OK, "Success"),
 	GENERAL_ERROR(500, "GEN-001", HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred"),
 
-	TOKEN_EXPIRED(400, "SEC-001", HttpStatus.BAD_REQUEST, "token is expired or not available"),
-	TOKEN_NOT_AVAILABLE(400, "SEC-002", HttpStatus.BAD_REQUEST, "token is not available ");
+	//Auth response
+	ACCOUNT_ID_DUPLICATED(409, "AUTH-001", HttpStatus.CONFLICT, "AccountId is duplicated"),
+	INVALID_ADMIN_LOGIN(401, "AUTH-002", HttpStatus.UNAUTHORIZED, "Invalid AccountId or Password"),
+
+	//Security response
+	TOKEN_EXPIRED(401, "SEC-001", HttpStatus.UNAUTHORIZED, "token is expired or not available"),
+	TOKEN_NOT_AVAILABLE(401, "SEC-002", HttpStatus.UNAUTHORIZED, "token is not available");
 
 	private final Integer status;
 	private final String code;
