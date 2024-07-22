@@ -1,9 +1,10 @@
 package comatching.comatching3.util;
 
-import java.util.List;
+import java.io.IOException;
 
-import javax.swing.text.html.HTML;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -12,9 +13,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+@Slf4j
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response<T> {
 	private Integer status;
@@ -44,5 +47,10 @@ public class Response<T> {
 		response.data = null;
 		response.message = code.getMessage();
 		return response;
+	}
+
+	public String convertToJson() throws IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		return objectMapper.writeValueAsString(this);
 	}
 }
