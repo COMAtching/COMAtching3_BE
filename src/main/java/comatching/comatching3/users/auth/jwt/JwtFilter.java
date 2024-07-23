@@ -106,14 +106,15 @@ public class JwtFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader("Authorization");
 
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            log.info("엑세스 토큰 출력 = {}", bearerToken.substring(7));
             return bearerToken.substring(7);
         }
 
-        log.info("엑세스 토큰 출력 = {}", bearerToken);
         return null;
     }
 
     private String getRefreshToken(HttpServletRequest request) {
+        log.info("리프레시 토큰 출력 = {}", request.getHeader("Refresh-Token"));
         return request.getHeader("Refresh-Token");
     }
 
