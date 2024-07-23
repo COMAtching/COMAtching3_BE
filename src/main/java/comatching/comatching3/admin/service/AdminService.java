@@ -28,6 +28,11 @@ public class AdminService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
 
+    /**
+     *
+     * @param form 관리자 회원 가입에 필요한 DTO
+     */
+
     public void adminRegister(AdminRegisterForm form) {
 
         Optional<Admin> existAdmin = adminRepository.findByAccountId(form.getAccountId());
@@ -44,6 +49,7 @@ public class AdminService {
         Admin admin = Admin.builder()
                 .accountId(form.getAccountId())
                 .password(encryptedPassword)
+                .email(form.getEmail())
                 .university(university)
                 .universityAuth(form.getIsUniversityVerified())
                 .adminRole(role)
@@ -51,6 +57,12 @@ public class AdminService {
 
         adminRepository.save(admin);
     }
+
+    /**
+     *
+     * @param form 관리자 ID, PW
+     * @return ACCESS, REFRESH TOKEN
+     */
 
     public TokenDto adminLogin(AdminLoginForm form) {
 
