@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum AdminRole {
-	ADMIN("ROLE_ADMIN"),
-	OPERATOR("ROLE_OPERATOR");
+	ROLE_ADMIN("ROLE_ADMIN"),
+	ROLE_OPERATOR("ROLE_OPERATOR");
 
 	private final String roleName;
 
