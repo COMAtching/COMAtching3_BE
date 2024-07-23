@@ -1,6 +1,5 @@
 package comatching.comatching3.users.auth.jwt;
 
-import comatching.comatching3.admin.exception.AccountIdDuplicatedException;
 import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
 import io.jsonwebtoken.JwtException;
