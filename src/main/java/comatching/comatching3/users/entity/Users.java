@@ -66,13 +66,13 @@ public class Users extends BaseEntity {
 
 	private String song;
 
-	private String word;
+	private String comment;
 
 	private Integer point;
 
 
 	@Builder
-	public Users(UserAiFeature userAiFeature, University university, String socialId, String email, String role, Integer pickMe, String song, String word, Integer point) {
+	public Users(UserAiFeature userAiFeature, University university, String socialId, String email, String role, Integer pickMe, String song, String comment, Integer point) {
 		this.userAiFeature = userAiFeature;
 		this.university = university;
 		this.socialId = socialId;
@@ -80,7 +80,7 @@ public class Users extends BaseEntity {
 		this.role = role;
 		this.pickMe = pickMe;
 		this.song = song;
-		this.word = word;
+		this.comment = comment;
 		this.point = point;
 	}
 
