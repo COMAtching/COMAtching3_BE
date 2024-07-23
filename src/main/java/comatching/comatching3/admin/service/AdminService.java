@@ -6,7 +6,7 @@ import comatching.comatching3.admin.dto.TokenDto;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.admin.enums.AdminRole;
-import comatching.comatching3.admin.exception.AccountIdAlreadyExistsException;
+import comatching.comatching3.admin.exception.AccountIdDuplicatedException;
 import comatching.comatching3.admin.exception.InvalidLoginException;
 import comatching.comatching3.admin.repository.AdminRepository;
 import comatching.comatching3.admin.repository.UniversityRepository;
@@ -33,7 +33,7 @@ public class AdminService {
         Optional<Admin> existAdmin = adminRepository.findByAccountId(form.getAccountId());
 
         if (existAdmin.isPresent()) {
-            throw new AccountIdAlreadyExistsException("ACCOUNT_ID_DUPLICATED");
+            throw new AccountIdDuplicatedException("ACCOUNT_ID_DUPLICATED");
         }
 
         String encryptedPassword = passwordEncoder.encode(form.getPassword());
