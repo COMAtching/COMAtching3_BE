@@ -66,10 +66,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/admin/login", "/admin/register").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/operator/**").hasRole("OPERATOR")
-                        .requestMatchers("/social/**").hasRole("SOCIAL")
-                        .requestMatchers("/user/**").hasRole("USER")
+                        .requestMatchers("/auth/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/auth/operator/**").hasRole("OPERATOR")
+                        .requestMatchers("/auth/social/**").hasRole("SOCIAL")
+                        .requestMatchers("/auth/user/**").hasRole("USER")
                         .anyRequest().authenticated()
                 );
 
