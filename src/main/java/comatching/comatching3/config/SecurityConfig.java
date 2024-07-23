@@ -1,6 +1,6 @@
 package comatching.comatching3.config;
 
-import comatching.comatching3.users.auth.exception.AuthExceptionFilter;
+import comatching.comatching3.users.auth.jwt.JwtExceptionFilter;
 import comatching.comatching3.users.auth.jwt.JwtFilter;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
 import comatching.comatching3.users.auth.oauth2.handler.OAuth2SuccessHandler;
@@ -53,7 +53,7 @@ public class SecurityConfig {
 
         http
                 .addFilterAfter(new JwtFilter(jwtUtil, refreshTokenService), OAuth2LoginAuthenticationFilter.class)
-                        .addFilterBefore(new AuthExceptionFilter(), JwtFilter.class);
+                        .addFilterBefore(new JwtExceptionFilter(), JwtFilter.class);
 
         http
                 .oauth2Login(oauth2 -> oauth2
@@ -65,7 +65,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/login", "/admin/login", "/admin/register").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/operator/**").hasRole("OPERATOR")
                         .requestMatchers("/social/**").hasRole("SOCIAL")
