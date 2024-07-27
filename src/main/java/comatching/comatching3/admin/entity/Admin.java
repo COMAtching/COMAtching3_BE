@@ -37,14 +37,17 @@ public class Admin extends BaseEntity {
 
 	private String password;
 
+	private String email;
+
 	private Boolean universityAuth = false;
 
 	@Builder
-	public Admin(University university, AdminRole adminRole, String accountId, String password, Boolean universityAuth) {
+	public Admin(University university, AdminRole adminRole, String accountId, String password, String email, Boolean universityAuth) {
 		this.university = university;
 		this.adminRole = adminRole;
 		this.accountId = accountId;
 		this.password = password;
+		this.email = email;
 		this.universityAuth = universityAuth;
 	}
 }
