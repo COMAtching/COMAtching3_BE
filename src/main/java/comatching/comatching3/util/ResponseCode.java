@@ -18,7 +18,7 @@ public enum ResponseCode {
 	USER_NOT_FOUND(404, "AUTH-003", HttpStatus.NOT_FOUND, "Cannot found user or userId"),
 
 	//Security response
-	TOKEN_EXPIRED(401, "SE제C-001", HttpStatus.UNAUTHORIZED, "token is expired or not available"),
+	TOKEN_EXPIRED(401, "SEC-001", HttpStatus.UNAUTHORIZED, "token is expired or not available"),
 	TOKEN_NOT_AVAILABLE(401, "SEC-002", HttpStatus.UNAUTHORIZED, "token is not available"),
 
 	ARGUMENT_NOT_VALID(400, "VAL-001", HttpStatus.BAD_REQUEST, "Argument not valid");
