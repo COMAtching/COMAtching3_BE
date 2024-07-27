@@ -31,6 +31,8 @@ public class University extends BaseEntity {
 	@OneToMany(mappedBy = "university", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Admin> admins;
 
+	private String universityName;
+
 	private String mailDomain;
 
 	private String s3Key;
@@ -38,7 +40,8 @@ public class University extends BaseEntity {
 	private String appName;
 
 	@Builder
-	public University(String mailDomain, String s3Key, String appName) {
+	public University(String universityName, String mailDomain, String s3Key, String appName) {
+		this.universityName = universityName;
 		this.mailDomain = mailDomain;
 		this.s3Key = s3Key;
 		this.appName = appName;
