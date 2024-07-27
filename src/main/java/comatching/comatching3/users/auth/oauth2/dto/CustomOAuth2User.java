@@ -3,6 +3,7 @@ package comatching.comatching3.users.auth.oauth2.dto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.Collection;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class CustomOAuth2User implements OAuth2User {
+public class CustomOAuth2User implements OAuth2User, UserDetails {
 
     private final KakaoUserDto kakaoUserDto;
 
@@ -28,10 +29,20 @@ public class CustomOAuth2User implements OAuth2User {
 
     @Override
     public String getName() {
-        return kakaoUserDto.getSocialId();
+        return kakaoUserDto.getUuid();
     }
 
     public String getRole() {
         return kakaoUserDto.getRole();
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return kakaoUserDto.getUuid();
     }
 }
