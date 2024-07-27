@@ -3,7 +3,7 @@ package comatching.comatching3.admin.dto;
 import lombok.Getter;
 
 @Getter
-public class AdminRegisterForm {
+public class AdminRegisterReq {
     private String accountId;
     private String password;
     private String email;
