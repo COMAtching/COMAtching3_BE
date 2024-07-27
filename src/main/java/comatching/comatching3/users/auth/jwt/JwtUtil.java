@@ -20,7 +20,7 @@ public class JwtUtil {
 
     public static final long REFRESH_TOKEN_EXPIRATION = TimeUnit.DAYS.toMillis(1);
 //    public static final long ACCESS_TOKEN_EXPIRATION = TimeUnit.HOURS.toMillis(1);
-    public static final long ACCESS_TOKEN_EXPIRATION = TimeUnit.MINUTES.toMillis(1);
+    public static final long ACCESS_TOKEN_EXPIRATION = TimeUnit.MINUTES.toMillis(2);
 
 
     public JwtUtil(@Value("${jwt.secret}") String secret) {
@@ -35,13 +35,13 @@ public class JwtUtil {
         }
     }
 
-    public String getSocialId(String token) {
+    public String getUUID(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .get("socialId", String.class);
+                .get("uuid", String.class);
     }
 
     public String getRole(String token) {
@@ -62,16 +62,16 @@ public class JwtUtil {
                 .getExpiration()
                 .before(new Date());
     }
-    public String generateAccessToken(String socialId, String role) {
-        return generateToken(socialId, role, ACCESS_TOKEN_EXPIRATION);
+    public String generateAccessToken(String uuid, String role) {
+        return generateToken(uuid, role, ACCESS_TOKEN_EXPIRATION);
     }
-    public String generateRefreshToken(String socialId, String role) {
-        return generateToken(socialId, role, REFRESH_TOKEN_EXPIRATION);
+    public String generateRefreshToken(String uuid, String role) {
+        return generateToken(uuid, role, REFRESH_TOKEN_EXPIRATION);
     }
 
-    public String generateToken(String socialId, String role, long expiredMs) {
+    public String generateToken(String uuid, String role, long expiredMs) {
         return Jwts.builder()
-                .claim("socialId", socialId)
+                .claim("uuid", uuid)
                 .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
