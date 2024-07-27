@@ -51,4 +51,6 @@ public class UserAiFeature {
 
 	@Enumerated(EnumType.STRING)
 	private Major major;
+
+	private Integer admissionYear;
 }

@@ -5,8 +5,7 @@ import lombok.Getter;
 @Getter
 public enum Role {
 	SOCIAL("ROLE_SOCIAL"),
-	USER("ROLE_USER"),
-	ADMIN("ROLE_ADMIN");
+	USER("ROLE_USER");
 
 	private final String roleName;
 
