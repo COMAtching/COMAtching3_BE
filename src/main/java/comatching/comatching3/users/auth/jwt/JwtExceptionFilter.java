@@ -40,7 +40,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             res = Response.errorResponse(ResponseCode.TOKEN_NOT_AVAILABLE);
             log.info("[JwtExceptionFilter] - INVALID");
         } else {
-            res = Response.errorResponse(ResponseCode.GENERAL_ERROR);
+            res = Response.errorResponse(ResponseCode.INTERNAL_SERVER_ERROR);
             log.info("[JwtExceptionFilter] - GENERAL_ERROR");
         }
 

@@ -28,15 +28,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomOAuth2User user = (CustomOAuth2User) authentication.getPrincipal();
-        String socialId = user.getName();
+        String uuid = user.getName();
         String role = user.getRole();
 
-        String accessToken = jwtUtil.generateAccessToken(socialId, role);
-        String refreshToken = refreshTokenService.getRefreshToken(socialId);
+        String accessToken = jwtUtil.generateAccessToken(uuid, role);
+        String refreshToken = refreshTokenService.getRefreshToken(uuid);
 
         if (refreshToken == null) {
-            refreshToken = jwtUtil.generateRefreshToken(socialId, role);
-            refreshTokenService.saveRefreshToken(socialId, refreshToken);
+            refreshToken = jwtUtil.generateRefreshToken(uuid, role);
+            refreshTokenService.saveRefreshToken(uuid, refreshToken);
         }
 
         response.addHeader("Authorization", "Bearer " + accessToken);

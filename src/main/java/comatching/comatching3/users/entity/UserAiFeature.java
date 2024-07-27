@@ -5,7 +5,6 @@ import java.util.List;
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.Hobby;
-import comatching.comatching3.users.enums.Major;
 import comatching.comatching3.util.HobbyListConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -18,9 +17,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 
 @Entity
 @Getter
@@ -31,6 +34,8 @@ public class UserAiFeature {
 	@Column(name = "user_ai_feature_id")
 	private Long id;
 
+	@Column(columnDefinition = "BINARY(16)")
+	private byte[] uuid;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "users_id")
@@ -44,13 +49,49 @@ public class UserAiFeature {
 	@Convert(converter = HobbyListConverter.class)
 	private List<Hobby> hobby;
 
+	@Min(20) @Max(30)
 	private Integer age;
 
 	@Enumerated(EnumType.STRING)
 	private Gender gender;
 
-	@Enumerated(EnumType.STRING)
-	private Major major;
+	private String  major;
 
 	private Integer admissionYear;
+
+
+	@Builder
+	public UserAiFeature(byte[] uuid, Users users) {
+		this.uuid = uuid;
+		this.users = users;
+	}
+
+	public void updateMbti(String mbti) {
+		this.mbti = mbti;
+	}
+
+	public void updateContactFrequency(ContactFrequency contactFrequency) {
+		this.contactFrequency = contactFrequency;
+	}
+
+	public void updateHobby(List<Hobby> hobby) {
+		this.hobby = hobby;
+	}
+
+	public void updateAge(Integer age) {
+		this.age = age;
+	}
+
+	public void updateGender(Gender gender) {
+		this.gender = gender;
+	}
+
+	public void updateMajor(String major) {
+		this.major = major;
+	}
+
+	public void updateAdmissionYear(Integer admissionYear) {
+		this.admissionYear = admissionYear;
+	}
+
 }
