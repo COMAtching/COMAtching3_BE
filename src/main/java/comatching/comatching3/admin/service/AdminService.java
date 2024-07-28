@@ -1,8 +1,8 @@
 package comatching.comatching3.admin.service;
 
-import comatching.comatching3.admin.dto.AdminLoginForm;
-import comatching.comatching3.admin.dto.AdminRegisterForm;
-import comatching.comatching3.admin.dto.TokenDto;
+import comatching.comatching3.admin.dto.AdminLoginReq;
+import comatching.comatching3.admin.dto.AdminRegisterReq;
+import comatching.comatching3.admin.dto.TokenRes;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.admin.enums.AdminRole;
@@ -33,7 +33,7 @@ public class AdminService {
      * @param form 관리자 회원 가입에 필요한 DTO
      */
 
-    public void adminRegister(AdminRegisterForm form) {
+    public void adminRegister(AdminRegisterReq form) {
 
         Optional<Admin> existAdmin = adminRepository.findByAccountId(form.getAccountId());
 
@@ -64,7 +64,7 @@ public class AdminService {
      * @return ACCESS, REFRESH TOKEN
      */
 
-    public TokenDto adminLogin(AdminLoginForm form) {
+    public TokenRes adminLogin(AdminLoginReq form) {
 
         Optional<Admin> existAdmin = adminRepository.findByAccountId(form.getAccountId());
 
@@ -86,7 +86,7 @@ public class AdminService {
             refreshTokenService.saveRefreshToken(admin.getAccountId(), refreshToken);
         }
 
-        return TokenDto.builder()
+        return TokenRes.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

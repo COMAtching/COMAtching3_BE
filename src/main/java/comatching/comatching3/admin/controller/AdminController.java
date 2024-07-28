@@ -1,8 +1,8 @@
 package comatching.comatching3.admin.controller;
 
-import comatching.comatching3.admin.dto.AdminLoginForm;
-import comatching.comatching3.admin.dto.AdminRegisterForm;
-import comatching.comatching3.admin.dto.TokenDto;
+import comatching.comatching3.admin.dto.AdminLoginReq;
+import comatching.comatching3.admin.dto.AdminRegisterReq;
+import comatching.comatching3.admin.dto.TokenRes;
 import comatching.comatching3.admin.service.AdminService;
 import comatching.comatching3.util.Response;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,16 +20,16 @@ public class AdminController {
     private final AdminService adminService;
 
     @PostMapping("/register")
-    public Response<?> adminRegister(@RequestBody AdminRegisterForm form) {
+    public Response<?> adminRegister(@RequestBody AdminRegisterReq form) {
         adminService.adminRegister(form);
         return Response.ok();
     }
 
     @PostMapping("/login")
-    public Response<?> adminLogin(@RequestBody AdminLoginForm form,
+    public Response<?> adminLogin(@RequestBody AdminLoginReq form,
                            HttpServletResponse response) {
 
-        TokenDto tokens = adminService.adminLogin(form);
+        TokenRes tokens = adminService.adminLogin(form);
 
         response.addHeader("Authorization", "Bearer " + tokens.getAccessToken());
         response.addHeader("Refresh-Token", tokens.getRefreshToken());

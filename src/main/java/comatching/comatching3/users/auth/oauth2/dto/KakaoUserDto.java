@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class KakaoUserDto {
-    private String socialId;
+    private String uuid;
     private String role;
+    private String nickname;
 }

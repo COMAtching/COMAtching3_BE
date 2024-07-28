@@ -58,35 +58,57 @@ public class Users extends BaseEntity {
 
 	private String socialId;
 
+	private String username;
+
 	private String email;
 
 	private String role;
 
-	private Integer pickMe;
+	private Integer pickMe = 0;
 
 	private String song;
 
 	private String comment;
 
-	private Integer point;
+	private Integer point = 0;
 
 
 	@Builder
-	public Users(UserAiFeature userAiFeature, University university, String socialId, String email, String role, Integer pickMe, String song, String comment, Integer point) {
-		this.userAiFeature = userAiFeature;
-		this.university = university;
+	public Users(String socialId, String role, String username) {
 		this.socialId = socialId;
-		this.email = email;
 		this.role = role;
-		this.pickMe = pickMe;
-		this.song = song;
-		this.comment = comment;
-		this.point = point;
+		this.username = username;
 	}
 
-	@Builder
-	public Users(String socialId, String role) {
-		this.socialId = socialId;
+	public void updateUserAiFeature(UserAiFeature userAiFeature) {
+		this.userAiFeature = userAiFeature;
+	}
+
+	public void updateUniversity(University university) {
+		this.university = university;
+	}
+
+	public void updateEmail(String email) {
+		this.email = email;
+	}
+
+	public void updateRole(String role) {
 		this.role = role;
+	}
+
+	public void updatePickMe(Integer pickMe) {
+		this.pickMe = pickMe;
+	}
+
+	public void updateSong(String song) {
+		this.song = song;
+	}
+
+	public void updateComment(String comment) {
+		this.comment = comment;
+	}
+
+	public void updatePoint(Integer point) {
+		this.point = point;
 	}
 }

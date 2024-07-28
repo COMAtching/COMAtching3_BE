@@ -27,4 +27,7 @@ public class KakaoResponse implements OAuth2Response{
         return attributes.get("id").toString();
     }
 
+    public String getNickname() {
+        return profileAttributes.get("nickname").toString();
+    }
 }
