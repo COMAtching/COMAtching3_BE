@@ -4,6 +4,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Optional;
+
 public class SecurityUtil {
 
     /**
@@ -20,14 +22,11 @@ public class SecurityUtil {
 
     /**
      *
-     * @return 현재 로그인 한 유저의 ID
+     * @return 현재 로그인 한 유저의 UUID
      */
-    public static String getCurrentUserId() {
+    public static Optional<String> getCurrentUserUUID() {
         UserDetails userDetails = getCurrentUserDetails();
-        if (userDetails != null) {
-            return userDetails.getUsername();
-        }
-        return null;
+        return Optional.ofNullable(userDetails).map(UserDetails::getUsername);
     }
 
     /**

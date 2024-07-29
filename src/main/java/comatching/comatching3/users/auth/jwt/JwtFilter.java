@@ -31,8 +31,9 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        log.info("요청 URL = {}", request.getRequestURI());
-        if (request.getRequestURI().equals("/login")) {
+        String requestURI = request.getRequestURI();
+        log.info("요청 URL = {}", requestURI);
+        if (requestURI.equals("/login") || requestURI.startsWith("/api/match/")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -64,7 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             if (refreshToken != null && !jwtUtil.isExpired(refreshToken)) {
                 log.info("헤더 리프레시 토큰 유효");
-                String socialId = jwtUtil.getSocialId(refreshToken);
+                String socialId = jwtUtil.getUUID(refreshToken);
                 String role = jwtUtil.getRole(refreshToken);
                 String redisRefreshToken = refreshTokenService.getRefreshToken(socialId);
 
@@ -119,11 +120,11 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private void setAuthentication(String accessToken) {
-        String socialId = jwtUtil.getSocialId(accessToken);
+        String uuid = jwtUtil.getUUID(accessToken);
         String role = jwtUtil.getRole(accessToken);
 
         KakaoUserDto kakaoUserDto = new KakaoUserDto();
-        kakaoUserDto.setSocialId(socialId);
+        kakaoUserDto.setUuid(uuid);
         kakaoUserDto.setRole(role);
 
         CustomOAuth2User customOAuth2User = new CustomOAuth2User(kakaoUserDto);
