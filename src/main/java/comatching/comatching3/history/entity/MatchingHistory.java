@@ -4,8 +4,8 @@ import java.util.List;
 
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.Hobby;
-import comatching.comatching3.process_ai.AgeOption;
-import comatching.comatching3.process_ai.ContactFrequencyOption;
+import comatching.comatching3.match.AgeOption;
+import comatching.comatching3.match.ContactFrequencyOption;
 import comatching.comatching3.util.HobbyListConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
