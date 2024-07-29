@@ -36,4 +36,14 @@ public class UserController {
         UserInfoRes userInfo = userService.getUserInfo();
         return Response.ok(userInfo);
     }
+
+    /**
+     * 유저 포인트 조회
+     * @return 유저 포인트
+     */
+    @GetMapping("/api/user/points")
+    public Response<?> getPoints() {
+        Integer points = userService.getPoints();
+        return Response.ok("point : " + points);
+    }
 }
