@@ -1,8 +1,8 @@
 package comatching.comatching3.admin.controller;
 
-import comatching.comatching3.admin.dto.AdminLoginReq;
-import comatching.comatching3.admin.dto.AdminRegisterReq;
-import comatching.comatching3.admin.dto.TokenRes;
+import comatching.comatching3.admin.dto.request.AdminLoginReq;
+import comatching.comatching3.admin.dto.request.AdminRegisterReq;
+import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.admin.service.AdminService;
 import comatching.comatching3.util.Response;
 import jakarta.servlet.http.HttpServletResponse;
