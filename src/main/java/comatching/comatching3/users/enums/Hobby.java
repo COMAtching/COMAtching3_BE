@@ -34,22 +34,7 @@ public enum Hobby {
 		this.value = value;
 	}
 
-	public static String toCsvValue(List<Hobby> hobbies) {
-		StringBuilder result = new StringBuilder();
-		if (hobbies == null || hobbies.get(0).equals(Hobby.NONE)) {
-			return "";
-		} else {
-			for (Hobby hobby : hobbies) {
-				result.append(hobby.getVector().toString()).append("_");
-			}
-		}
-
-		System.out.println("[Hobby] - toCscValue().result =" + result);
-
-		return result.toString();
-	}
-
-	@JsonCreator
+ 	@JsonCreator
 	public static Hobby from(String value) {
 		for (Hobby hobby : Hobby.values()) {
 			if (hobby.getValue().equals(value)) {
