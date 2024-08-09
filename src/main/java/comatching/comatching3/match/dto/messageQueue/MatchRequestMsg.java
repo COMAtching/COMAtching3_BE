@@ -8,12 +8,12 @@ public class MatchRequestMsg extends MatchReq {
 	private String requestId;
 
 	public MatchRequestMsg(MatchReq matchReq, String requestId){
-		super.mbti = matchReq.getMbti();
-		super.ageOption = matchReq.getAgeOption();
-		super.uuid = matchReq.getUuid();
-		super.hobbyOption = matchReq.getHobbyOption();
-		super.contactFrequency = matchReq.getContactFrequency();
-		super.sameMajorOption = matchReq.getSameMajorOption();
+		this.mbti = matchReq.getMbti();
+		this.ageOption = matchReq.getAgeOption();
+		this.uuid = matchReq.getUuid();
+		this.hobbyOption = matchReq.getHobbyOption();
+		this.contactFrequencyOption = matchReq.getContactFrequencyOption();
+		this.sameMajorOption = matchReq.getSameMajorOption();
 		this.requestId = requestId;
 	}
 }
