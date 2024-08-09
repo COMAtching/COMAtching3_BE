@@ -1,14 +1,10 @@
 package comatching.comatching3.util.RabbitMQ;
 
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
-import comatching.comatching3.match.dto.response.MatchRes;
 
 @Component
 public class RabbitMQUtil {

@@ -1,26 +1,20 @@
 package comatching.comatching3.util.RabbitMQ;
 
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.CorrelationDataPostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.match.dto.request.MatchReq;
+import comatching.comatching3.match.dto.response.MatchRes;
 import comatching.comatching3.util.ResponseCode;
 
 
@@ -40,7 +34,7 @@ public class MatchRabbitMQUtil {
 	 * @param requestId : 매칭 요청 고유 id
 	 * @return : 결과로 나온 유저의 uuid
 	 */
-	public String match(MatchReq matchReq, String requestId) {
+	public MatchResponseMsg match(MatchReq matchReq, String requestId) {
 		MatchRequestMsg requestMsg = new MatchRequestMsg(matchReq, requestId);
 
 		// 메시지를 큐에 보냄
@@ -54,7 +48,7 @@ public class MatchRabbitMQUtil {
 		try{
 			MatchResponseMsg response = responseQueue.poll(10, TimeUnit.SECONDS);
 			if (response != null && response.getRequestId().equals(requestId)) {
-				return response.getUuid();
+				return response;
 			}
 			else {
 				throw new BusinessException(ResponseCode.MATCH_GENERAL_FAIL);
@@ -74,7 +68,6 @@ public class MatchRabbitMQUtil {
 	 */
 	@RabbitListener(queues = "match-response")
 	public void handleResponse(MatchResponseMsg response){
-
 		BlockingQueue<MatchResponseMsg> queue = responseMap.get(response.getRequestId());
 		queue.offer(response);
 	}

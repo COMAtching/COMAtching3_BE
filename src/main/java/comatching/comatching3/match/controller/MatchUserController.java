@@ -11,6 +11,7 @@ import comatching.comatching3.match.dto.request.MatchReq;
 import comatching.comatching3.match.dto.response.MatchRes;
 import comatching.comatching3.match.service.MatchService;
 import comatching.comatching3.util.Response;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/match/")
@@ -25,7 +26,7 @@ public class MatchUserController {
 
 
 	@PostMapping("match-request")
-	public Response<Void> requestMatch(@RequestBody MatchReq req){
+	public Response<Void> requestMatch(@RequestBody @Valid MatchReq req){
 		return matchService.requestMatch(req);
 	}
 }
