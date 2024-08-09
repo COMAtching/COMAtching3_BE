@@ -24,7 +24,7 @@ public enum Hobby {
 	ott시청(13, "ott시청"),
 	게임(14, "게임"),
 	독서(15, "독서"),
-	NONE(-1, "NONE");
+	UNSELECTED(-1, "UNSELECTED");
 
 	private final Integer vector;
 	private final String value;

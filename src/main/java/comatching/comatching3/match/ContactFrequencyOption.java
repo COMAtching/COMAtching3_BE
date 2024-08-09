@@ -4,6 +4,6 @@ public enum ContactFrequencyOption {
 	FREQUENT,
 	NORMAL,
 	NOT_FREQUENT,
-	NONE;
+	UNSELECTED;
 
 }

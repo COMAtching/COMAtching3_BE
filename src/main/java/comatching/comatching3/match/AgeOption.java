@@ -4,6 +4,6 @@ public enum AgeOption {
 	YOUNGER,
 	EQUAL,
 	OLDER,
-	NONE;
+	UNSELECTED;
 
 }
