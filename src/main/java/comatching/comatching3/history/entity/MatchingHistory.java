@@ -2,6 +2,7 @@ package comatching.comatching3.history.entity;
 
 import java.util.List;
 
+import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.match.AgeOption;
@@ -19,6 +20,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -52,5 +54,25 @@ public class MatchingHistory {
 	private List<Hobby> hobbyOption;
 
 	private Boolean noSameMajorOption;
+
+	@Builder
+	public MatchingHistory(Users applier, Users enemy, String mbtiOption, AgeOption ageOption, ContactFrequencyOption contactFrequencyOption, List<Hobby> hobbyOption, Boolean noSameMajorOption){
+		this.applier = applier;
+		this.enemy = enemy;
+		this.mbtiOption = mbtiOption;
+		this.ageOption = ageOption;
+		this.contactFrequencyOption = contactFrequencyOption;
+		this.hobbyOption = hobbyOption;
+		this.noSameMajorOption = noSameMajorOption;
+
+	}
+
+	public void updateOptionsFromRequestMsg(MatchRequestMsg matchRequestMsg){
+		this.noSameMajorOption = matchRequestMsg.getSameMajorOption();
+		this.hobbyOption = matchRequestMsg.getHobbyOption();
+		this.ageOption = matchRequestMsg.getAgeOption();
+		this.mbtiOption = matchRequestMsg.getMbti();
+		this.contactFrequencyOption = matchRequestMsg.getContactFrequencyOption();
+	}
 
 }
