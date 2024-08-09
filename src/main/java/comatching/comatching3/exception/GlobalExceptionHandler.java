@@ -37,4 +37,9 @@ public class GlobalExceptionHandler {
         }
         return Response.errorResponse(ResponseCode.ARGUMENT_NOT_VALID);
     }
+
+    @ExceptionHandler(BusinessException.class)
+    public Response<ResponseCode> handleCustomException(BusinessException ex) {
+        return new Response<>(ex.getResponseCode());
+    }
 }

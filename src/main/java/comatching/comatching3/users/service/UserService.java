@@ -77,6 +77,15 @@ public class UserService {
                 .build();
     }
 
+    /**
+     * 유저 포인트 조회
+     * @return 유저 포인트
+     */
+    public Integer getPoints() {
+        Users user = getUsersFromContext();
+        return user.getPoint();
+    }
+
     private Users getUsersFromContext() {
         Optional<String> userUUIDOptional = SecurityUtil.getCurrentUserUUID();
 

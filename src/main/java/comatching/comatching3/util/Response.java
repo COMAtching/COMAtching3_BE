@@ -49,6 +49,13 @@ public class Response<T> {
 		return response;
 	}
 
+	public Response(ResponseCode responseCode){
+		this.code = responseCode.getCode();
+		this.status = responseCode.getStatus();
+		this.message = responseCode.getMessage();
+		this.data = null;
+	}
+
 	public String convertToJson() throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		return objectMapper.writeValueAsString(this);

@@ -31,8 +31,9 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        log.info("요청 URL = {}", request.getRequestURI());
-        if (request.getRequestURI().equals("/login")) {
+        String requestURI = request.getRequestURI();
+        log.info("요청 URL = {}", requestURI);
+        if (requestURI.equals("/login") || requestURI.startsWith("/api/match/")) {
             filterChain.doFilter(request, response);
             return;
         }

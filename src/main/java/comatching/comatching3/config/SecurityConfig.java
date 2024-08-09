@@ -65,7 +65,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/admin/login", "/admin/register").permitAll()
+                        .requestMatchers("/login", "/admin/login", "/admin/register", "/api/match/**").permitAll()
                         .requestMatchers("/auth/admin/**").hasRole("ADMIN")
                         .requestMatchers("/auth/operator/**").hasRole("OPERATOR")
                         .requestMatchers("/auth/social/**").hasRole("SOCIAL")
