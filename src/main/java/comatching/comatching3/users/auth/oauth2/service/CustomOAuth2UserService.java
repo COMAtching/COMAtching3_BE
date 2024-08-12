@@ -2,7 +2,7 @@ package comatching.comatching3.users.auth.oauth2.service;
 
 import comatching.comatching3.users.auth.oauth2.dto.CustomOAuth2User;
 import comatching.comatching3.users.auth.oauth2.dto.KakaoResponse;
-import comatching.comatching3.users.auth.oauth2.dto.KakaoUserDto;
+import comatching.comatching3.users.auth.oauth2.dto.UserDto;
 import comatching.comatching3.users.auth.oauth2.dto.OAuth2Response;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
@@ -45,7 +45,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String username = oAuth2Response.getNickname();
 
         Optional<Users> user = usersRepository.findBySocialId(socialId);
-        KakaoUserDto kakaoUserDto;
+        UserDto userDto;
 
 
         if (user.isEmpty()) {
@@ -66,7 +66,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             usersRepository.save(newUser);
             userAiFeatureRepository.save(userAiFeature);
 
-            kakaoUserDto = KakaoUserDto.builder()
+            userDto = UserDto.builder()
                     .uuid(UUIDUtil.bytesToHex(uuid))
                     .role(newUser.getRole())
                     .nickname(username)
@@ -75,13 +75,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             Users existUser = user.get();
             byte[] uuid = existUser.getUserAiFeature().getUuid();
 
-            kakaoUserDto = KakaoUserDto.builder()
+            userDto = UserDto.builder()
                     .uuid(UUIDUtil.bytesToHex(uuid))
                     .role(user.get().getRole())
                     .nickname(username)
                     .build();
         }
 
-        return new CustomOAuth2User(kakaoUserDto);
+        return new CustomOAuth2User(userDto);
     }
 }
