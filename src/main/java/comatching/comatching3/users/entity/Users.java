@@ -72,6 +72,8 @@ public class Users extends BaseEntity {
 
 	private Integer point = 0;
 
+	private String schoolMail;
+
 
 	@Builder
 	public Users(String socialId, String role, String username) {
