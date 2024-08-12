@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
 public class UniversityController {
 
     private final UniversityService universityService;
