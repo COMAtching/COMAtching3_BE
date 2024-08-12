@@ -26,6 +26,9 @@ public class Admin extends BaseEntity {
 	@Id
 	private Long id;
 
+	@Column(columnDefinition = "BINARY(16)")
+	private byte[] uuid;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "university_id")
 	private University university;
@@ -37,17 +40,35 @@ public class Admin extends BaseEntity {
 
 	private String password;
 
-	private String email;
+	private String nickname;
+
+	private String schoolEmail;
 
 	private Boolean universityAuth = false;
 
+	private Boolean isEmailVerified = false;
+
+	private String contactEmail;
+
 	@Builder
-	public Admin(University university, AdminRole adminRole, String accountId, String password, String email, Boolean universityAuth) {
-		this.university = university;
+	public Admin(byte[] uuid,String nickname, AdminRole adminRole, String accountId, String password, University university) {
+		this.uuid = uuid;
+		this.nickname = nickname;
 		this.adminRole = adminRole;
 		this.accountId = accountId;
 		this.password = password;
-		this.email = email;
-		this.universityAuth = universityAuth;
+		this.university = university;
+	}
+
+	public void changeAdminRole(AdminRole adminRole) {
+		this.adminRole = adminRole;
+	}
+
+	public void emailVerifiedSuccess() {
+		isEmailVerified = true;
+	}
+
+	public void setSchoolEmail(String schoolEmail) {
+		this.schoolEmail = schoolEmail;
 	}
 }
