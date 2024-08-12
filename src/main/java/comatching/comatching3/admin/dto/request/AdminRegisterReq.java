@@ -6,8 +6,6 @@ import lombok.Getter;
 public class AdminRegisterReq {
     private String accountId;
     private String password;
-    private String email;
-    private String universityName;
-    private Boolean isUniversityVerified;
     private String role;
+    private String university;
 }
