@@ -13,7 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomOAuth2User implements OAuth2User, UserDetails {
 
-    private final KakaoUserDto kakaoUserDto;
+    private final UserDto userDto;
 
     @Override
     public Map<String, Object> getAttributes() {
@@ -23,17 +23,17 @@ public class CustomOAuth2User implements OAuth2User, UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(kakaoUserDto.getRole()));
+        authorities.add(new SimpleGrantedAuthority(userDto.getRole()));
         return authorities;
     }
 
     @Override
     public String getName() {
-        return kakaoUserDto.getUuid();
+        return userDto.getUuid();
     }
 
     public String getRole() {
-        return kakaoUserDto.getRole();
+        return userDto.getRole();
     }
 
     @Override
@@ -43,6 +43,6 @@ public class CustomOAuth2User implements OAuth2User, UserDetails {
 
     @Override
     public String getUsername() {
-        return kakaoUserDto.getUuid();
+        return userDto.getUuid();
     }
 }
