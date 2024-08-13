@@ -4,6 +4,7 @@ import comatching.comatching3.admin.dto.request.AdminLoginReq;
 import comatching.comatching3.admin.dto.request.AdminRegisterReq;
 import comatching.comatching3.admin.dto.request.EmailVerifyReq;
 import comatching.comatching3.admin.dto.request.SchoolEmailReq;
+import comatching.comatching3.admin.dto.response.AdminInfoRes;
 import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.entity.University;
@@ -147,14 +148,43 @@ public class AdminService {
         return false;
     }
 
+    public AdminInfoRes getAdminInfo() {
+        Admin admin = getAdminFromContext();
+
+        return AdminInfoRes.builder()
+                .accountId(admin.getAccountId())
+                .nickname(admin.getNickname())
+                .university(admin.getUniversity().getUniversityName())
+                .schoolEmail(admin.getSchoolEmail())
+                .contactEmail(admin.getContactEmail().orElse(null))
+                .universityAuth(admin.getUniversityAuth())
+                .accountIdChanged(admin.getAccountIdChanged())
+                .appName(admin.getUniversity().getAppName())
+                .build();
+
+    }
+
     public Boolean checkEmailDuplicate(String schoolEmail) {
         return adminRepository.existsBySchoolEmail(schoolEmail);
+    }
+
+    public Boolean checkEmailDomain(String schoolEmail) {
+        String mailDomain = getAdminFromContext().getUniversity().getMailDomain();
+
+        String[] emailParts = schoolEmail.split("@");
+
+        if (emailParts.length != 2) {
+            return false;
+        }
+
+        String domain = emailParts[1];
+        return domain.equalsIgnoreCase(mailDomain);
     }
 
 
     private Admin getAdminFromContext() {
         String adminUuid = SecurityUtil.getCurrentUserUUID()
-                .orElseThrow(() -> new UserNotFoundException("AdminId not found"));
+                .orElseThrow(() -> new UserNotFoundException("Admin not found"));
 
         return adminRepository.findByUuid(UUIDUtil.uuidStringToBytes(adminUuid))
                 .orElseThrow(() -> new UserNotFoundException("Admin not found"));

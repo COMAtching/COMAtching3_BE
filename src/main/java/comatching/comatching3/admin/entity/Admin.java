@@ -17,6 +17,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -48,7 +50,9 @@ public class Admin extends BaseEntity {
 
 	private Boolean isEmailVerified = false;
 
-	private String contactEmail;
+	private String contactEmail = null;
+
+	private Boolean accountIdChanged = false;
 
 	@Builder
 	public Admin(byte[] uuid,String nickname, AdminRole adminRole, String accountId, String password, University university) {
@@ -70,5 +74,9 @@ public class Admin extends BaseEntity {
 
 	public void setSchoolEmail(String schoolEmail) {
 		this.schoolEmail = schoolEmail;
+	}
+
+	public Optional<String> getContactEmail() {
+		return Optional.ofNullable(contactEmail);
 	}
 }
