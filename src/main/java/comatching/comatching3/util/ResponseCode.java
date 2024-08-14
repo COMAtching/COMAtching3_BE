@@ -21,6 +21,10 @@ public enum ResponseCode {
 	TOKEN_EXPIRED(401, "SEC-001", HttpStatus.UNAUTHORIZED, "token is expired or not available"),
 	TOKEN_NOT_AVAILABLE(401, "SEC-002", HttpStatus.UNAUTHORIZED, "token is not available"),
 
+	//User Exception
+	USER_REGISTER_FAIL(400, "USR-001", HttpStatus.BAD_REQUEST, "User register is fail"),
+
+	//Validation exception response
 	ARGUMENT_NOT_VALID(400, "VAL-001", HttpStatus.BAD_REQUEST, "Argument not valid"),
 
 	//Match service exception response
