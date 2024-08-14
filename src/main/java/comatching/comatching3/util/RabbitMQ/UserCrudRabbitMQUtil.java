@@ -23,9 +23,11 @@ public class UserCrudRabbitMQUtil {
 	private String userCrudCompensation;
 
 	private final RabbitTemplate rabbitTemplate;
+	private final RabbitMQUtil rabbitMQUtil;
 
-	public UserCrudRabbitMQUtil(RabbitTemplate rabbitTemplate){
+	public UserCrudRabbitMQUtil(RabbitTemplate rabbitTemplate, RabbitMQUtil rabbitMQUtil){
 		this.rabbitTemplate = rabbitTemplate;
+		this.rabbitMQUtil = rabbitMQUtil;
 	}
 
 	/**
@@ -33,12 +35,12 @@ public class UserCrudRabbitMQUtil {
 	 * @param users : CSV에 반영하려는 타겟 Users
 	 * @param type : CSV 반영 방법 (UserCrudType 참고)
 	 */
-	public void sendUserChange(Users users, UserCrudType type){
+	public boolean sendUserChange(Users users, UserCrudType type){
 		CorrelationData correlationData = new CorrelationData();
 		UserCrudMsg userCrudMsg = UserCrudMsg.fromUserAIFeatureAndType(type, users.getUserAiFeature());
 
 		rabbitTemplate.convertAndSend(userCrudQueue,userCrudMsg, correlationData);
 
-		checkAcknowledge(correlationData, userCrudMsg.getUuid());
+		return rabbitMQUtil.checkAcknowledge(correlationData, userCrudMsg.getUuid());
 	}
 }

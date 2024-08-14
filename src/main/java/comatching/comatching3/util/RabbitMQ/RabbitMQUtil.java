@@ -33,7 +33,7 @@ public class RabbitMQUtil {
 	 * CorrelationData를 가지고 ACK, NACK를 반환받고 메세지 큐에 잘 삽입되었는지 확인
 	 * @param correlationData : publish한 Message의 CorrelationData
 	 */
-	public static void checkAcknowledge(CorrelationData correlationData, String uuid) {
+	public boolean checkAcknowledge(CorrelationData correlationData, String uuid) {
 		try {
 			if(!correlationData.getFuture().get(10, TimeUnit.SECONDS).isAck()){
 				ReturnedMessage message = correlationData.getReturned();
@@ -41,10 +41,12 @@ public class RabbitMQUtil {
 				log.warn("Reply Code: {}, Reply Text: {}, Exchange: {}, Routing Key: {}", message.getReplyCode(), message.getReplyText(), message.getExchange(), message.getRoutingKey());
 
 				// todo : response 코드 추가 & 변경 | 에러 - 요청 실패
-				throw new BusinessException(ResponseCode.USER_NOT_FOUND);
+				return false;
 			}
 		} catch(ExecutionException | InterruptedException | TimeoutException e){
 			log.warn("RabbitMQ Ack/Nack를 시스템 문제로 확인되지 못했습니다!! uuid={} ", uuid);
+			return false;
 		}
+		return true;
 	}
 }
