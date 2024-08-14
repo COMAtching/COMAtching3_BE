@@ -20,7 +20,7 @@ public class JwtUtil {
 
     public static final long REFRESH_TOKEN_EXPIRATION = TimeUnit.DAYS.toMillis(1);
 //    public static final long ACCESS_TOKEN_EXPIRATION = TimeUnit.HOURS.toMillis(1);
-    public static final long ACCESS_TOKEN_EXPIRATION = TimeUnit.MINUTES.toMillis(2);
+    public static final long ACCESS_TOKEN_EXPIRATION = TimeUnit.MINUTES.toMillis(60);
 
 
     public JwtUtil(@Value("${jwt.secret}") String secret) {

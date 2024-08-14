@@ -16,15 +16,15 @@ public class RefreshTokenService {
     private final RedisTemplate<String, Object> redisTemplate;
 
 
-    public void saveRefreshToken(String socialId, String refreshToken) {
-        redisTemplate.opsForValue().set(socialId, refreshToken, REFRESH_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
+    public void saveRefreshToken(String uuid, String refreshToken) {
+        redisTemplate.opsForValue().set(uuid, refreshToken, REFRESH_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
     }
 
-    public String getRefreshToken(String socialId) {
-        return (String) redisTemplate.opsForValue().get(socialId);
+    public String getRefreshToken(String uuid) {
+        return (String) redisTemplate.opsForValue().get(uuid);
     }
 
-    public void deleteRefreshToken(String socialId) {
-        redisTemplate.delete(socialId);
+    public void deleteRefreshToken(String uuid) {
+        redisTemplate.delete(uuid);
     }
 }

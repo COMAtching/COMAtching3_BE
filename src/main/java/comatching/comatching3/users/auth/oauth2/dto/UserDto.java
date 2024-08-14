@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class KakaoUserDto {
+public class UserDto {
     private String uuid;
     private String role;
     private String nickname;
