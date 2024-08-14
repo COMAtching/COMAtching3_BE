@@ -1,23 +1,20 @@
 package comatching.comatching3.admin.service;
 
-import comatching.comatching3.admin.dto.request.AdminLoginReq;
-import comatching.comatching3.admin.dto.request.AdminRegisterReq;
-import comatching.comatching3.admin.dto.request.EmailVerifyReq;
-import comatching.comatching3.admin.dto.request.SchoolEmailReq;
+import comatching.comatching3.admin.dto.request.*;
 import comatching.comatching3.admin.dto.response.AdminInfoRes;
 import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.admin.enums.AdminRole;
 import comatching.comatching3.admin.exception.AccountIdDuplicatedException;
-import comatching.comatching3.admin.exception.InvalidLoginException;
 import comatching.comatching3.admin.exception.UniversityNotExistException;
 import comatching.comatching3.admin.repository.AdminRepository;
 import comatching.comatching3.admin.repository.UniversityRepository;
+import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
-import comatching.comatching3.users.exception.UserNotFoundException;
 import comatching.comatching3.util.EmailUtil;
+import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -78,7 +75,7 @@ public class AdminService {
     }
 
     /**
-     *
+     * 관리자 로그인
      * @param form 관리자 ID, PW
      * @return ACCESS, REFRESH TOKEN
      */
@@ -88,13 +85,13 @@ public class AdminService {
         Optional<Admin> existAdmin = adminRepository.findByAccountId(form.getAccountId());
 
         if (existAdmin.isEmpty()) {
-            throw new InvalidLoginException("INVALID_ADMIN_LOGIN");
+            throw new BusinessException(ResponseCode.INVALID_LOGIN);
         }
 
         Admin admin = existAdmin.get();
 
         if (!passwordEncoder.matches(form.getPassword(), admin.getPassword())) {
-            throw new InvalidLoginException("INVALID_ADMIN_LOGIN");
+            throw new BusinessException(ResponseCode.INVALID_LOGIN);
         }
 
         String adminUuid = UUIDUtil.bytesToHex(admin.getUuid());
@@ -155,6 +152,7 @@ public class AdminService {
                 .accountId(admin.getAccountId())
                 .nickname(admin.getNickname())
                 .university(admin.getUniversity().getUniversityName())
+                .role(admin.getAdminRole().toString())
                 .schoolEmail(admin.getSchoolEmail())
                 .contactEmail(admin.getContactEmail().orElse(null))
                 .universityAuth(admin.getUniversityAuth())
@@ -181,13 +179,50 @@ public class AdminService {
         return domain.equalsIgnoreCase(mailDomain);
     }
 
+    /**
+     * 관리자 정보 변경 메소드 (계정 ID는 1번만 가능, 닉네임, 연락용 이메일, 앱 이름)
+     * @param request 바꿀 항목의 정보 (바꾸지 않을 항목은 null)
+     */
+    @Transactional
+    public void updateAdminInfo(AdminInfoUpdateReq request) {
+        Admin admin = getAdminFromContext();
+
+        if (request.getAccountId().isPresent()) {
+            if (admin.getAccountIdChanged()) {
+                throw new BusinessException(ResponseCode.BAD_REQUEST);
+            }
+            admin.updateAccountId(request.getAccountId().get());
+        }
+
+        if (request.getNickname().isPresent()) {
+            admin.updateNickname(request.getNickname().get());
+        }
+
+        if (request.getContactEmail().isPresent()) {
+            admin.updateContactEmail(request.getContactEmail().get());
+        }
+
+        if (request.getAppName().isPresent()) {
+            if (!admin.getAdminRole().equals(AdminRole.ROLE_ADMIN)) {
+                throw new BusinessException(ResponseCode.BAD_REQUEST);
+            }
+
+            University university = universityRepository.findByUniversityName(admin.getUniversity().getUniversityName())
+                    .orElseThrow(() -> new UniversityNotExistException("존재하지 않는 대학교 정보"));
+
+            university.updateAppName(request.getAppName().get());
+            universityRepository.save(university);
+        }
+
+        adminRepository.save(admin);
+    }
+
 
     private Admin getAdminFromContext() {
         String adminUuid = SecurityUtil.getCurrentUserUUID()
-                .orElseThrow(() -> new UserNotFoundException("Admin not found"));
+                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
         return adminRepository.findByUuid(UUIDUtil.uuidStringToBytes(adminUuid))
-                .orElseThrow(() -> new UserNotFoundException("Admin not found"));
+                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
     }
-
 }

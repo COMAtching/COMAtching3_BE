@@ -1,9 +1,6 @@
 package comatching.comatching3.admin.controller;
 
-import comatching.comatching3.admin.dto.request.AdminLoginReq;
-import comatching.comatching3.admin.dto.request.AdminRegisterReq;
-import comatching.comatching3.admin.dto.request.EmailVerifyReq;
-import comatching.comatching3.admin.dto.request.SchoolEmailReq;
+import comatching.comatching3.admin.dto.request.*;
 import comatching.comatching3.admin.dto.response.AdminInfoRes;
 import comatching.comatching3.admin.dto.response.EmailTokenRes;
 import comatching.comatching3.admin.dto.response.TokenRes;
@@ -14,10 +11,7 @@ import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -94,5 +88,17 @@ public class AdminController {
         AdminInfoRes adminInfo = adminService.getAdminInfo();
 
         return Response.ok(adminInfo);
+    }
+
+    /**
+     * admin 정보 수정 메소드
+     * @param request 수정할 항목의 정보
+     * @return 성공시 ok, 실패 시 400
+     */
+    @PatchMapping("/auth/admin/info")
+    public Response<Void> updateAdminInfo(@RequestBody AdminInfoUpdateReq request) {
+        adminService.updateAdminInfo(request);
+
+        return Response.ok();
     }
 }

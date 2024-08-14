@@ -79,4 +79,16 @@ public class Admin extends BaseEntity {
 	public Optional<String> getContactEmail() {
 		return Optional.ofNullable(contactEmail);
 	}
+
+	public void updateAccountId(String accountId) {
+		this.accountId = accountId;
+	}
+
+	public void updateNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public void updateContactEmail(String contactEmail) {
+		this.contactEmail = contactEmail;
+	}
 }

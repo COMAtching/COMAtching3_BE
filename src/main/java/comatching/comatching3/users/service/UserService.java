@@ -108,7 +108,7 @@ public class UserService {
         Optional<String> userUUIDOptional = SecurityUtil.getCurrentUserUUID();
 
         if (userUUIDOptional.isEmpty()) {
-            throw new UserNotFoundException("UserId not found");
+            throw new BusinessException(ResponseCode.USER_NOT_FOUND);
         }
 
         String uuid = userUUIDOptional.get();
@@ -116,7 +116,7 @@ public class UserService {
         Optional<UserAiFeature> userOptional = userAiFeatureRepository.findByUuid(byteUUID);
 
         if (userOptional.isEmpty()) {
-            throw new UserNotFoundException("User not found");
+            throw new BusinessException(ResponseCode.USER_NOT_FOUND);
         }
 
         return userOptional.get().getUsers();
