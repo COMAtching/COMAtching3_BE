@@ -46,4 +46,8 @@ public class University extends BaseEntity {
 		this.s3Key = s3Key;
 		this.appName = appName;
 	}
+
+	public void updateAppName(String appName) {
+		this.appName = appName;
+	}
 }
