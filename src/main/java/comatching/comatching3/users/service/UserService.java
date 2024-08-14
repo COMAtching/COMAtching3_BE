@@ -1,5 +1,6 @@
 package comatching.comatching3.users.service;
 
+import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.users.dto.UserFeatureReq;
 import comatching.comatching3.users.dto.UserInfoRes;
 import comatching.comatching3.users.entity.UserAiFeature;
@@ -8,14 +9,18 @@ import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.users.enums.Role;
+import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.exception.UserNotFoundException;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
+import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
+import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,11 +32,13 @@ public class UserService {
 
     private final UsersRepository usersRepository;
     private final UserAiFeatureRepository userAiFeatureRepository;
+    private final UserCrudRabbitMQUtil rabbitMQUtil;
 
     /**
      * 소셜 유저 피처 정보 입력 후 유저로 역할 변경까지
      * @param form social 유저의 Feature
      */
+    @Transactional
     public void inputUserInfo(UserFeatureReq form) {
 
         Users user = getUsersFromContext();
@@ -56,6 +63,17 @@ public class UserService {
         user.updateRole(Role.USER.getRoleName());
 
         usersRepository.save(user);
+
+        /**
+         * csv 반영 요청 3번까지 요청 후 안되면 throw (최대 30초)
+         */
+        int attempt = 3;
+        while(attempt > 0){
+            if(rabbitMQUtil.sendUserChange(user, UserCrudType.CREATE)){
+                break;
+            }
+            throw new BusinessException(ResponseCode.USER_REGISTER_FAIL);
+        }
     }
 
     /**

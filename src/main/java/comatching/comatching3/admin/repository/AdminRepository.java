@@ -7,4 +7,8 @@ import java.util.Optional;
 
 public interface AdminRepository extends JpaRepository<Admin, Long> {
     Optional<Admin> findByAccountId(String accountId);
+
+    Optional<Admin> findByUuid(byte[] uuid);
+
+    boolean existsBySchoolEmail(String schoolEmail);
 }

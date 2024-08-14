@@ -1,4 +1,4 @@
-package comatching.comatching3.admin.dto;
+package comatching.comatching3.admin.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

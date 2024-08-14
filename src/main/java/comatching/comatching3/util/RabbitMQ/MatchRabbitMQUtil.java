@@ -14,7 +14,6 @@ import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.match.dto.request.MatchReq;
-import comatching.comatching3.match.dto.response.MatchRes;
 import comatching.comatching3.util.ResponseCode;
 
 
@@ -30,6 +29,7 @@ public class MatchRabbitMQUtil {
 
 	/**
 	 * 매칭 요청을 MQ에 요청 & 응답  프로세스 수행
+	 * 사용 queue : match-request & match-resposne
 	 * @param matchReq : 매칭 리퀘스트 정보
 	 * @param requestId : 매칭 요청 고유 id
 	 * @return : 결과로 나온 유저의 uuid

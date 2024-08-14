@@ -1,0 +1,19 @@
+package comatching.comatching3.admin.dto.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+@AllArgsConstructor
+public class AdminInfoRes {
+    private String accountId;
+    private String nickname;
+    private String university;
+    private String schoolEmail;
+    private String contactEmail;
+    private Boolean universityAuth;
+    private Boolean accountIdChanged;
+    private String appName;
+}

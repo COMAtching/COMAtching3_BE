@@ -1,7 +1,7 @@
 package comatching.comatching3.users.auth.jwt;
 
 import comatching.comatching3.users.auth.oauth2.dto.CustomOAuth2User;
-import comatching.comatching3.users.auth.oauth2.dto.KakaoUserDto;
+import comatching.comatching3.users.auth.oauth2.dto.UserDto;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -123,11 +123,11 @@ public class JwtFilter extends OncePerRequestFilter {
         String uuid = jwtUtil.getUUID(accessToken);
         String role = jwtUtil.getRole(accessToken);
 
-        KakaoUserDto kakaoUserDto = new KakaoUserDto();
-        kakaoUserDto.setUuid(uuid);
-        kakaoUserDto.setRole(role);
+        UserDto userDto = new UserDto();
+        userDto.setUuid(uuid);
+        userDto.setRole(role);
 
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(kakaoUserDto);
+        CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDto);
         Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
     }

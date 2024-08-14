@@ -12,7 +12,7 @@ public class AdminExceptionHandler {
 
     @ExceptionHandler(InvalidLoginException.class)
     public Response<?> handleInvalidLoginException(InvalidLoginException ex) {
-        return Response.errorResponse(ResponseCode.INVALID_ADMIN_LOGIN);
+        return Response.errorResponse(ResponseCode.INVALID_LOGIN);
     }
 
     @ExceptionHandler(AccountIdDuplicatedException.class)
