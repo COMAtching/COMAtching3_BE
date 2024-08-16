@@ -10,7 +10,6 @@ import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.users.enums.Role;
 import comatching.comatching3.users.enums.UserCrudType;
-import comatching.comatching3.users.exception.UserNotFoundException;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
