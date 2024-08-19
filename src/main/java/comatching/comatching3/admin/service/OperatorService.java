@@ -1,6 +1,8 @@
 package comatching.comatching3.admin.service;
 
 import comatching.comatching3.admin.dto.request.EmailVerifyReq;
+import comatching.comatching3.admin.dto.request.ResetPasswordReq;
+import comatching.comatching3.admin.dto.request.SendResetPasswordEmailReq;
 import comatching.comatching3.admin.dto.request.SchoolEmailReq;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.enums.AdminRole;
@@ -11,6 +13,7 @@ import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +29,9 @@ public class OperatorService {
     private final SecurityUtil securityUtil;
     private final EmailUtil emailUtil;
     private final AdminRepository adminRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    private String RESET_LINK = "http://localhost:8080/admin/reset-password";
 
     // 이메일 전송하면서 관리자의 인증용 이메일 등록까지 같이 수행
     // todo: 이메일 양식 꾸며야 함
@@ -72,19 +78,53 @@ public class OperatorService {
     }
 
     /**
-     * 비밀번호 재설정 메소드
-     * @param schoolEmailReq
-     * todo: 토큰 발행 후 레디스에 이메일 - 토큰으로 저장, 만료 시간 부여
-     * todo: 비밀번호 재설정 URL에 파라미터로 토큰을 넣어 무작위성 부여
-     * todo: 링크 접속 시 레디스의 토큰이 있는지 확인 (있으면 유효, 없으면 유효하지 않은 토큰)
-     * todo: 비밀번호 재설정 후 레디스에서 삭제해 토큰 만료시킴
+     * 비밀번호 재설정 요청 메소드
+     * @param req 계정 아이디, 학교 이메일
      */
     @Transactional
-    public void updatePassword(SchoolEmailReq schoolEmailReq) {
-        Admin admin = adminRepository.findBySchoolEmail(schoolEmailReq.getSchoolEmail())
+    public void sendResetPasswordEmail(SendResetPasswordEmailReq req) {
+        Admin admin = adminRepository.findBySchoolEmail(req.getSchoolEmail())
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
+        if (!admin.getAccountId().equals(req.getAccountId())) {
+            throw new BusinessException(ResponseCode.USER_NOT_FOUND);
+        }
 
+        String token = UUID.randomUUID().toString();
+        redisTemplate.opsForValue().set(token, req.getSchoolEmail(), 24, TimeUnit.HOURS);
+
+        String resetLink = RESET_LINK + "?token=" + token;
+
+        emailUtil.sendEmail(req.getSchoolEmail(), "비밀번호 재설정 이메일입니다.", "비밀번호를 재설정 하려면 다음 링크를 클릭하세요: " + resetLink);
+    }
+
+    /**
+     * 비밀번호 재설정 메소드
+     * @param req 토큰, 비밀번호, 확인 비밀번호
+     * 비밀번호 재설정이 완료되면 토큰 만료
+     * todo: 하루에 5번만 재설정할 수 있도록 제한을 둘지 고민
+     */
+    @Transactional
+    public void resetPassword(ResetPasswordReq req) {
+        if (!req.getPassword().equals(req.getConfirmPassword())) {
+            throw new BusinessException(ResponseCode.ARGUMENT_NOT_VALID);
+        }
+
+        Object emailObj = redisTemplate.opsForValue().get(req.getToken());
+        if (emailObj == null) {
+            throw new BusinessException(ResponseCode.TOKEN_NOT_AVAILABLE);
+        }
+        String schoolEmail = String.valueOf(emailObj);
+
+        Admin admin = adminRepository.findBySchoolEmail(schoolEmail)
+                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+        String encryptedPassword = passwordEncoder.encode(req.getPassword());
+        admin.updatePassword(encryptedPassword);
+
+        adminRepository.save(admin);
+
+        redisTemplate.delete(req.getToken());
     }
 
     public Boolean checkEmailDuplicate(String schoolEmail) {

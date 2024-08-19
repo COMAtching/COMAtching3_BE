@@ -80,6 +80,10 @@ public class Admin extends BaseEntity {
 		this.accountId = accountId;
 	}
 
+	public void updatePassword(String password) {
+		this.password = password;
+	}
+
 	public void accountIdChange() {
 		this.accountIdChanged = true;
 	}

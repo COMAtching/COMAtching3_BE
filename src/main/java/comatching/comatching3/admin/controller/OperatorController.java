@@ -1,15 +1,15 @@
 package comatching.comatching3.admin.controller;
 
 import comatching.comatching3.admin.dto.request.EmailVerifyReq;
+import comatching.comatching3.admin.dto.request.ResetPasswordReq;
+import comatching.comatching3.admin.dto.request.SendResetPasswordEmailReq;
 import comatching.comatching3.admin.dto.request.SchoolEmailReq;
 import comatching.comatching3.admin.dto.response.EmailTokenRes;
 import comatching.comatching3.admin.service.OperatorService;
 import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -53,10 +53,40 @@ public class OperatorController {
         }
     }
 
+    /**
+     * 관리자 아이디 찾기 메소드
+     * @param schoolEmailReq 학교 이메일
+     * @return GEN-000
+     */
     @PostMapping("/admin/email/account/id")
     public Response<Void> sendFindIdEmail(@RequestBody SchoolEmailReq schoolEmailReq) {
         operatorService.sendFindIdEmail(schoolEmailReq.getSchoolEmail());
 
         return Response.ok();
     }
+
+    /**
+     * 관리자 비밀번호 재설정 이메일 요청 메소드
+     * @param sendResetPasswordEmailReq 아이디, 학교 이메일
+     * @return GEN-000
+     */
+    @PostMapping("/admin/email/account/password")
+    public Response<Void> sendResetPasswordEmail(@RequestBody SendResetPasswordEmailReq sendResetPasswordEmailReq) {
+        operatorService.sendResetPasswordEmail(sendResetPasswordEmailReq);
+
+        return Response.ok();
+    }
+
+    /**
+     * 관리자 비밀번호 재설정 메소드
+     * @param resetPasswordReq 토큰, 비밀번호, 확인 비밀번호
+     * @return GEN-000
+     */
+    @PostMapping( "/admin/password")
+    public Response<Void> resetPassword(@ModelAttribute ResetPasswordReq resetPasswordReq) {
+        operatorService.resetPassword(resetPasswordReq);
+        return Response.ok();
+    }
+
+
 }
