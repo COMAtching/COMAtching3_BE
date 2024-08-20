@@ -48,11 +48,11 @@ public class Admin extends BaseEntity {
 
 	private Boolean universityAuth = false;
 
-	private Boolean isEmailVerified = false;
-
 	private String contactEmail = null;
 
 	private Boolean accountIdChanged = false;
+
+	private Boolean access = false;
 
 	@Builder
 	public Admin(byte[] uuid,String nickname, AdminRole adminRole, String accountId, String password, University university) {
@@ -68,10 +68,6 @@ public class Admin extends BaseEntity {
 		this.adminRole = adminRole;
 	}
 
-	public void emailVerifiedSuccess() {
-		isEmailVerified = true;
-	}
-
 	public void setSchoolEmail(String schoolEmail) {
 		this.schoolEmail = schoolEmail;
 	}
@@ -84,11 +80,23 @@ public class Admin extends BaseEntity {
 		this.accountId = accountId;
 	}
 
+	public void updatePassword(String password) {
+		this.password = password;
+	}
+
+	public void accountIdChange() {
+		this.accountIdChanged = true;
+	}
+
 	public void updateNickname(String nickname) {
 		this.nickname = nickname;
 	}
 
 	public void updateContactEmail(String contactEmail) {
 		this.contactEmail = contactEmail;
+	}
+
+	public void accessOk() {
+		this.access = true;
 	}
 }

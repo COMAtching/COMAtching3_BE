@@ -1,10 +1,10 @@
 package comatching.comatching3.util.security;
 
-import org.hibernate.validator.constraints.UUID;
-import org.springframework.context.annotation.Configuration;
+import comatching.comatching3.admin.entity.Admin;
+import comatching.comatching3.admin.repository.AdminRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -17,13 +17,11 @@ import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 
 @Component
+@RequiredArgsConstructor
 public class SecurityUtil {
 
     private final UsersRepository usersRepository;
-
-    public SecurityUtil(UsersRepository usersRepository){
-        this.usersRepository = usersRepository;
-    }
+    private final AdminRepository adminRepository;
 
     /**
      *
@@ -78,5 +76,13 @@ public class SecurityUtil {
         }
 
         throw new BusinessException(ResponseCode.USER_NOT_FOUND);
+    }
+
+    public Admin getAdminFromContext() {
+        String adminUuid = getCurrentUserUUID()
+                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+        return adminRepository.findByUuid(UUIDUtil.uuidStringToBytes(adminUuid))
+                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
     }
 }
