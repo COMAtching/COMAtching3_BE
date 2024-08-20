@@ -8,6 +8,7 @@ build/
 ./src/main/resources/application.*
 .env
 .docker/
+rabbitmq_definitions.json
 ### STS ###
 .apt_generated
 .classpath
