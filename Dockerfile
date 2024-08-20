@@ -14,7 +14,6 @@ COPY src ./src
 # 빌드 실행
 RUN ./gradlew build -x test
 
-
 # 2단계: 실행 이미지 설정
 FROM openjdk:17-jdk-slim
 
