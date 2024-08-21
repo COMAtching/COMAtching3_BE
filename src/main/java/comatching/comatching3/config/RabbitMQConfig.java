@@ -24,8 +24,10 @@ public class RabbitMQConfig {
 	@Value("${spring.rabbitmq.password}")
 	private String password;
 	@Bean
-	public ConnectionFactory connectionFactory(){
+	public ConnectionFactory connectionFactory() {
 		CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
+		connectionFactory.setHost(host);  // RabbitMQ 호스트 설정
+		connectionFactory.setPort(port);  // RabbitMQ 포트 설정
 		connectionFactory.setUsername(username);
 		connectionFactory.setPassword(password);
 		return connectionFactory;
