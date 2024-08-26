@@ -1,5 +1,11 @@
 package comatching.comatching3.users.service;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.users.dto.UserFeatureReq;
 import comatching.comatching3.users.dto.UserInfoRes;
@@ -18,11 +24,6 @@ import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -66,13 +67,13 @@ public class UserService {
         /**
          * csv 반영 요청 3번까지 요청 후 안되면 throw (최대 30초)
          */
-        int attempt = 3;
-        while(attempt > 0){
-            if(rabbitMQUtil.sendUserChange(user, UserCrudType.CREATE)){
-                break;
-            }
+        Boolean sendSuccess = rabbitMQUtil.sendUserChange(user, UserCrudType.CREATE);
+
+        if(!sendSuccess){
             throw new BusinessException(ResponseCode.USER_REGISTER_FAIL);
         }
+
+
     }
 
     /**
