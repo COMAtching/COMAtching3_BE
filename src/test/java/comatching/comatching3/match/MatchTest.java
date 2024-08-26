@@ -1,15 +1,11 @@
 package comatching.comatching3.match;
 
-import comatching.comatching3.history.entity.MatchingHistory;
-import comatching.comatching3.history.repository.MatchingHistoryRepository;
-import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
-import comatching.comatching3.match.dto.request.MatchReq;
-import comatching.comatching3.match.dto.response.MatchRes;
-import comatching.comatching3.match.service.MatchService;
-import comatching.comatching3.users.enums.Hobby;
-import comatching.comatching3.users.repository.UsersRepository;
-import comatching.comatching3.util.RabbitMQ.RabbitMQUtil;
-import org.junit.jupiter.api.BeforeAll;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,70 +14,98 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import comatching.comatching3.history.entity.MatchingHistory;
+import comatching.comatching3.history.repository.MatchingHistoryRepository;
+import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
+import comatching.comatching3.match.dto.request.MatchReq;
+import comatching.comatching3.match.dto.response.MatchRes;
+import comatching.comatching3.match.service.MatchService;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
+import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.users.enums.Role;
+import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.RabbitMQ.MatchRabbitMQUtil;
 import comatching.comatching3.util.UUIDUtil;
-import static org.assertj.core.api.Assertions.*;
-
-import java.util.*;
-
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
+import comatching.comatching3.util.security.SecurityUtil;
+import jakarta.persistence.EntityManager;
 
 @SpringBootTest
 @Transactional
 @ExtendWith(MockitoExtension.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class MatchTest {
 	@Mock
 	private MatchRabbitMQUtil matchRabbitMQUtil;
 
+	@Mock
+	private UsersRepository usersRepository;
+
+	@Mock
+	private SecurityUtil securityUtil;
+
 	@InjectMocks
 	private MatchService matchService;
 
-	final byte[] enemyUuid = UUIDUtil.createUUID();
-	final byte[] applierUuid = UUIDUtil.createUUID();
-
+	private byte[] enemyUuid;
+	private byte[] applierUuid;
+	private UserAiFeature applierFeature;
+	private UserAiFeature enemyFeature;
+	private Users applier;
+	private Users enemy;
 
 	@Autowired
-	private UsersRepository usersRepository;
+	private MatchingHistoryRepository matchingHistoryRepository;
 
-    @Autowired
-    private MatchingHistoryRepository matchingHistoryRepository;
+	@Autowired
+	private EntityManager em;
 
 	/**
 	 * 매칭 신청자 & 결과로 나온 상대 세팅
 	 */
 	@BeforeEach
-	public void beforeEach(){
-		UserAiFeature applierFeature = UserAiFeature.builder()
-			.uuid(applierUuid)
-			.build();
+	void beforeEach(){
+		enemyUuid = UUIDUtil.createUUID();
+		applierUuid = UUIDUtil.createUUID();
 
-		UserAiFeature enemyFeature = UserAiFeature.builder()
+		enemyFeature = UserAiFeature.builder()
 			.uuid(enemyUuid)
 			.build();
 
-		Users applier = Users.builder()
+		applierFeature = UserAiFeature.builder()
+			.uuid(applierUuid)
+			.build();
+
+		em.persist(enemyFeature);
+		em.persist(applierFeature);
+
+		applier = Users.builder()
 			.role(Role.USER.getRoleName())
 			.build();
 
-		Users enemy = Users.builder()
+		enemy = Users.builder()
 			.role(Role.USER.getRoleName())
 			.build();
 
 		applier.updateUserAiFeature(applierFeature);
 		enemy.updateUserAiFeature(enemyFeature);
 
+		//System.out.println(UUIDUtil.bytesToHex(enemy.getUserAiFeature().getUuid()));
+		em.persist(applier);
+		em.persist(enemy);
+
 	}
 
 	@Test
 	@DisplayName("매칭 서비스 성공")
 	void successMatchLogic(){
+
+		/*usersRepository.save(applier);
+		usersRepository.save(enemy);*/
 
 		//given
 		MatchReq testMatchReq = MatchReq.builder()
@@ -95,13 +119,16 @@ public class MatchTest {
 
 		MatchResponseMsg matchResponseMsg = new MatchResponseMsg();
 		matchResponseMsg.setUuid(UUIDUtil.bytesToHex(enemyUuid));
-		Users enemy = usersRepository.findUsersByUuid(enemyUuid).get();
-		Users applier = usersRepository.findUsersByUuid(applierUuid).get();
+		System.out.println("uuid: " + matchResponseMsg.getUuid());
+		Users enemy = em.find(Users.class, this.enemy.getId());
+		Users applier = em.find(Users.class, this.applier.getId());
 
 		Integer originalPoint = applier.getPoint();
 		Integer originalPickMe = applier.getPickMe();
 
-		when(matchRabbitMQUtil.match(testMatchReq, UUID.randomUUID().toString())).thenReturn(matchResponseMsg);
+		when(matchRabbitMQUtil.match(any(MatchReq.class), anyString())).thenReturn(matchResponseMsg);
+		when(usersRepository.findUsersByUuid(enemyUuid)).thenReturn(Optional.of(enemy));
+		when(securityUtil.getCurrentUsersEntity()).thenReturn(applier);
 
 
 		//when
@@ -111,7 +138,7 @@ public class MatchTest {
 
 
 		//then
-		applier = usersRepository.findUsersByUuid(applierUuid).get();
+		applier = em.find(Users.class, this.applier.getId());
 		MatchingHistory matchingHistory = matchingHistoryRepository.findMatchingHistoriesByApplierId(applier.getId()).get(0);
 
 		assertThat(applier.getPoint()).isEqualTo(originalPoint-800);

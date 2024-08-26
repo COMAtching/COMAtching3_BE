@@ -20,7 +20,6 @@ import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.RabbitMQ.MatchRabbitMQUtil;
 import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
-import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;

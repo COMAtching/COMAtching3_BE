@@ -2,13 +2,11 @@ package comatching.comatching3.util.RabbitMQ;
 
 import java.util.UUID;
 
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import comatching.comatching3.users.dto.messageQueue.CompensationMsg;
 import comatching.comatching3.users.dto.messageQueue.UserCrudMsg;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.UserCrudType;
@@ -57,8 +55,8 @@ public class UserCrudRabbitMQUtil {
 		return false;
 	}
 
-	@RabbitListener(queues = "#{userCrudCompensation}")
+	/*@RabbitListener(queues = "#{userCrudCompensation}")
 	public void handleCompensationMessage(CompensationMsg msg){
 
-	}
+	}*/
 }
