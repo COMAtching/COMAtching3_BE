@@ -1,7 +1,5 @@
 package comatching.comatching3.match.controller;
 
-import org.springframework.boot.autoconfigure.mustache.MustacheAutoConfiguration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +24,8 @@ public class MatchUserController {
 
 
 	@PostMapping("match-request")
-	public Response<Void> requestMatch(@RequestBody @Valid MatchReq req){
+	public Response<MatchRes> requestMatch(@RequestBody @Valid MatchReq req){
+		//return Response.ok(MatchRes.testResult());
 		return matchService.requestMatch(req);
 	}
 }
