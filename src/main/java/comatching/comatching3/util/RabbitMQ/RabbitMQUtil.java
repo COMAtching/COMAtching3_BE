@@ -10,8 +10,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import comatching.comatching3.exception.BusinessException;
-import comatching.comatching3.util.ResponseCode;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -37,10 +35,10 @@ public class RabbitMQUtil {
 		try {
 			if(!correlationData.getFuture().get(10, TimeUnit.SECONDS).isAck()){
 				ReturnedMessage message = correlationData.getReturned();
+
 				log.warn(message.getMessage().toString());
 				log.warn("Reply Code: {}, Reply Text: {}, Exchange: {}, Routing Key: {}", message.getReplyCode(), message.getReplyText(), message.getExchange(), message.getRoutingKey());
 
-				// todo : response 코드 추가 & 변경 | 에러 - 요청 실패
 				return false;
 			}
 		} catch(ExecutionException | InterruptedException | TimeoutException e){
