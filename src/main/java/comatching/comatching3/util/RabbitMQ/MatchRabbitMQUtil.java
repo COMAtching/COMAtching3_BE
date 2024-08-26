@@ -32,7 +32,7 @@ public class MatchRabbitMQUtil {
 	 * @return : 결과로 나온 유저의 uuid
 	 */
 	public MatchResponseMsg match(MatchReq matchReq, String requestId) {
-		MatchRequestMsg requestMsg = new MatchRequestMsg(matchReq, requestId);
+		MatchRequestMsg requestMsg = new MatchRequestMsg(matchReq);
 		CorrelationData correlationData = new CorrelationData(requestId);
 		ParameterizedTypeReference<MatchResponseMsg> responseType = new ParameterizedTypeReference<MatchResponseMsg>(){};
 
