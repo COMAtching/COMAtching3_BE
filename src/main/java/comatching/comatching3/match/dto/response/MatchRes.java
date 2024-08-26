@@ -25,7 +25,7 @@ public class MatchRes {
 	private String socialId;
 
 	public static MatchRes fromUsers(Users users){
-		MatchRes matchres = MatchRes.builder()
+        return MatchRes.builder()
 			.song(users.getSong())
 			.comment(users.getComment())
 			.mbti(users.getUserAiFeature().getMbti())
@@ -36,7 +36,6 @@ public class MatchRes {
 			.currentPoint(users.getPoint())
 			.socialId(users.getSocialId())
 			.build();
-		return matchres;
 	}
 
 	/**
