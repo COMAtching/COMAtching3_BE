@@ -46,12 +46,12 @@ public class MatchService {
 	 *
 	 */
 	@Transactional
-	public Response<MatchRes> requestMatch(MatchReq matchReq){
+	public MatchRes requestMatch(MatchReq matchReq){
 		String requestId = UUID.randomUUID().toString();
-		MatchRequestMsg requestMsg = new MatchRequestMsg(matchReq, requestId);
+		MatchRequestMsg requestMsg = new MatchRequestMsg(matchReq);
 		MatchResponseMsg responseMsg  = matchRabbitMQUtil.match(matchReq, requestId);
 
-		log.info("{match-queues} = requestId:{} / enemyId:{}", responseMsg.getRequestId(), responseMsg.getRequestId());
+		log.info("{match-queues} = enemyId:{}", responseMsg.getUuid());
 
 		//사용자 조회
 		// todo : 조회 불가시 보상 처리
@@ -82,7 +82,7 @@ public class MatchService {
 		matchingHistoryRepository.save(history);
 
 		MatchRes response = MatchRes.fromUsers(enemy);
-		return Response.ok(response);
+		return response;
 	}
 
 	/**

@@ -26,6 +26,7 @@ public class MatchUserController {
 	@PostMapping("match-request")
 	public Response<MatchRes> requestMatch(@RequestBody @Valid MatchReq req){
 		//return Response.ok(MatchRes.testResult());
-		return matchService.requestMatch(req);
+		MatchRes res = matchService.requestMatch(req);
+		return Response.ok(res);
 	}
 }
