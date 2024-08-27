@@ -1,0 +1,60 @@
+services:
+  app:
+    image: popeye0618/comatching3_be-app:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+    env_file:
+      - .env
+    networks:
+      - backend
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      MYSQL_DATABASE: ${SPRING_DATASOURCE_DATABASE}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "25672:25672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${SPRING_RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${SPRING_RABBITMQ_PASSWORD}
+    volumes:
+      - ./rabbitmq_definitions.json:/etc/rabbitmq_definitions.json
+    entrypoint: >
+      sh -c "
+      rabbitmq-server & sleep 30 && 
+      rabbitmqctl await_startup && 
+      rabbitmqctl import_definitions /etc/rabbitmq_definitions.json &&
+      tail -f /dev/null"
+    networks:
+      - backend
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ${SPRING_REDIS_PASSWORD} --port 6379
+    networks:
+      - backend
+
+networks:
+  backend:
+volumes:
+  mysql-data:

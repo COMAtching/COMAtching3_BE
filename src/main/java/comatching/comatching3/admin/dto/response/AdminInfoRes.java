@@ -11,6 +11,7 @@ public class AdminInfoRes {
     private String accountId;
     private String nickname;
     private String university;
+    private String role;
     private String schoolEmail;
     private String contactEmail;
     private Boolean universityAuth;

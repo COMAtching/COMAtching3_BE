@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class AdminExceptionHandler {
 
-    @ExceptionHandler(InvalidLoginException.class)
-    public Response<?> handleInvalidLoginException(InvalidLoginException ex) {
-        return Response.errorResponse(ResponseCode.INVALID_LOGIN);
-    }
-
     @ExceptionHandler(AccountIdDuplicatedException.class)
     public Response<?> handleAccountIdDuplicatedException(AccountIdDuplicatedException ex) {
         return Response.errorResponse(ResponseCode.ACCOUNT_ID_DUPLICATED);
+    }
+
+    @ExceptionHandler(UniversityNotExistException.class)
+    public Response<?> handleUniversityNotExistException(UniversityNotExistException ex) {
+        return Response.errorResponse(ResponseCode.ARGUMENT_NOT_VALID);
     }
 
 }
