@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import comatching.comatching3.admin.entity.University;
+import comatching.comatching3.charge.entity.ChargeRequest;
 import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.match_message.entity.MessageMap;
 import comatching.comatching3.util.BaseEntity;
@@ -43,7 +44,7 @@ public class Users extends BaseEntity {
 	@OneToOne(mappedBy = "users", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private UserAiFeature userAiFeature;
 
-	@OneToMany(mappedBy = "users", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PointHistory> pointHistoryList = new ArrayList<PointHistory>();
 
 	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -51,6 +52,9 @@ public class Users extends BaseEntity {
 
 	@OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MessageMap> receivedMessageMap = new ArrayList<MessageMap>();
+
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ChargeRequest> chargeRequestList = new ArrayList<>();
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "university_id")
@@ -110,7 +114,11 @@ public class Users extends BaseEntity {
 		this.comment = comment;
 	}
 
-	public void updatePoint(Integer point) {
-		this.point = point;
+	public void addPoint(Integer point) {
+		this.point += point;
+	}
+
+	public void subtractPoint(Integer point) {
+		this.point -= point;
 	}
 }
