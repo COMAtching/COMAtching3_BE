@@ -15,4 +15,5 @@ public class UserInfoRes {
     private String mbti;
     private Integer point;
     private Integer pickMe;
+    private Boolean canRequestCharge;
 }
