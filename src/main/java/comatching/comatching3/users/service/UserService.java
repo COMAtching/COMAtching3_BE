@@ -1,12 +1,15 @@
 package comatching.comatching3.users.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import comatching.comatching3.admin.dto.response.TokenRes;
+import comatching.comatching3.charge.repository.ChargeRequestRepository;
 import comatching.comatching3.exception.BusinessException;
+import comatching.comatching3.users.auth.jwt.JwtUtil;
+import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.users.dto.UserFeatureReq;
 import comatching.comatching3.users.dto.UserInfoRes;
 import comatching.comatching3.users.entity.UserAiFeature;
@@ -32,6 +35,10 @@ public class UserService {
 
     private final UsersRepository usersRepository;
     private final UserAiFeatureRepository userAiFeatureRepository;
+    private final ChargeRequestRepository chargeRequestRepository;
+    private final SecurityUtil securityUtil;
+    private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
     private final UserCrudRabbitMQUtil rabbitMQUtil;
 
     /**
@@ -39,9 +46,9 @@ public class UserService {
      * @param form social 유저의 Feature
      */
     @Transactional
-    public void inputUserInfo(UserFeatureReq form) {
+    public TokenRes inputUserInfo(UserFeatureReq form) {
 
-        Users user = getUsersFromContext();
+        Users user = securityUtil.getCurrentUsersEntity();
         List<Hobby> hobbyList = form.getHobby().stream()
                 .map(Hobby::valueOf)
                 .toList();
@@ -64,6 +71,13 @@ public class UserService {
 
         usersRepository.save(user);
 
+        //역할 업데이트된 jwt 토큰 발행 및 토큰 교체
+        String uuid = UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid());
+        String accessToken = jwtUtil.generateAccessToken(uuid, Role.USER.getRoleName());
+        String refreshToken = refreshTokenService.getRefreshToken(uuid);
+
+        securityUtil.setAuthentication(accessToken);
+
         /**
          * csv 반영 요청 3번까지 요청 후 안되면 throw (최대 30초)
          */
@@ -73,8 +87,13 @@ public class UserService {
             throw new BusinessException(ResponseCode.USER_REGISTER_FAIL);
         }
 
-
+        return TokenRes.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
+
+
 
     /**
      * 메인 페이지 유저 정보 조회
@@ -82,7 +101,9 @@ public class UserService {
      */
     public UserInfoRes getUserInfo() {
 
-        Users user = getUsersFromContext();
+        Users user = securityUtil.getCurrentUsersEntity();
+
+        Boolean canRequest = !chargeRequestRepository.existsByUsers(user);
 
         return UserInfoRes.builder()
                 .username(user.getUsername())
@@ -92,6 +113,7 @@ public class UserService {
                 .mbti(user.getUserAiFeature().getMbti())
                 .point(user.getPoint())
                 .pickMe(user.getPickMe())
+                .canRequestCharge(canRequest)
                 .build();
     }
 
@@ -100,25 +122,7 @@ public class UserService {
      * @return 유저 포인트
      */
     public Integer getPoints() {
-        Users user = getUsersFromContext();
+        Users user = securityUtil.getCurrentUsersEntity();
         return user.getPoint();
-    }
-
-    private Users getUsersFromContext() {
-        Optional<String> userUUIDOptional = SecurityUtil.getCurrentUserUUID();
-
-        if (userUUIDOptional.isEmpty()) {
-            throw new BusinessException(ResponseCode.USER_NOT_FOUND);
-        }
-
-        String uuid = userUUIDOptional.get();
-        byte[] byteUUID = UUIDUtil.uuidStringToBytes(uuid);
-        Optional<UserAiFeature> userOptional = userAiFeatureRepository.findByUuid(byteUUID);
-
-        if (userOptional.isEmpty()) {
-            throw new BusinessException(ResponseCode.USER_NOT_FOUND);
-        }
-
-        return userOptional.get().getUsers();
     }
 }
