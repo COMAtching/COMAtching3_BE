@@ -61,7 +61,7 @@ public class MatchService {
 
 		//포인트 & pickMe 차감
 		Integer usePoint = calcPoint(requestMsg);
-		applier.updatePoint(usePoint);
+		applier.subtractPoint(usePoint);
 		enemy.updatePickMe(enemy.getPickMe() - 1);
 
 		// fixme : sendUserChange 내부 익셉션으로 변경 필요

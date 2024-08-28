@@ -6,6 +6,7 @@ import comatching.comatching3.users.auth.jwt.JwtUtil;
 import comatching.comatching3.users.auth.oauth2.handler.OAuth2SuccessHandler;
 import comatching.comatching3.users.auth.oauth2.service.CustomOAuth2UserService;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
+import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +34,7 @@ public class SecurityConfig {
     private final RefreshTokenService refreshTokenService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final SecurityUtil securityUtil;
 
 
     @Bean
@@ -52,7 +54,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable);
 
         http
-                .addFilterAfter(new JwtFilter(jwtUtil, refreshTokenService), OAuth2LoginAuthenticationFilter.class)
+                .addFilterAfter(new JwtFilter(jwtUtil, refreshTokenService, securityUtil), OAuth2LoginAuthenticationFilter.class)
                         .addFilterBefore(new JwtExceptionFilter(), JwtFilter.class);
 
         http
@@ -65,7 +67,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/admin/**", "/api/match/**").permitAll()
+                        .requestMatchers("/login", "/admin/**", "/api/match/**", "/ws/**", "/charge-monitor/**", "/app/**").permitAll()
                         .requestMatchers("/auth/admin/**").hasRole("ADMIN")
                         .requestMatchers("/auth/operator/**").hasAnyRole("OPERATOR", "ADMIN")
                         .requestMatchers("/auth/semi/**").hasAnyRole("SEMI_OPERATOR", "SEMI_ADMIN")
@@ -78,6 +80,11 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+//        http
+//                .headers(headers -> headers
+//                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' https:; font-src 'self' https:;"))
+//                        .referrerPolicy(rp -> rp.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
+//                );
         return http.build();
     }
 

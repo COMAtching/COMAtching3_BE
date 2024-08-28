@@ -24,6 +24,23 @@ public class AdminController {
         return Response.ok();
     }
 
+    /**
+     * 관리자 회원가입 시 아이디 중복확인 메소드
+     * @param accountIdCheckReq 아이디
+     * @return true, false
+     */
+    @PostMapping("/admin/register/check-id")
+    public Response<Boolean> isAccountDuplicated(@RequestBody AccountIdCheckReq accountIdCheckReq) {
+        Boolean result = adminService.isAccountDuplicated(accountIdCheckReq.getAccountId());
+        return Response.ok(result);
+    }
+
+    /**
+     * 관리자 로그인 메소드
+     * @param form 아이디, 비밀번호
+     * @param response 응답 헤더 설정
+     * @return ok
+     */
     @PostMapping("/admin/login")
     public Response<Void> adminLogin(@RequestBody AdminLoginReq form,
                            HttpServletResponse response) {
