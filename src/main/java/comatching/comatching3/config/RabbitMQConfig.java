@@ -3,6 +3,7 @@ package comatching.comatching3.config;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +54,8 @@ public class RabbitMQConfig {
 				byte[] body = message.getBody();
 				log.error("메세지 발행에 실패했습니다.ID {}", correlationData.getId());
 			}
+			correlationData.getFuture().complete(new CorrelationData.Confirm(true, "success"));
+			log.info("received ack");
 		}));
 		return rabbitTemplate;
 	}

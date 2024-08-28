@@ -83,7 +83,7 @@ public class UserService {
         /**
          * csv 반영 요청 3번까지 요청 후 안되면 throw (최대 30초)
          */
-        Boolean sendSuccess = rabbitMQUtil.sendUserChange(user, UserCrudType.CREATE);
+        Boolean sendSuccess = rabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
 
         if(!sendSuccess){
             throw new BusinessException(ResponseCode.USER_REGISTER_FAIL);
