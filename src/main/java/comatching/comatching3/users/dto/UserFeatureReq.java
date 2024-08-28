@@ -1,10 +1,10 @@
 package comatching.comatching3.users.dto;
 
+import java.util.List;
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 public class UserFeatureReq {

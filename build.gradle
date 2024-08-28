@@ -42,6 +42,7 @@ dependencies {
 
     //Message Queue dependency
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    testImplementation 'org.springframework.amqp:spring-rabbit-test'
 
     //Cache dependency
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
