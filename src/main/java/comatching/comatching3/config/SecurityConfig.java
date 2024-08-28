@@ -80,6 +80,11 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+//        http
+//                .headers(headers -> headers
+//                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' https:; font-src 'self' https:;"))
+//                        .referrerPolicy(rp -> rp.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
+//                );
         return http.build();
     }
 
