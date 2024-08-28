@@ -1,5 +1,7 @@
 package comatching.comatching3.match.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -14,7 +16,11 @@ import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.match.dto.request.MatchReq;
 import comatching.comatching3.match.dto.response.MatchRes;
+import comatching.comatching3.users.dto.UserFeatureReq;
+import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
+import comatching.comatching3.users.enums.ContactFrequency;
+import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.UsersRepository;
@@ -66,7 +72,7 @@ public class MatchService {
 
 		// fixme : sendUserChange 내부 익셉션으로 변경 필요
 		if(enemy.getPoint() == 0){
-			Boolean sendSuccess = userCrudRabbitMQUtil.sendUserChange(enemy, UserCrudType.DELETE);
+			Boolean sendSuccess = userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
 			if(!sendSuccess){
 				throw new BusinessException(ResponseCode.MATCH_GENERAL_FAIL);
 			}
@@ -111,4 +117,26 @@ public class MatchService {
 		return point;
 	}
 
+	public void testCrud(UserFeatureReq req){
+
+		UserAiFeature userAiFeature = UserAiFeature.builder()
+			.uuid(UUIDUtil.createUUID())
+			.build();
+
+		List<Hobby> hobbies = new ArrayList<>();
+		for(String s : req.getHobby()){
+			System.out.println(s);
+			hobbies.add(Hobby.from(s));
+		}
+
+		userAiFeature.updateMbti(req.getMbti());
+		userAiFeature.updateContactFrequency(ContactFrequency.from(req.getContactFrequency()));
+		userAiFeature.updateHobby(hobbies);
+		userAiFeature.updateAge(req.getAge());
+		userAiFeature.updateGender(Gender.from(req.getGender()));
+		userAiFeature.updateMajor(req.getMajor());
+		userAiFeature.updateAdmissionYear(req.getAdmissionYear());
+
+		userCrudRabbitMQUtil.sendUserChange(userAiFeature,UserCrudType.CREATE);
+	}
 }
