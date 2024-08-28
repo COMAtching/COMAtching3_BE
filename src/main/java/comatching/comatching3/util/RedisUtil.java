@@ -1,5 +1,7 @@
 package comatching.comatching3.util;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,11 @@ public class RedisUtil {
 	@Transactional
 	public void putRedisValue(String key, Object putData) throws JsonProcessingException {
 		redisTemplate.opsForValue().set(key, objectMapper.writeValueAsString(putData));
+	}
+
+	@Transactional
+	public void putRedisValue(String key, Object putData, Integer seconds) throws JsonProcessingException {
+		redisTemplate.opsForValue().set(key, objectMapper.writeValueAsString(putData), seconds, TimeUnit.SECONDS);
 	}
 
 	@Transactional
