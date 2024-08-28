@@ -30,7 +30,7 @@ public class PointHistory extends BaseEntity {
 	@Column(name = "point_history_id")
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "users_id")
 	private Users users;
 

@@ -1,5 +1,6 @@
 package comatching.comatching3.config;
 
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -9,6 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 public class RabbitMQConfig {
 
@@ -43,6 +47,13 @@ public class RabbitMQConfig {
 	public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(jackson2JsonMessageConverter());
+		rabbitTemplate.setConfirmCallback(((correlationData, ack, cause) -> {
+			if(!ack){
+				Message message = correlationData.getReturned().getMessage();
+				byte[] body = message.getBody();
+				log.error("메세지 발행에 실패했습니다.ID {}", correlationData.getId());
+			}
+		}));
 		return rabbitTemplate;
 	}
 }

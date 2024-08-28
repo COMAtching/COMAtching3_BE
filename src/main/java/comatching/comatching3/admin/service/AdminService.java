@@ -7,7 +7,6 @@ import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.admin.enums.AdminRole;
-import comatching.comatching3.admin.exception.AccountIdDuplicatedException;
 import comatching.comatching3.admin.exception.UniversityNotExistException;
 import comatching.comatching3.admin.repository.AdminRepository;
 import comatching.comatching3.admin.repository.UniversityRepository;
@@ -45,10 +44,9 @@ public class AdminService {
     @Transactional
     public void adminRegister(AdminRegisterReq form) {
 
-        Optional<Admin> existAdmin = adminRepository.findByAccountId(form.getAccountId());
-
-        if (existAdmin.isPresent()) {
-            throw new AccountIdDuplicatedException("ACCOUNT_ID_DUPLICATED");
+        Boolean exist = adminRepository.existsAdminByAccountId(form.getAccountId());
+        if (exist) {
+            throw new BusinessException(ResponseCode.ACCOUNT_ID_DUPLICATED);
         }
 
         String encryptedPassword = passwordEncoder.encode(form.getPassword());
@@ -82,6 +80,10 @@ public class AdminService {
         }
 
         adminRepository.save(admin);
+    }
+
+    public Boolean isAccountDuplicated(String accountId) {
+        return adminRepository.existsAdminByAccountId(accountId);
     }
 
     /**
