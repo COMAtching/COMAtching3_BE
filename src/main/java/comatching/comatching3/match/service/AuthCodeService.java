@@ -49,7 +49,7 @@ public class AuthCodeService {
 
 	/**
 	 *
-	 * @param req : 코
+	 * @param req : 코드 유효성 체크
 	 * @return : 코드 체크 응답
 	 */
 
