@@ -26,6 +26,10 @@ public class AuthCodeService {
 	private final SecurityUtil securityUtil;
 	private final UsersRepository usersRepository;
 
+	/**
+	 * 코드 생성 및 캐싱 메서드
+	 * @return
+	 */
 	public RequestCodeRes requestCode(){
 		Long userId = securityUtil.getCurrentUsersEntity().getId();
 		String authCode = UUIDUtil.bytesToHex(UUIDUtil.createUUID());
@@ -43,26 +47,41 @@ public class AuthCodeService {
 		return new RequestCodeRes(authCode);
 	}
 
+	/**
+	 *
+	 * @param req : 코
+	 * @return : 코드 체크 응답
+	 */
+
 	public CodeCheckRes checkCode(CodeCheckReq req){
 		CodeCheckInfo codeCheckInfo;
 		try{
 			codeCheckInfo = redisUtil.getRedisValue(req.getCode(), CodeCheckInfo.class);
+
+			if(codeCheckInfo == null){
+				throw new BusinessException(ResponseCode.MATCH_CODE_CHECK_FAIL);
+			}
+
+			Users applier = usersRepository.findById(codeCheckInfo.getUserId())
+				.orElseThrow( () -> new BusinessException(ResponseCode.MATCH_CODE_CHECK_FAIL));
+
+			codeCheckInfo.updateCheckStatus(CheckStatus.AUTHENTICATED);
+			redisUtil.putRedisValue(req.getCode(), codeCheckInfo, 6000);
+
+			return new CodeCheckRes(applier.getPoint());
+		} catch(JsonProcessingException e){
+			throw new BusinessException(ResponseCode.MATCH_CODE_CHECK_FAIL);
+		}
+
+
+	}
+
+	public void updateTime(String code, CodeCheckInfo info){
+
+		try{
+			redisUtil.putRedisValue(code, info, 60000);
 		} catch( JsonProcessingException e){
 			throw new BusinessException(ResponseCode.MATCH_CODE_CHECK_FAIL);
 		}
-
-		if(codeCheckInfo == null){
-			throw new BusinessException(ResponseCode.MATCH_CODE_CHECK_FAIL);
-		}
-
-		Users applier = usersRepository.findById(codeCheckInfo.getUserId())
-			.orElseThrow( () -> new BusinessException(ResponseCode.MATCH_CODE_CHECK_FAIL));
-
-		codeCheckInfo.updateCheckStatus(CheckStatus.AUTHENTICATED);
-
-		return new CodeCheckRes(applier.getPoint());
-	}
-
-	public void updateTime(String code){
 	}
 }
