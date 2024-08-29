@@ -1,6 +1,7 @@
 package comatching.comatching3.charge.controller;
 
 import comatching.comatching3.charge.dto.request.ChargeApprovalReq;
+import comatching.comatching3.charge.dto.request.ChargeCancelReq;
 import comatching.comatching3.charge.dto.request.ChargeReq;
 import comatching.comatching3.charge.service.ChargeService;
 import comatching.comatching3.util.Response;
@@ -22,9 +23,11 @@ public class ChargeController {
 
     @MessageMapping("/approveCharge")
     public void handleChargeApproval(ChargeApprovalReq approvalReq) {
-        System.out.println("approvalReq.getUserId() = " + approvalReq.getUserId());
-        System.out.println("approvalReq.getAmount() = " + approvalReq.getAmount());
-        System.out.println("approvalReq.getApprovalTime() = " + approvalReq.getApprovalTime());
         chargeService.createApprovalRequest(approvalReq);
+    }
+
+    @MessageMapping("/cancelCharge")
+    public void handleCancelCharge(ChargeCancelReq chargeCancelReq) {
+        chargeService.cancelChargeRequest(chargeCancelReq);
     }
 }

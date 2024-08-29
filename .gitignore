@@ -8,6 +8,7 @@ build/
 src/main/resources/application.*
 .env
 .docker/
+my.cnf
 rabbitmq_definitions.json
 ### STS ###
 .apt_generated

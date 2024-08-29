@@ -6,7 +6,6 @@ services:
     depends_on:
       - mysql
       - redis
-      - rabbitmq
     env_file:
       - .env
     networks:
@@ -21,27 +20,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
-    networks:
-      - backend
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-      - "25672:25672"
-    environment:
-      RABBITMQ_DEFAULT_USER: ${SPRING_RABBITMQ_USERNAME}
-      RABBITMQ_DEFAULT_PASS: ${SPRING_RABBITMQ_PASSWORD}
-    volumes:
-      - ./rabbitmq_definitions.json:/etc/rabbitmq_definitions.json
-    entrypoint: >
-      sh -c "
-      rabbitmq-server & sleep 30 && 
-      rabbitmqctl await_startup && 
-      rabbitmqctl import_definitions /etc/rabbitmq_definitions.json &&
-      tail -f /dev/null"
+      - ./my.cnf:/etc/mysql/my.cnf
     networks:
       - backend
 
