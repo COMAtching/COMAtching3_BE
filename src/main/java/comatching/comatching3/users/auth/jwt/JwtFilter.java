@@ -1,8 +1,7 @@
 package comatching.comatching3.users.auth.jwt;
 
-import comatching.comatching3.users.auth.oauth2.dto.CustomOAuth2User;
-import comatching.comatching3.users.auth.oauth2.dto.UserDto;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
+import comatching.comatching3.util.security.SecurityUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -12,12 +11,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,6 +22,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
+    private final SecurityUtil securityUtil;
+
+    private static final List<String> WHITELIST = List.of(
+            "/login",
+            "/api/match",
+            "/charge-monitor",
+            "/admin"
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -33,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
         log.info("요청 URL = {}", requestURI);
-        if (requestURI.equals("/login") || requestURI.startsWith("/api/match/")) {
+        if (WHITELIST.stream().anyMatch(requestURI::startsWith)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -45,7 +50,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             if (accessToken != null && !jwtUtil.isExpired(accessToken)) {
                 log.info("엑세스 토큰 유효");
-                setAuthentication(accessToken);
+                securityUtil.setAuthentication(accessToken);
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -81,7 +86,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
                     response.setHeader("Authorization", newAccessToken);
                     response.setHeader("Refresh-Token", newRefreshToken);
-                    setAuthentication(newAccessToken);
+                    securityUtil.setAuthentication(newAccessToken);
                 } else {
                     log.info("레디스와 리프레시 토큰 다름");
 //                    response.sendRedirect("/login");
@@ -117,19 +122,6 @@ public class JwtFilter extends OncePerRequestFilter {
     private String getRefreshToken(HttpServletRequest request) {
         log.info("리프레시 토큰 출력 = {}", request.getHeader("Refresh-Token"));
         return request.getHeader("Refresh-Token");
-    }
-
-    private void setAuthentication(String accessToken) {
-        String uuid = jwtUtil.getUUID(accessToken);
-        String role = jwtUtil.getRole(accessToken);
-
-        UserDto userDto = new UserDto();
-        userDto.setUuid(uuid);
-        userDto.setRole(role);
-
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDto);
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authToken);
     }
 
     private void setSecurityHeaders(HttpServletResponse response) {

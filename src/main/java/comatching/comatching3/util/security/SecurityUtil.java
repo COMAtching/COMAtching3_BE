@@ -2,7 +2,11 @@ package comatching.comatching3.util.security;
 
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.repository.AdminRepository;
+import comatching.comatching3.users.auth.jwt.JwtUtil;
+import comatching.comatching3.users.auth.oauth2.dto.CustomOAuth2User;
+import comatching.comatching3.users.auth.oauth2.dto.UserDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +26,7 @@ public class SecurityUtil {
 
     private final UsersRepository usersRepository;
     private final AdminRepository adminRepository;
+    private final JwtUtil jwtUtil;
 
     /**
      *
@@ -44,20 +49,17 @@ public class SecurityUtil {
         return Optional.ofNullable(userDetails).map(UserDetails::getUsername);
     }
 
-    /**
-     *
-     * @return 현재 로그인 한 유저의 권한
-     */
-    public static String getCurrentUserRole() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && !authentication.getAuthorities().isEmpty()) {
-            return authentication
-                    .getAuthorities()
-                    .iterator()
-                    .next()
-                    .getAuthority();
-        }
-        return null;
+    public void setAuthentication(String accessToken) {
+        String uuid = jwtUtil.getUUID(accessToken);
+        String role = jwtUtil.getRole(accessToken);
+
+        UserDto userDto = new UserDto();
+        userDto.setUuid(uuid);
+        userDto.setRole(role);
+
+        CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDto);
+        Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
     }
 
     /**
@@ -67,8 +69,7 @@ public class SecurityUtil {
     public Users getCurrentUsersEntity(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails userDetails =  (UserDetails) authentication.getPrincipal();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
             byte[] uuid = UUIDUtil.uuidStringToBytes(userDetails.getUsername());
 
             return usersRepository.findUsersByUuid(uuid)
