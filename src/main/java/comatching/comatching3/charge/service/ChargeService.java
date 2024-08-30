@@ -1,9 +1,9 @@
 package comatching.comatching3.charge.service;
 
 import comatching.comatching3.charge.dto.request.ChargeApprovalReq;
+import comatching.comatching3.charge.dto.request.ChargeCancelReq;
 import comatching.comatching3.charge.dto.request.ChargeReq;
 import comatching.comatching3.charge.dto.response.ChargePendingInfo;
-import comatching.comatching3.charge.dto.response.ChargeRes;
 import comatching.comatching3.charge.entity.ChargeRequest;
 import comatching.comatching3.charge.repository.ChargeRequestRepository;
 import comatching.comatching3.exception.BusinessException;
@@ -13,7 +13,6 @@ import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,5 +93,14 @@ public class ChargeService {
 
         //웹 소켓 반영
         simpMessagingTemplate.convertAndSend("/topic/approvalUpdate", approvalReq.getUserId());
+    }
+
+    @Transactional
+    public void cancelChargeRequest(ChargeCancelReq chargeCancelReq) {
+        Users user = usersRepository.findUsersByUuid(UUIDUtil.uuidStringToBytes(chargeCancelReq.getUserId()))
+                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+        chargeRequestRepository.deleteByUsers(user);
+        simpMessagingTemplate.convertAndSend("/topic/cancelUpdate", chargeCancelReq.getUserId());
     }
 }
