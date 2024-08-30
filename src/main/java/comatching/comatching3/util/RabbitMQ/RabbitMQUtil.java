@@ -33,7 +33,7 @@ public class RabbitMQUtil {
 	 */
 	public boolean checkAcknowledge(CorrelationData correlationData, String uuid) {
 		try {
-			if(!correlationData.getFuture().get(10, TimeUnit.SECONDS).isAck()){
+			if(correlationData.getFuture().get(10, TimeUnit.SECONDS).isAck()){
 				ReturnedMessage message = correlationData.getReturned();
 
 				log.warn(message.getMessage().toString());
@@ -42,7 +42,7 @@ public class RabbitMQUtil {
 				return false;
 			}
 		} catch(ExecutionException | InterruptedException | TimeoutException e){
-			log.warn("RabbitMQ Ack/Nack를 시스템 문제로 확인되지 못했습니다!! uuid={} ", uuid);
+			log.warn("RabbitMQ Ack/Nack를 시스템 문제로 확인되지 못했습니다!! uuid={} error case : {}", uuid, e.getStackTrace());
 			return false;
 		}
 		return true;
