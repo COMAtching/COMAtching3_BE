@@ -4,10 +4,12 @@ import comatching.comatching3.admin.dto.request.EmailVerifyReq;
 import comatching.comatching3.admin.dto.request.ResetPasswordReq;
 import comatching.comatching3.admin.dto.request.SendResetPasswordEmailReq;
 import comatching.comatching3.admin.dto.request.SchoolEmailReq;
+import comatching.comatching3.admin.dto.response.AfterVerifyEmailRes;
 import comatching.comatching3.admin.dto.response.EmailTokenRes;
 import comatching.comatching3.admin.service.OperatorService;
 import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,11 +44,14 @@ public class OperatorController {
      * @return 인증 성공 시 ok, 실패 시 VAL-001
      */
     @PostMapping("/auth/semi/email/verify/code")
-    public Response<Void> verifyCode(@RequestBody EmailVerifyReq request) {
+    public Response<Void> verifyCode(@RequestBody EmailVerifyReq request,
+                                     HttpServletResponse response) {
 
-        Boolean result = operatorService.verifyCode(request);
+        AfterVerifyEmailRes result = operatorService.verifyCode(request);
 
-        if (result) {
+        if (result.getSuccess()) {
+            response.addHeader("Authorization", "Bearer " + result.getAccessToken());
+            response.addHeader("Refresh-Token", result.getRefreshToken());
             return Response.ok();
         } else {
             return Response.errorResponse(ResponseCode.ARGUMENT_NOT_VALID);

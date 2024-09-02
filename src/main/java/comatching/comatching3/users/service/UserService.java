@@ -3,6 +3,9 @@ package comatching.comatching3.users.service;
 
 import java.util.List;
 
+import comatching.comatching3.admin.entity.University;
+import comatching.comatching3.admin.repository.UniversityRepository;
+import comatching.comatching3.users.dto.BuyPickMeReq;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,10 +41,16 @@ public class UserService {
     private final UsersRepository usersRepository;
     private final UserAiFeatureRepository userAiFeatureRepository;
     private final ChargeRequestRepository chargeRequestRepository;
+    private final UniversityRepository universityRepository;
     private final SecurityUtil securityUtil;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
     private final UserCrudRabbitMQUtil rabbitMQUtil;
+
+    public Long getParticipations() {
+        return usersRepository.count();
+    }
+
 
     /**
      * 소셜 유저 피처 정보 입력 후 유저로 역할 변경까지
@@ -54,6 +63,9 @@ public class UserService {
         List<Hobby> hobbyList = form.getHobby().stream()
                 .map(Hobby::valueOf)
                 .toList();
+
+        University university = universityRepository.findByUniversityName(form.getUniversity())
+                .orElseThrow(() -> new BusinessException(ResponseCode.ARGUMENT_NOT_VALID));
 
         UserAiFeature userAiFeature = user.getUserAiFeature();
 
@@ -70,6 +82,7 @@ public class UserService {
         user.updateSong(form.getSong());
         user.updateComment(form.getComment());
         user.updateRole(Role.USER.getRoleName());
+        user.updateUniversity(university);
 
         usersRepository.save(user);
 
@@ -110,7 +123,7 @@ public class UserService {
         return UserInfoRes.builder()
                 .username(user.getUsername())
                 .major(user.getUserAiFeature().getMajor())
-                .admissionYear(user.getUserAiFeature().getAdmissionYear())
+                .age(user.getUserAiFeature().getAge())
                 .song(user.getSong())
                 .mbti(user.getUserAiFeature().getMbti())
                 .point(user.getPoint())
@@ -126,5 +139,20 @@ public class UserService {
     public Integer getPoints() {
         Users user = securityUtil.getCurrentUsersEntity();
         return user.getPoint();
+    }
+
+    @Transactional
+    public void buyPickMe(BuyPickMeReq req) {
+        Users user = securityUtil.getCurrentUsersEntity();
+        int price = 500;
+        int userPoint = user.getPoint();
+        int reqPoint = req.getAmount() * price;
+
+        if (reqPoint > userPoint) {
+            throw new BusinessException(ResponseCode.NOT_ENOUGH_POINT);
+        }
+
+        user.subtractPoint(reqPoint);
+        user.addPickMe(req.getAmount());
     }
 }
