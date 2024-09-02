@@ -1,6 +1,5 @@
 package comatching.comatching3.users.service;
 
-
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -15,8 +14,6 @@ import comatching.comatching3.users.dto.UserFeatureReq;
 import comatching.comatching3.users.dto.UserInfoRes;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.enums.ContactFrequency;
-import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.users.enums.Role;
 import comatching.comatching3.users.enums.UserCrudType;
@@ -58,11 +55,11 @@ public class UserService {
         UserAiFeature userAiFeature = user.getUserAiFeature();
 
         userAiFeature.updateMajor(form.getMajor());
-        userAiFeature.updateGender(Gender.valueOf(form.getGender()));
+        userAiFeature.updateGender(form.getGender());
         userAiFeature.updateAge(form.getAge());
         userAiFeature.updateMbti(form.getMbti());
         userAiFeature.updateHobby(hobbyList);
-        userAiFeature.updateContactFrequency(ContactFrequency.valueOf(form.getContactFrequency()));
+        userAiFeature.updateContactFrequency(form.getContactFrequency());
         userAiFeature.updateAdmissionYear(form.getAdmissionYear());
 
         userAiFeatureRepository.save(userAiFeature);
