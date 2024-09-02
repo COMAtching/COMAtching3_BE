@@ -10,7 +10,7 @@ import lombok.Getter;
 public class UserInfoRes {
     private String username;
     private String major;
-    private Integer admissionYear;
+    private Integer age;
     private String song;
     private String mbti;
     private Integer point;
