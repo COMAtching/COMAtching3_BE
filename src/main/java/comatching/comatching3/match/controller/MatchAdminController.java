@@ -26,14 +26,14 @@ public class MatchAdminController {
 
 	@PostMapping("match-request")
 	public Response<MatchRes> requestMatch(@RequestBody @Valid MatchReq req){
-		MatchRes res = matchService.requestMatch(req);
+		//MatchRes res = matchService.requestMatch(req);
 		//return Response.ok(res);
 		return Response.ok(MatchRes.testResult());
 	}
 
 	@PostMapping("test/crud")
 	public Response<Void> requestCrud(@RequestBody UserFeatureReq req){
-		//System.out.println(req.getGender());
+		System.out.println(req.getGender());
 		matchService.testCrud(req);
 		return Response.ok();
 	}

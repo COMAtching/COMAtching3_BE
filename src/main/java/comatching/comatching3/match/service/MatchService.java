@@ -10,17 +10,15 @@ import org.springframework.transaction.annotation.Transactional;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.history.entity.MatchingHistory;
 import comatching.comatching3.history.repository.MatchingHistoryRepository;
-import comatching.comatching3.match.AgeOption;
-import comatching.comatching3.match.ContactFrequencyOption;
 import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.match.dto.request.MatchReq;
 import comatching.comatching3.match.dto.response.MatchRes;
+import comatching.comatching3.match.enums.AgeOption;
+import comatching.comatching3.match.enums.ContactFrequencyOption;
 import comatching.comatching3.users.dto.UserFeatureReq;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.enums.ContactFrequency;
-import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.UsersRepository;
@@ -53,6 +51,7 @@ public class MatchService {
 	@Transactional
 	public MatchRes requestMatch(MatchReq matchReq){
 		String requestId = UUID.randomUUID().toString();
+		log.info("{req-contactFrequency} = {}", matchReq.getContactFrequencyOption());
 		MatchRequestMsg requestMsg = new MatchRequestMsg(matchReq);
 		MatchResponseMsg responseMsg  = matchRabbitMQUtil.match(matchReq, requestId);
 
@@ -130,10 +129,10 @@ public class MatchService {
 		}
 
 		userAiFeature.updateMbti(req.getMbti());
-		userAiFeature.updateContactFrequency(ContactFrequency.from(req.getContactFrequency()));
+		userAiFeature.updateContactFrequency(req.getContactFrequency());
 		userAiFeature.updateHobby(hobbies);
 		userAiFeature.updateAge(req.getAge());
-		userAiFeature.updateGender(Gender.from(req.getGender()));
+		userAiFeature.updateGender(req.getGender());
 		userAiFeature.updateMajor(req.getMajor());
 		userAiFeature.updateAdmissionYear(req.getAdmissionYear());
 

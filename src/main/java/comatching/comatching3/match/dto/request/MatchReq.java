@@ -1,10 +1,9 @@
 package comatching.comatching3.match.dto.request;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import comatching.comatching3.match.AgeOption;
-import comatching.comatching3.match.ContactFrequencyOption;
+import comatching.comatching3.match.enums.AgeOption;
+import comatching.comatching3.match.enums.ContactFrequencyOption;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.util.validation.ValidEnum;
 import jakarta.validation.constraints.Pattern;
