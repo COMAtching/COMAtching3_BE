@@ -55,7 +55,6 @@ public class UserCrudMsg {
 		List<Hobby> hobbyList = new ArrayList<>();
 		List<String> hobbies = Arrays.asList(hobbyString.split(","));
 
-
 		for (String hobby : hobbies) {
 			Hobby h = Hobby.from(hobby);
 			if (h != null) {

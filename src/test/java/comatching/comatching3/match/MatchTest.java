@@ -23,6 +23,8 @@ import comatching.comatching3.history.repository.MatchingHistoryRepository;
 import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.match.dto.request.MatchReq;
 import comatching.comatching3.match.dto.response.MatchRes;
+import comatching.comatching3.match.enums.AgeOption;
+import comatching.comatching3.match.enums.ContactFrequencyOption;
 import comatching.comatching3.match.service.MatchService;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;

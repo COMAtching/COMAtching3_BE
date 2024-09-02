@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.history.entity.MatchingHistory;
 import comatching.comatching3.history.repository.MatchingHistoryRepository;
-import comatching.comatching3.match.AgeOption;
-import comatching.comatching3.match.ContactFrequencyOption;
+import comatching.comatching3.match.enums.AgeOption;
+import comatching.comatching3.match.enums.ContactFrequencyOption;
 import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.match.dto.request.MatchReq;
@@ -53,6 +53,7 @@ public class MatchService {
 	@Transactional
 	public MatchRes requestMatch(MatchReq matchReq){
 		String requestId = UUID.randomUUID().toString();
+		log.info("{req-contactFrequency} = {}", matchReq.getContactFrequencyOption());
 		MatchRequestMsg requestMsg = new MatchRequestMsg(matchReq);
 		MatchResponseMsg responseMsg  = matchRabbitMQUtil.match(matchReq, requestId);
 
