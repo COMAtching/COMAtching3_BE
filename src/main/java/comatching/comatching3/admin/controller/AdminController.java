@@ -42,7 +42,7 @@ public class AdminController {
      * @return ok
      */
     @PostMapping("/admin/login")
-    public Response<Void> adminLogin(@RequestBody AdminLoginReq form,
+    public Response<TokenRes> adminLogin(@RequestBody AdminLoginReq form,
                            HttpServletResponse response) {
 
         TokenRes tokens = adminService.adminLogin(form);
@@ -50,7 +50,7 @@ public class AdminController {
         response.addHeader("Authorization", "Bearer " + tokens.getAccessToken());
         response.addHeader("Refresh-Token", tokens.getRefreshToken());
 
-        return Response.ok();
+        return Response.ok(tokens);
     }
 
     /**

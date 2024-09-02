@@ -4,12 +4,16 @@ import comatching.comatching3.admin.dto.request.EmailVerifyReq;
 import comatching.comatching3.admin.dto.request.ResetPasswordReq;
 import comatching.comatching3.admin.dto.request.SendResetPasswordEmailReq;
 import comatching.comatching3.admin.dto.request.SchoolEmailReq;
+import comatching.comatching3.admin.dto.response.AfterVerifyEmailRes;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.enums.AdminRole;
 import comatching.comatching3.admin.repository.AdminRepository;
 import comatching.comatching3.exception.BusinessException;
+import comatching.comatching3.users.auth.jwt.JwtUtil;
+import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.util.EmailUtil;
 import comatching.comatching3.util.ResponseCode;
+import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,6 +31,8 @@ public class OperatorService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final SecurityUtil securityUtil;
+    private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
     private final EmailUtil emailUtil;
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
@@ -53,19 +59,32 @@ public class OperatorService {
     }
 
     @Transactional
-    public Boolean verifyCode(EmailVerifyReq request) {
+    public AfterVerifyEmailRes verifyCode(EmailVerifyReq request) {
         String redisKey = "email-verification:" + request.getToken();
         String storedCode = (String) redisTemplate.opsForValue().get(redisKey);
 
+        AfterVerifyEmailRes response = new AfterVerifyEmailRes();
         if (storedCode != null && storedCode.equals(request.getCode())) {
             Admin admin = securityUtil.getAdminFromContext();
             admin.changeAdminRole(admin.getAdminRole().equals(AdminRole.ROLE_SEMI_ADMIN) ? AdminRole.ROLE_ADMIN : AdminRole.ROLE_OPERATOR);
             adminRepository.save(admin);
 
+            String uuid = UUIDUtil.bytesToHex(admin.getUuid());
+            String accessToken = jwtUtil.generateAccessToken(uuid, String.valueOf(admin.getAdminRole()));
+            String refreshToken = refreshTokenService.getRefreshToken(uuid);
+
+            securityUtil.setAuthentication(accessToken);
+
             redisTemplate.delete(redisKey);
-            return true;
+            response.setAccessToken(accessToken);
+            response.setRefreshToken(refreshToken);
+            response.setSuccess(true);
+            return response;
         }
-        return false;
+        response.setAccessToken(null);
+        response.setRefreshToken(null);
+        response.setSuccess(false);
+        return response;
     }
 
     // todo: 아이디를 다 알려주지말고 조금만 보여줄지 고민

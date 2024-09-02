@@ -121,4 +121,12 @@ public class Users extends BaseEntity {
 	public void subtractPoint(Integer point) {
 		this.point -= point;
 	}
+
+	public void addPickMe(Integer pickMe) {
+		this.pickMe += pickMe;
+	}
+
+	public void subtractPickMe(Integer pickMe) {
+		this.pickMe -= pickMe;
+	}
 }

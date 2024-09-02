@@ -10,6 +10,7 @@ import lombok.Getter;
 
 @Getter
 public class UserFeatureReq {
+    private String university;
     private String major;
 //    private String contactId; 아직 안정해져서 주석처리
     private Gender gender;
