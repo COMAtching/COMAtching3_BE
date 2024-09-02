@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Charge Request Monitor</title>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
@@ -19,66 +19,91 @@
         <th>Actions</th>
     </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
 </table>
 
 <script type="text/javascript">
-    var socket = new SockJS('http://3.36.57.86:8080/ws');  // Update the URL to your WebSocket address
+    var socket = new SockJS("http://backend.comatching.site:8080/ws"); // Update the URL to your WebSocket address
     var stompClient = Stomp.over(socket);
+    var token =
+        "eyJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiMTFlZjY2YWYwMjYzMzI4ZDgzZDY1MWVjMjAwYTRjZGQiLCJyb2xlIjoiUk9MRV9TRU1JX09QRVJBVE9SIiwiaWF0IjoxNzI1MDc3MDYxLCJleHAiOjE3MjUwODA2NjF9.KhTDYCW9kc0RXou40R59x-ifxAGWifiunFyFV80Hn1w";
 
-    stompClient.connect({}, function (frame) {
-        // console.log('Connected: ' + frame);
+    stompClient.connect(
+        { Authorization: "Bearer " + token },
+        function (frame) {
+            // console.log('Connected: ' + frame);
 
-        // Subscribe to the topic
-        stompClient.subscribe('/topic/chargeRequests', function (message) {
-            var chargeRequests = JSON.parse(message.body);
-            chargeRequests.forEach(chargeRequest => {
-                addChargeRequestToTable(chargeRequest);
+            // Subscribe to the topic
+            stompClient.subscribe("/topic/chargeRequests", function (message) {
+                var chargeRequests = JSON.parse(message.body);
+                chargeRequests.forEach((chargeRequest) => {
+                    addChargeRequestToTable(chargeRequest);
+                });
             });
-        });
 
-        stompClient.subscribe('/topic/approvalUpdate', function (message) {
-            var userId = message.body;
-            removeRequestFromTable(userId);
-        });
-    });
+            stompClient.subscribe("/topic/approvalUpdate", function (message) {
+                var userId = message.body;
+                removeRequestFromTable(userId);
+            });
+        }
+    );
 
     function addChargeRequestToTable(chargeRequest) {
-        var table = document.getElementById('requestsTable').getElementsByTagName('tbody')[0];
+        if (document.querySelector("#request-" + chargeRequest.userId)) {
+            return; // 요청이 이미 테이블에 있으면 추가하지 않음
+        }
+        var table = document
+            .getElementById("requestsTable")
+            .getElementsByTagName("tbody")[0];
         var newRow = table.insertRow(table.rows.length);
+        newRow.id = "request-" + chargeRequest.userId; // 각 요청에 고유 ID 부여
 
         newRow.insertCell(0).innerHTML = chargeRequest.userId;
         newRow.insertCell(1).innerHTML = chargeRequest.username;
-        newRow.insertCell(2).innerHTML = chargeRequest.requestAmount;
+
+        var amountInput =
+            '<input type="number" value="' +
+            chargeRequest.requestAmount +
+            '" id="amount-' +
+            chargeRequest.userId +
+            '">';
+        newRow.insertCell(2).innerHTML = amountInput;
+
         newRow.insertCell(3).innerHTML = chargeRequest.existingPoints;
-        newRow.insertCell(4).innerHTML = formatDateTime(chargeRequest.createdAt);
-        var approveBtn = '<button onclick="approveCharge(\'' + chargeRequest.userId + '\', ' + chargeRequest.requestAmount + ')">Approve</button>';
+        newRow.insertCell(4).innerHTML = formatDateTime(
+            chargeRequest.createdAt
+        );
+
+        var approveBtn =
+            "<button onclick=\"approveCharge('" +
+            chargeRequest.userId +
+            "')\">Approve</button>";
         newRow.insertCell(5).innerHTML = approveBtn;
     }
 
     function formatDateTime(dateTimeStr) {
         var date = new Date(dateTimeStr);
-        return date.toLocaleString();  // 날짜 형식을 보기 좋게 변환, 오류 시 Date 포맷 조정 필요
+        return date.toLocaleString(); // 날짜 형식을 보기 좋게 변환, 오류 시 Date 포맷 조정 필요
     }
 
-    function approveCharge(userId, amount) {
-        // 여기서 승인 로직을 처리합니다.
-        // console.log('Approving charge for user ID: ' + userId + ' with amount: ' + amount);
+    function approveCharge(userId) {
+        var amount = document.getElementById("amount-" + userId).value; // 입력 필드에서 수정된 값을 가져옴
         var approvalData = {
             userId: userId,
             amount: amount,
-            approvalTime: new Date().toISOString()
+            approvalTime: new Date().toISOString(),
         };
-        stompClient.send("/app/approveCharge", {}, JSON.stringify(approvalData));
+        stompClient.send(
+            "/app/approveCharge",
+            {},
+            JSON.stringify(approvalData)
+        );
     }
-
-
 
     function removeRequestFromTable(userId) {
         // 테이블에서 해당 userId를 가진 요청을 찾아 제거
-        var rows = document.querySelectorAll('#requestsTable tbody tr');
-        rows.forEach(row => {
+        var rows = document.querySelectorAll("#requestsTable tbody tr");
+        rows.forEach((row) => {
             if (row.cells[0].textContent === userId) {
                 row.remove();
             }
