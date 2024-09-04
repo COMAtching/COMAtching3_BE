@@ -26,7 +26,7 @@ public class MatchAdminController {
 
 	@PostMapping("match-request")
 	public Response<MatchRes> requestMatch(@RequestBody @Valid MatchReq req){
-		//MatchRes res = matchService.requestMatch(req);
+		MatchRes res = matchService.requestMatch(req);
 		//return Response.ok(res);
 		return Response.ok(MatchRes.testResult());
 	}

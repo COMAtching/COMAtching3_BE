@@ -106,7 +106,7 @@ public class MatchService {
 			point += 100;
 		}
 
-		if(!msg.getHobbyOption().get(0).equals(Hobby.UNSELECTED.getValue())){
+		if(!msg.getHobbyOption().get(0).equals(Hobby.UNSELECTED)){
 			point += 100;
 		}
 
