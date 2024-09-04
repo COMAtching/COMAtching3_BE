@@ -69,9 +69,9 @@ public class MatchingHistory {
 
 	public void updateOptionsFromRequestMsg(MatchRequestMsg matchRequestMsg){
 		this.noSameMajorOption = matchRequestMsg.getSameMajorOption();
-		this.hobbyOption = matchRequestMsg.getHobbyOption();
+		this.hobbyOption =Hobby.convertStringToHobbies(matchRequestMsg.getHobbyOption());
 		this.ageOption = matchRequestMsg.getAgeOption();
-		this.mbtiOption = matchRequestMsg.getMbti();
+		this.mbtiOption = matchRequestMsg.getMbtiOption();
 		this.contactFrequencyOption = matchRequestMsg.getContactFrequencyOption();
 	}
 
