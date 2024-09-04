@@ -120,8 +120,8 @@ public class MatchTest {
 				.build();
 
 		MatchResponseMsg matchResponseMsg = new MatchResponseMsg();
-		matchResponseMsg.setUuid(UUIDUtil.bytesToHex(enemyUuid));
-		System.out.println("uuid: " + matchResponseMsg.getUuid());
+		matchResponseMsg.setEnemyUuid(UUIDUtil.bytesToHex(enemyUuid));
+		System.out.println("uuid: " + matchResponseMsg.getEnemyUuid());
 		Users enemy = em.find(Users.class, this.enemy.getId());
 		Users applier = em.find(Users.class, this.applier.getId());
 
@@ -141,7 +141,7 @@ public class MatchTest {
 
 		//then
 		applier = em.find(Users.class, this.applier.getId());
-		MatchingHistory matchingHistory = matchingHistoryRepository.findMatchingHistoriesByApplierId(applier.getId()).get(0);
+		MatchingHistory matchingHistory = matchingHistoryRepository.findMatchingHistoriesByApplierId(applier.getId()).get().get(0);
 
 		assertThat(applier.getPoint()).isEqualTo(originalPoint-800);
 		assertThat(applier.getPickMe()).isEqualTo(originalPickMe-1);

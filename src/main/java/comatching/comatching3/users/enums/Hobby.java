@@ -1,5 +1,7 @@
 package comatching.comatching3.users.enums;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -48,4 +50,33 @@ public enum Hobby {
 	public String getValue() {
 		return value;
 	}
+
+	public static String convertHobbiesString(List<Hobby> hobbies) {
+		StringBuilder hobbiesString = new StringBuilder();
+
+		for (int i = 0; i < hobbies.size(); i++) {
+			hobbiesString.append(hobbies.get(i).getValue());
+			if (i < hobbies.size() - 1) {
+				hobbiesString.append(", ");
+			}
+		}
+
+		return hobbiesString.toString();
+	}
+	public static List<Hobby> convertStringToHobbies(String hobbiesString) {
+		List<Hobby> hobbiesList = new ArrayList<>();
+
+		// 문자열을 콤마로 분리
+		List<String> hobbyNames = Arrays.asList(hobbiesString.split(","));
+
+		for (String hobbyName : hobbyNames) {
+			Hobby hobby = Hobby.from(hobbyName);
+			if (hobby != null) {
+				hobbiesList.add(hobby);
+			}
+		}
+
+		return hobbiesList;
+	}
+
 }

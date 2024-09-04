@@ -52,20 +52,21 @@ public class MatchService {
 	public MatchRes requestMatch(MatchReq matchReq){
 		String requestId = UUID.randomUUID().toString();
 		log.info("{req-contactFrequency} = {}", matchReq.getContactFrequencyOption());
-		MatchRequestMsg requestMsg = new MatchRequestMsg(matchReq);
+		MatchRequestMsg requestMsg = new MatchRequestMsg();
+		requestMsg.fromMatchReq(matchReq);
 		MatchResponseMsg responseMsg  = matchRabbitMQUtil.match(matchReq, requestId);
 
-		log.info("{match-queues} = enemyId:{}", responseMsg.getUuid());
+		log.info("{match-queues} = enemyId:{}", responseMsg.getEnemyUuid());
 
 		//사용자 조회
 		// todo : 조회 불가시 보상 처리
-		byte[] enemyUuid = UUIDUtil.uuidStringToBytes(responseMsg.getUuid());
+		byte[] enemyUuid = UUIDUtil.uuidStringToBytes(responseMsg.getEnemyUuid());
 		Users enemy = usersRepository.findUsersByUuid(enemyUuid)
 			.orElseThrow( () -> new BusinessException(ResponseCode.MATCH_GENERAL_FAIL));
 		Users applier = securityUtil.getCurrentUsersEntity();
 
 		//포인트 & pickMe 차감
-		Integer usePoint = calcPoint(requestMsg);
+		Integer usePoint = calcPoint(matchReq);
 		applier.subtractPoint(usePoint);
 		enemy.updatePickMe(enemy.getPickMe() - 1);
 
@@ -94,7 +95,7 @@ public class MatchService {
 	 * @param msg : 리퀘스트 정보
 	 * @return : 요청된 매칭 포인트
 	 */
-	private Integer calcPoint(MatchRequestMsg msg){
+	private Integer calcPoint(MatchReq msg){
 		Integer point = 500;
 
 		if(!msg.getAgeOption().equals(AgeOption.UNSELECTED)){
