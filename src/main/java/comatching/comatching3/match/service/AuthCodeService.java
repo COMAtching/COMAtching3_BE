@@ -72,8 +72,6 @@ public class AuthCodeService {
 		} catch(JsonProcessingException e){
 			throw new BusinessException(ResponseCode.MATCH_CODE_CHECK_FAIL);
 		}
-
-
 	}
 
 	public void updateTime(String code, CodeCheckInfo info){

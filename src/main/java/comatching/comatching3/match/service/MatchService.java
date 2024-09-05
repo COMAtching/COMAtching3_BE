@@ -51,10 +51,21 @@ public class MatchService {
 	@Transactional
 	public MatchRes requestMatch(MatchReq matchReq){
 		String requestId = UUID.randomUUID().toString();
-		log.info("{req-contactFrequency} = {}", matchReq.getContactFrequencyOption());
+		Users applier = securityUtil.getCurrentUsersEntity();
 		MatchRequestMsg requestMsg = new MatchRequestMsg();
 		requestMsg.fromMatchReq(matchReq);
-		MatchResponseMsg responseMsg  = matchRabbitMQUtil.match(matchReq, requestId);
+
+		List<MatchingHistory> matchingHistories = matchingHistoryRepository.findMatchingHistoriesByApplierId(applier.getId())
+			.orElse(null);
+
+		if(matchingHistories == null){
+			requestMsg.updateNoDuplication();
+		}
+		else{
+			requestMsg.updateDuplicationListFromHistory(matchingHistories);
+		}
+
+		MatchResponseMsg responseMsg  = matchRabbitMQUtil.match(requestMsg, requestId);
 
 		log.info("{match-queues} = enemyId:{}", responseMsg.getEnemyUuid());
 
@@ -63,7 +74,7 @@ public class MatchService {
 		byte[] enemyUuid = UUIDUtil.uuidStringToBytes(responseMsg.getEnemyUuid());
 		Users enemy = usersRepository.findUsersByUuid(enemyUuid)
 			.orElseThrow( () -> new BusinessException(ResponseCode.MATCH_GENERAL_FAIL));
-		Users applier = securityUtil.getCurrentUsersEntity();
+
 
 		//포인트 & pickMe 차감
 		Integer usePoint = calcPoint(matchReq);
@@ -89,6 +100,18 @@ public class MatchService {
 		MatchRes response = MatchRes.fromUsers(enemy);
 		return response;
 	}
+
+	public void matchRequestTest(MatchReq matchReq){
+		String requestId = UUID.randomUUID().toString();
+
+		MatchRequestMsg requestMsg = new MatchRequestMsg();
+		requestMsg.fromMatchReq(matchReq);
+		requestMsg.updateDuplicationList(matchReq.getDuplicationList());
+
+		MatchResponseMsg responseMsg  = matchRabbitMQUtil.match(requestMsg, requestId);
+		log.info("{match-queues} = enemyId:{}", responseMsg.getEnemyUuid());
+	}
+
 
 	/**
 	 * 매칭 포인트 계산 메서드
@@ -141,6 +164,6 @@ public class MatchService {
 		userAiFeature.updateMajor(req.getMajor());
 		userAiFeature.updateAdmissionYear(req.getAdmissionYear());
 
-		userCrudRabbitMQUtil.sendUserChange(userAiFeature,UserCrudType.DELETE);
+		userCrudRabbitMQUtil.sendUserChange(userAiFeature,UserCrudType.CREATE);
 	}
 }

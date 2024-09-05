@@ -27,4 +27,5 @@ public class MatchReq {
 	@ValidEnum(enumClass = ContactFrequencyOption.class)
 	protected ContactFrequencyOption contactFrequencyOption;
 	protected Boolean sameMajorOption;
+	protected String duplicationList;
 }

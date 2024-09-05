@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
-import comatching.comatching3.match.dto.request.MatchReq;
 import comatching.comatching3.util.ResponseCode;
 
 @Component
@@ -27,13 +26,11 @@ public class MatchRabbitMQUtil {
 
 	/**
 	 * 메세지 브로커로 매칭 요청 & 응답 처리
-	 * @param matchReq : 매칭 리퀘스트 정보
+	 * @param requestMsg : 매칭 리퀘스트 정보
 	 * @param requestId : 매칭 요청 고유 id
 	 * @return : 결과로 나온 유저의 uuid
 	 */
-	public MatchResponseMsg match(MatchReq matchReq, String requestId) {
-		MatchRequestMsg requestMsg = new MatchRequestMsg();
-		requestMsg.fromMatchReq(matchReq);
+	public MatchResponseMsg match(MatchRequestMsg requestMsg, String requestId) {
 		CorrelationData correlationData = new CorrelationData(requestId);
 		ParameterizedTypeReference<MatchResponseMsg> responseType = new ParameterizedTypeReference<MatchResponseMsg>(){};
 
