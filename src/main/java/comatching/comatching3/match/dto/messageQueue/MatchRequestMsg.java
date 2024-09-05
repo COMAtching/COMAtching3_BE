@@ -26,7 +26,7 @@ public class MatchRequestMsg{
 		this.hobbyOption = Hobby.convertHobbiesString(matchReq.getHobbyOption());
 		this.sameMajorOption = matchReq.getSameMajorOption();
 		this.ageOption = matchReq.getAgeOption();
-		this.mbtiOption = matchReq.getMbti();
+		this.mbtiOption = matchReq.getMbtiOption();
 		this.myMajor = "정보통신전자공학부";
 		this.myAge = 24;
 	}
