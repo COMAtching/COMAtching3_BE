@@ -1,9 +1,7 @@
 package comatching.comatching3.config;
 
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +46,8 @@ public class RabbitMQConfig {
 	public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(jackson2JsonMessageConverter());
-		rabbitTemplate.setConfirmCallback(((correlationData, ack, cause) -> {
+
+		/*rabbitTemplate.setConfirmCallback(((correlationData, ack, cause) -> {
 			if(!ack){
 				Message message = correlationData.getReturned().getMessage();
 				byte[] body = message.getBody();
@@ -56,7 +55,7 @@ public class RabbitMQConfig {
 			}
 			correlationData.getFuture().complete(new CorrelationData.Confirm(true, "success"));
 			log.info("received ack");
-		}));
+		}));*/
 		return rabbitTemplate;
 	}
 }

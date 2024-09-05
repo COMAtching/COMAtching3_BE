@@ -26,9 +26,16 @@ public class MatchAdminController {
 
 	@PostMapping("/match-request")
 	public Response<MatchRes> requestMatch(@RequestBody @Valid MatchReq req){
-		//MatchRes res = matchService.requestMatch(req);
+		MatchRes res = matchService.requestMatch(req);
 		//return Response.ok(res);
 		return Response.ok(MatchRes.testResult());
+	}
+
+	@PostMapping("/match-request/test")
+	public Response requestMatchTest(@RequestBody @Valid MatchReq req){
+		matchService.matchRequestTest(req);
+		//return Response.ok(res);
+		return Response.ok();
 	}
 
 	@PostMapping("/test/crud")
@@ -42,6 +49,5 @@ public class MatchAdminController {
 	public Response<CodeCheckRes> checkCode(CodeCheckReq req){
 		CodeCheckRes res = authCodeService.checkCode(req);
 		return Response.ok(res);
-
 	}
 }

@@ -24,11 +24,7 @@ public class UserCrudRabbitMQUtil {
 	@Value("${rabbitmq.routing-keys.user-crud-request}")
 	private String userCrudQueue;
 
-	@Value("${rabbitmq.routing-keys.user-crud-compensation}")
-	private String userCrudCompensation;
-
 	private final RabbitTemplate rabbitTemplate;
-	private final RabbitMQUtil rabbitMQUtil;
 
 	/**
 	 * AI CSV에 반영하려는 데이터를 메세지큐로 보냄
@@ -36,6 +32,7 @@ public class UserCrudRabbitMQUtil {
 	 * @param type : CSV 반영 방법 (UserCrudType 참고)
 	 */
 	public Boolean sendUserChange(UserAiFeature feature, UserCrudType type){
+		rabbitTemplate.setReplyTimeout(10000);
 
 		String requestId = UUID.randomUUID().toString();
 		CorrelationData correlationData = new CorrelationData(requestId);
@@ -55,27 +52,7 @@ public class UserCrudRabbitMQUtil {
 			return false;
 		}
 
-		// todo: correlationData confirm callback 확인 로직 수정 필요
-		/*
-		int sendAttempt = 0;
-		while(sendAttempt < 3){
-
-			rabbitTemplate.convertAndSend(userCrudQueue,userCrudMsg, correlationData);
-
-			if(rabbitMQUtil.checkAcknowledge(correlationData, userCrudMsg.getUuid())){
-				return true;
-			}
-			sendAttempt++;
-		}
-
-		return false;*/
-
-		log.info("[compensation Success]= errorCode: {} errorMsg: {}",response.getErrorCode(), response.getErrorMessage() );
+		log.info("[compensation Success]= errorCode: {} errorMsg: {}",response.getErrorCode(), response.getErrorMessage());
 		return true;
 	}
-
-	/*@RabbitListener(queues = "${rabbitmq.routing-keys.user-crud-compensation}")
-	public void handleCompensationMessage(CompensationMsg msg){
-		log.warn("ai server fail work for request \n error code - {} \n error message - {}", msg.getErrorCode(), msg.getErrorMessage());
-	}*/
 }
