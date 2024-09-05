@@ -114,6 +114,10 @@ public class MatchService {
 			point += 200;
 		}
 
+		/*if(!msg.getMbti().equals("UNSELECTED")){
+			point += 200;
+		}*/
+
 		return point;
 	}
 
@@ -137,6 +141,6 @@ public class MatchService {
 		userAiFeature.updateMajor(req.getMajor());
 		userAiFeature.updateAdmissionYear(req.getAdmissionYear());
 
-		userCrudRabbitMQUtil.sendUserChange(userAiFeature,UserCrudType.CREATE);
+		userCrudRabbitMQUtil.sendUserChange(userAiFeature,UserCrudType.DELETE);
 	}
 }
