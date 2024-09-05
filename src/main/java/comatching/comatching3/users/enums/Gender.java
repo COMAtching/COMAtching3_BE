@@ -7,14 +7,14 @@ import lombok.Getter;
 
 @Getter
 public enum Gender {
-	MALE(0, "남자"),
-	FEMALE(1, "여자");
+	MALE("MALE", "남자"),
+	FEMALE("FEMALE", "여자");
 
-	private final Integer vector;
+	private final String aiValue;
 	private final String value;
 
-	Gender(Integer vector, String value) {
-		this.vector = vector;
+	Gender(String vector, String value) {
+		this.aiValue = vector;
 		this.value = value;
 	}
 

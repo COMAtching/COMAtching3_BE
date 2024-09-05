@@ -8,15 +8,15 @@ import lombok.Getter;
 @Getter
 public enum ContactFrequency {
 
-	FREQUENT(2, "자주"),
-	NORMAL(1, "보통"),
-	NOT_FREQUENT(0, "가끔");
+	FREQUENT("FREQUENT", "자주"),
+	NORMAL("NORMAL", "보통"),
+	NOT_FREQUENT("NOT_FREQUENT", "가끔");
 
-	private final Integer vector;
+	private final String aiValue;
 	private final String value;
 
-	ContactFrequency(Integer vector, String value) {
-		this.vector = vector;
+	ContactFrequency(String vector, String value) {
+		this.aiValue = vector;
 		this.value = value;
 	}
 
