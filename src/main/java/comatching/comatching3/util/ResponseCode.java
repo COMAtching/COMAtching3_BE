@@ -33,7 +33,8 @@ public enum ResponseCode {
 	MATCH_GENERAL_FAIL(400, "MAT-001", HttpStatus.BAD_REQUEST, "Matching request process is failed"),
 	MATCH_TIME_OVER(400, "MAT-002", HttpStatus.BAD_REQUEST, "Match process time is over please try again"),
 	MATCH_CODE_GENERATE_FAIL(400, "MAT-003", HttpStatus.BAD_REQUEST, "Match auth code generate failed"),
-	MATCH_CODE_CHECK_FAIL(400, "MAT-003", HttpStatus.BAD_REQUEST, "Match auth code authentication failed"),
+	MATCH_CODE_CHECK_FAIL(400, "MAT-004", HttpStatus.BAD_REQUEST, "Match auth code authentication failed"),
+	NO_MATCH_RESPONSE(400, "MAT-005", HttpStatus.BAD_REQUEST, "Couldn't receive the response message from ai server"),
 
 
 	//History exception response

@@ -19,7 +19,7 @@ public class MatchReq {
 
 	@ValidEnum(enumClass = AgeOption.class)
 	protected AgeOption ageOption;
-	protected String mbti;
+	protected String mbtiOption;
 
 	@ValidEnum(enumClass =  Hobby.class)
 	protected List<Hobby> hobbyOption;

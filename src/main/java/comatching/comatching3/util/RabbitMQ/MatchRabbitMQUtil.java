@@ -1,8 +1,8 @@
 package comatching.comatching3.util.RabbitMQ;
 
 import org.springframework.amqp.core.MessagePostProcessor;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -45,7 +45,7 @@ public class MatchRabbitMQUtil {
 			responseType);
 
 		if(response == null){
-			throw new BusinessException(ResponseCode.MATCH_GENERAL_FAIL);
+			throw new BusinessException(ResponseCode.NO_MATCH_RESPONSE);
 		}
 
 		return response;

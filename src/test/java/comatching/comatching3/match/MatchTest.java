@@ -113,7 +113,7 @@ public class MatchTest {
 		MatchReq testMatchReq = MatchReq.builder()
 				.uuid(UUIDUtil.bytesToHex(applierUuid))
 				.ageOption(AgeOption.EQUAL)
-				.mbti("EN")
+				.mbtiOption("EN")
 				.hobbyOption(List.of(Hobby.게임, Hobby.독서))
 				.contactFrequencyOption(ContactFrequencyOption.FREQUENT)
 				.sameMajorOption(false)
