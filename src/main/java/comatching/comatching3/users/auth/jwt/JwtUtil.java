@@ -1,5 +1,7 @@
 package comatching.comatching3.users.auth.jwt;
 
+import comatching.comatching3.admin.enums.AdminRole;
+import comatching.comatching3.users.enums.Role;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,8 @@ public class JwtUtil {
 
     public static final long REFRESH_TOKEN_EXPIRATION = TimeUnit.DAYS.toMillis(1);
 //    public static final long ACCESS_TOKEN_EXPIRATION = TimeUnit.HOURS.toMillis(1);
-    public static final long ACCESS_TOKEN_EXPIRATION = TimeUnit.MINUTES.toMillis(60);
+    public static final long USER_ACCESS_TOKEN_EXPIRATION = TimeUnit.MINUTES.toMillis(60);
+    public static final long ADMIN_ACCESS_TOKEN_EXPIRATION = TimeUnit.MINUTES.toMillis(240);
 
 
     public JwtUtil(@Value("${jwt.secret}") String secret) {
@@ -63,7 +66,10 @@ public class JwtUtil {
                 .before(new Date());
     }
     public String generateAccessToken(String uuid, String role) {
-        return generateToken(uuid, role, ACCESS_TOKEN_EXPIRATION);
+        if (role.equals(AdminRole.ROLE_ADMIN.getRoleName())) {
+            return generateToken(uuid, role, ADMIN_ACCESS_TOKEN_EXPIRATION);
+        }
+        return generateToken(uuid, role, USER_ACCESS_TOKEN_EXPIRATION);
     }
     public String generateRefreshToken(String uuid, String role) {
         return generateToken(uuid, role, REFRESH_TOKEN_EXPIRATION);
