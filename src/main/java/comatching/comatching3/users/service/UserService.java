@@ -19,7 +19,6 @@ import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.users.enums.Role;
-import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
@@ -80,6 +79,7 @@ public class UserService {
         user.updateComment(form.getComment());
         user.updateRole(Role.USER.getRoleName());
         user.updateUniversity(university);
+        user.updateContactId(form.getContactId());
 
         usersRepository.save(user);
 
@@ -93,11 +93,11 @@ public class UserService {
         /**
          * csv 반영 요청 3번까지 요청 후 안되면 throw (최대 30초)
          */
-        Boolean sendSuccess = rabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
-
-        if(!sendSuccess){
-            throw new BusinessException(ResponseCode.USER_REGISTER_FAIL);
-        }
+//        Boolean sendSuccess = rabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+//
+//        if(!sendSuccess){
+//            throw new BusinessException(ResponseCode.USER_REGISTER_FAIL);
+//        }
 
         return TokenRes.builder()
                 .accessToken(accessToken)
@@ -123,9 +123,11 @@ public class UserService {
                 .age(user.getUserAiFeature().getAge())
                 .song(user.getSong())
                 .mbti(user.getUserAiFeature().getMbti())
+                .contactId(user.getContactId())
                 .point(user.getPoint())
                 .pickMe(user.getPickMe())
                 .canRequestCharge(canRequest)
+                .participations(getParticipations())
                 .build();
     }
 

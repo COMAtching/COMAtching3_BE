@@ -78,6 +78,8 @@ public class Users extends BaseEntity {
 
 	private String schoolMail;
 
+	private String contactId;
+
 
 	@Builder
 	public Users(String socialId, String role, String username) {
@@ -129,4 +131,8 @@ public class Users extends BaseEntity {
 	public void subtractPickMe(Integer pickMe) {
 		this.pickMe -= pickMe;
 	}
+
+	public void updateContactId(String contactId) {this.contactId = contactId;}
+
+
 }
