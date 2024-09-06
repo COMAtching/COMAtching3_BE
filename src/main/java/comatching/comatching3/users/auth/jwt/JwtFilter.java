@@ -1,6 +1,7 @@
 package comatching.comatching3.users.auth.jwt;
 
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
+import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.security.SecurityUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -87,7 +88,8 @@ public class JwtFilter extends OncePerRequestFilter {
                     response.setHeader("Authorization", "Bearer " + newAccessToken);
                     response.setHeader("Refresh-Token", newRefreshToken);
                     securityUtil.setAuthentication(newAccessToken);
-                    filterChain.doFilter(request, response);
+                    Users user = securityUtil.getCurrentUsersEntity();
+                    log.info("새로 등록한 유저 정보 출력(필터 안) " + user.getUsername() + "권한 " + user.getRole());
                 } else {
                     log.info("레디스와 리프레시 토큰 다름");
 //                    response.sendRedirect("/login");
@@ -106,6 +108,7 @@ public class JwtFilter extends OncePerRequestFilter {
             throw new JwtException("TOKEN_INVALID");
         }
 
+        log.info("필터 잘 넘어가는중~!!");
         filterChain.doFilter(request, response);
     }
 
@@ -129,7 +132,7 @@ public class JwtFilter extends OncePerRequestFilter {
         response.setHeader("X-Content-Type-Options", "nosniff"); //브라우저가 MIME 타입을 스니핑하지 못하도록 설정
 //        response.setHeader("X-Frame-Options", "DENY"); //페이지가 iframe 또는 프레임에 삽입되지 않도록 설정하여 Clickjacking 공격을 방지
 //        response.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains"); //모든 연결이 HTTPS를 통해 이루어지도록 강제
-        response.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' https://trusted-cdn.com");
+//        response.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' https://trusted-cdn.com");
     }
 
 }
