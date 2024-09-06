@@ -7,6 +7,7 @@ import java.util.List;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.users.enums.UserCrudType;
+import comatching.comatching3.util.UUIDUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,8 +27,8 @@ public class UserCrudMsg {
 
 	public void updateFromUserAIFeatureAndType(UserCrudType type, UserAiFeature userAiFeature){
 		this.type = type;
-		//this.uuid = UUIDUtil.bytesToHex(userAiFeature.getUuid());
-		this.uuid = "11ef6b568b0cdc2985f9c1ab3fa5c8fc";
+		this.uuid = UUIDUtil.bytesToHex(userAiFeature.getUuid());
+		//this.uuid = "11ef6b568b0cdc2985f9c1ab3fa5c8fc";
 		this.mbti = userAiFeature.getMbti();
 		this.contactFrequency = userAiFeature.getContactFrequency().getAiValue();
 		this.hobby = toHobbyString(userAiFeature.getHobby());
