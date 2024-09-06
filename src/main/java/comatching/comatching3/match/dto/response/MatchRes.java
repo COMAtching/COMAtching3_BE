@@ -22,7 +22,8 @@ public class MatchRes {
 	private Gender gender;
 	private String major;
 	private Integer currentPoint;
-	private String socialId;
+	private Integer admissionYear;
+	private String contactId;
 
 	public static MatchRes fromUsers(Users users){
         return MatchRes.builder()
@@ -34,7 +35,8 @@ public class MatchRes {
 			.age(users.getUserAiFeature().getAge())
 			.major(users.getUserAiFeature().getMajor())
 			.currentPoint(users.getPoint())
-			.socialId(users.getSocialId())
+			.contactId(users.getContactId())
+			.admissionYear(users.getUserAiFeature().getAdmissionYear())
 			.build();
 	}
 
@@ -57,7 +59,7 @@ public class MatchRes {
 			.major("컴퓨터정보공학부")
 			.gender(Gender.FEMALE)
 			.currentPoint(1500)
-			.socialId("@instagramId")
+			.contactId("@instagramId")
 			.build();
 	}
 
