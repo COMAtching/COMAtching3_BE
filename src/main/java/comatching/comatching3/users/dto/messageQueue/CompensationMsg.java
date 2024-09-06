@@ -1,12 +1,25 @@
 package comatching.comatching3.users.dto.messageQueue;
 
-import comatching.comatching3.users.enums.UserCrudType;
-import lombok.Getter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Getter
+import lombok.Data;
+
+@Data
 public class CompensationMsg{
 	private String errorCode;
 	private String errorMessage;
-	private UserCrudType requestType;
+	private String requestType;
 	private String userId;
+
+	public String toJson() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			return objectMapper.writeValueAsString(this);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }
+
