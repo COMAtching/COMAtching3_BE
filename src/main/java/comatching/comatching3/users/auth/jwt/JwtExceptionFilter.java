@@ -33,7 +33,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         response.setContentType("application/json; charset=UTF-8");
 
         Response<?> res;
-        if ("TOKEN_EXPIRE".equals(ex.getMessage())) {
+        if ("TOKEN_EXPIRED".equals(ex.getMessage())) {
             res = Response.errorResponse(ResponseCode.TOKEN_EXPIRED);
             log.info("[JwtExceptionFilter] - EXPIRE");
         } else if ("TOKEN_INVALID".equals(ex.getMessage())) {

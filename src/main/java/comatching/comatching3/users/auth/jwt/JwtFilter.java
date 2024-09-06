@@ -77,16 +77,17 @@ public class JwtFilter extends OncePerRequestFilter {
                 if (redisRefreshToken != null && redisRefreshToken.equals(refreshToken)) {
                     log.info("레디스 리프레시 토큰까지 유효, 엑세스 토큰 재발급");
                     String newAccessToken = jwtUtil.generateAccessToken(socialId, role);
-                    log.info("새 엑세스 토큰 출력 = {}", newAccessToken);
+//                    log.info("새 엑세스 토큰 출력 = {}", newAccessToken);
 
                     log.info("리프레시 토큰을 사용했으므로 재발급");
                     String newRefreshToken = jwtUtil.generateRefreshToken(socialId, role);
-                    log.info("새 리프레시 토큰 출력 = {}", newRefreshToken);
+//                    log.info("새 리프레시 토큰 출력 = {}", newRefreshToken);
                     refreshTokenService.saveRefreshToken(socialId, newRefreshToken);
 
-                    response.setHeader("Authorization", newAccessToken);
+                    response.setHeader("Authorization", "Bearer " + newAccessToken);
                     response.setHeader("Refresh-Token", newRefreshToken);
                     securityUtil.setAuthentication(newAccessToken);
+                    filterChain.doFilter(request, response);
                 } else {
                     log.info("레디스와 리프레시 토큰 다름");
 //                    response.sendRedirect("/login");
@@ -94,7 +95,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         } catch (ExpiredJwtException e) {
-            log.info("리프레시 토큰 만료, 로그인 페이지로 이동");
+            log.info("리프레시 토큰 만료");
 //            response.sendRedirect("/login");
             throw new JwtException("TOKEN_EXPIRED");
         } catch (SignatureException e) {
@@ -112,7 +113,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader("Authorization");
 
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            log.info("엑세스 토큰 출력 = {}", bearerToken.substring(7));
+//            log.info("엑세스 토큰 출력 = {}", bearerToken.substring(7));
             return bearerToken.substring(7);
         }
 
@@ -120,13 +121,13 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private String getRefreshToken(HttpServletRequest request) {
-        log.info("리프레시 토큰 출력 = {}", request.getHeader("Refresh-Token"));
+//        log.info("리프레시 토큰 출력 = {}", request.getHeader("Refresh-Token"));
         return request.getHeader("Refresh-Token");
     }
 
     private void setSecurityHeaders(HttpServletResponse response) {
         response.setHeader("X-Content-Type-Options", "nosniff"); //브라우저가 MIME 타입을 스니핑하지 못하도록 설정
-        response.setHeader("X-Frame-Options", "DENY"); //페이지가 iframe 또는 프레임에 삽입되지 않도록 설정하여 Clickjacking 공격을 방지
+//        response.setHeader("X-Frame-Options", "DENY"); //페이지가 iframe 또는 프레임에 삽입되지 않도록 설정하여 Clickjacking 공격을 방지
 //        response.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains"); //모든 연결이 HTTPS를 통해 이루어지도록 강제
         response.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' https://trusted-cdn.com");
     }

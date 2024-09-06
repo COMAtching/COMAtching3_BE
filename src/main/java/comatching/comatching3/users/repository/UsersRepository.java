@@ -13,4 +13,6 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 
     @Query("SELECT u FROM Users u JOIN u.userAiFeature uf WHERE uf.uuid = :uuid")
     Optional<Users> findUsersByUuid(@Param("uuid") byte[] uuid);
+
+    Boolean existsUsersBySocialId(String socialId);
 }
