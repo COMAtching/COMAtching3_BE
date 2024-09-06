@@ -67,7 +67,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("http://localhost:5173/**","/login", "/admin/**", "/api/match/**", "/ws/**", "/charge-monitor/**", "/app/**", "/login-success", "/api/participations").permitAll()
+                        .requestMatchers("http://localhost:5173/**","/login", "/admin/**", "/api/match/**", "/wss/**", "/charge-monitor/**", "/app/**", "/login-success", "/api/participations", "https://comatching-devs.web.app/**").permitAll()
                         .requestMatchers("/auth/admin/**").hasRole("ADMIN")
                         .requestMatchers("/auth/operator/**").hasAnyRole("OPERATOR", "ADMIN")
                         .requestMatchers("/auth/semi/**").hasAnyRole("SEMI_OPERATOR", "SEMI_ADMIN")

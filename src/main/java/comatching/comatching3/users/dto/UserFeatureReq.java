@@ -12,7 +12,7 @@ import lombok.Getter;
 public class UserFeatureReq {
     private String university;
     private String major;
-//    private String contactId; 아직 안정해져서 주석처리
+    private String contactId;
     private Gender gender;
 
     @Min(20) @Max(30)

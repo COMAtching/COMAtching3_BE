@@ -13,7 +13,9 @@ public class UserInfoRes {
     private Integer age;
     private String song;
     private String mbti;
+    private String contactId;
     private Integer point;
     private Integer pickMe;
     private Boolean canRequestCharge;
+    private Long participations;
 }
