@@ -54,16 +54,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-                    try {
-                        String authToken = accessor.getFirstNativeHeader("Authorization");
-                        if (authToken != null && !jwtUtil.isExpired(authToken) && authToken.startsWith("Bearer ")) {
-                            String jwt = authToken.substring(7);
-                            String uuid = jwtUtil.getUUID(jwt);
-                            accessor.setUser(new UsernamePasswordAuthenticationToken(uuid, null, new ArrayList<>()));
-                        } else {
-                            handleRefreshToken(accessor);
-                        }
-                    } catch (BusinessException e) {
+                    String authToken = accessor.getFirstNativeHeader("Authorization");
+                    if (authToken != null && !jwtUtil.isExpired(authToken) && authToken.startsWith("Bearer ")) {
+                        String jwt = authToken.substring(7);
+                        String uuid = jwtUtil.getUUID(jwt);
+                        accessor.setUser(new UsernamePasswordAuthenticationToken(uuid, null, new ArrayList<>()));
+                    } else {
                         handleRefreshToken(accessor);
                     }
                 }
@@ -71,22 +67,23 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             }
 
             private void handleRefreshToken(StompHeaderAccessor accessor) {
-                String refreshToken = accessor.getFirstNativeHeader("Refresh-Token");
-                if (refreshToken != null && !jwtUtil.isExpired(refreshToken)) {
-                    String uuid = jwtUtil.getUUID(refreshToken);
-                    String role = jwtUtil.getRole(refreshToken);
-
-                    String newAccessToken = jwtUtil.generateAccessToken(uuid, role);
-                    String newRefreshToken = jwtUtil.generateRefreshToken(uuid, role);
-                    accessor.setUser(new UsernamePasswordAuthenticationToken(uuid, null, new ArrayList<>()));
-
-                    Map<String, String> tokens = new HashMap<>();
-                    tokens.put("accessToken", newAccessToken);
-                    tokens.put("refreshToken", newRefreshToken);
-                    simpMessagingTemplate.convertAndSendToUser(accessor.getSessionId(), "/queue/tokens", tokens);
-                } else {
-                    throw new BusinessException(ResponseCode.TOKEN_EXPIRED);
-                }
+//                String refreshToken = accessor.getFirstNativeHeader("Refresh-Token");
+//                if (refreshToken != null && !jwtUtil.isExpired(refreshToken)) {
+//                    String uuid = jwtUtil.getUUID(refreshToken);
+//                    String role = jwtUtil.getRole(refreshToken);
+//
+//                    String newAccessToken = jwtUtil.generateAccessToken(uuid, role);
+//                    String newRefreshToken = jwtUtil.generateRefreshToken(uuid, role);
+//                    accessor.setUser(new UsernamePasswordAuthenticationToken(uuid, null, new ArrayList<>()));
+//
+//                    Map<String, String> tokens = new HashMap<>();
+//                    tokens.put("accessToken", newAccessToken);
+//                    tokens.put("refreshToken", newRefreshToken);
+//                    simpMessagingTemplate.convertAndSendToUser(accessor.getSessionId(), "/queue/tokens", tokens);
+//                } else {
+//                    throw new BusinessException(ResponseCode.TOKEN_EXPIRED);
+//                }
+                throw new BusinessException(ResponseCode.TOKEN_EXPIRED);
             }
         });
     }
