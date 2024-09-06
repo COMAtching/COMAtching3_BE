@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   app:
     image: popeye0618/comatching3_be-app:latest
@@ -30,10 +32,14 @@ services:
     ports:
       - "6379:6379"
     command: redis-server --requirepass ${SPRING_REDIS_PASSWORD} --port 6379
+    volumes:
+      - redis-data:/data  # Redis 볼륨 추가
     networks:
       - backend
 
 networks:
   backend:
+
 volumes:
-  mysql-data:
+  mysql-data:  # MySQL 볼륨
+  redis-data:  # Redis 볼륨
