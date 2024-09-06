@@ -25,6 +25,8 @@ public enum ResponseCode {
 	//User Exception
 	USER_REGISTER_FAIL(400, "USR-001", HttpStatus.BAD_REQUEST, "User register is fail"),
 	NOT_ENOUGH_POINT(400, "USR-002", HttpStatus.BAD_REQUEST, "Not enough point"),
+	INPUT_FEATURE_FAIL(400, "USR-003", HttpStatus.BAD_REQUEST, "User feature input fail"),
+	ADD_PICKME_FAIL(400, "USR-004", HttpStatus.BAD_REQUEST, "Add pickMe failed"),
 
 	//Validation exception response
 	ARGUMENT_NOT_VALID(400, "VAL-001", HttpStatus.BAD_REQUEST, "Argument not valid"),

@@ -83,10 +83,7 @@ public class MatchService {
 
 		// fixme : sendUserChange 내부 익셉션으로 변경 필요
 		if(enemy.getPoint() == 0){
-			Boolean sendSuccess = userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
-			if(!sendSuccess){
-				throw new BusinessException(ResponseCode.MATCH_GENERAL_FAIL);
-			}
+			userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
 		}
 
 		//history 생성

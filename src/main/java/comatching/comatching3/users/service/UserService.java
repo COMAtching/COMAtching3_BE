@@ -2,23 +2,24 @@ package comatching.comatching3.users.service;
 
 import java.util.List;
 
-import comatching.comatching3.admin.entity.University;
-import comatching.comatching3.admin.repository.UniversityRepository;
-import comatching.comatching3.users.dto.BuyPickMeReq;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import comatching.comatching3.admin.dto.response.TokenRes;
+import comatching.comatching3.admin.entity.University;
+import comatching.comatching3.admin.repository.UniversityRepository;
 import comatching.comatching3.charge.repository.ChargeRequestRepository;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
+import comatching.comatching3.users.dto.BuyPickMeReq;
 import comatching.comatching3.users.dto.UserFeatureReq;
 import comatching.comatching3.users.dto.UserInfoRes;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.users.enums.Role;
+import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
@@ -41,7 +42,7 @@ public class UserService {
     private final SecurityUtil securityUtil;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
-    private final UserCrudRabbitMQUtil rabbitMQUtil;
+    private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
 
     public Long getParticipations() {
         return usersRepository.count();
@@ -90,14 +91,10 @@ public class UserService {
 
         securityUtil.setAuthentication(accessToken);
 
-        /**
-         * csv 반영 요청 3번까지 요청 후 안되면 throw (최대 30초)
-         */
-//        Boolean sendSuccess = rabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
-//
-//        if(!sendSuccess){
-//            throw new BusinessException(ResponseCode.USER_REGISTER_FAIL);
-//        }
+        Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+        if(!isSuccess){
+            throw new BusinessException(ResponseCode.INPUT_FEATURE_FAIL);
+        }
 
         return TokenRes.builder()
                 .accessToken(accessToken)
@@ -149,6 +146,14 @@ public class UserService {
 
         if (reqPoint > userPoint) {
             throw new BusinessException(ResponseCode.NOT_ENOUGH_POINT);
+        }
+
+        if (user.getPickMe() == 0){
+            Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+
+            if(isSuccess){
+                throw new BusinessException(ResponseCode.ADD_PICKME_FAIL);
+            }
         }
 
         user.subtractPoint(reqPoint);
