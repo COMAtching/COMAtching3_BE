@@ -68,7 +68,7 @@ public class Users extends BaseEntity {
 
 	private String role;
 
-	private Integer pickMe = 0;
+	private Integer pickMe = 1;
 
 	private String song;
 
