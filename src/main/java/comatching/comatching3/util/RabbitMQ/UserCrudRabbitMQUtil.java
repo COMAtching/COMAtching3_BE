@@ -48,11 +48,11 @@ public class UserCrudRabbitMQUtil {
 			responseType);
 
 		if(!response.getErrorCode().equals("GEN-000")){
-			log.warn("[UserCrudResponse Error] errorCode={}  / errorMsg={}", response.getErrorCode(), response.getErrorMessage());
+			log.warn("[UserCrudResponse Error] errorCode={}  / errorMsg={}\n json = {}", response.getErrorCode(), response.getErrorMessage(), response.toJson());
 			return false;
 		}
 
-		log.info("[compensation Success]= errorCode: {} errorMsg: {}",response.getErrorCode(), response.getErrorMessage());
+		log.info("[UserCrudResponse Success]= errorCode: {} errorMsg: {}\njson = {}",response.getErrorCode(), response.getErrorMessage(), response.toJson());
 		return true;
 	}
 }

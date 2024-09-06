@@ -7,7 +7,10 @@ import comatching.comatching3.match.enums.ContactFrequencyOption;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.util.validation.ValidEnum;
 import jakarta.validation.constraints.Pattern;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder

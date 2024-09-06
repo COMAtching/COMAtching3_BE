@@ -55,6 +55,7 @@ public class MatchService {
 		MatchRequestMsg requestMsg = new MatchRequestMsg();
 		requestMsg.fromMatchReq(matchReq);
 
+		//중복 유저 조회
 		List<MatchingHistory> matchingHistories = matchingHistoryRepository.findMatchingHistoriesByApplierId(applier.getId())
 			.orElse(null);
 
@@ -70,7 +71,6 @@ public class MatchService {
 		log.info("{match-queues} = enemyId:{}", responseMsg.getEnemyUuid());
 
 		//사용자 조회
-		// todo : 조회 불가시 보상 처리
 		byte[] enemyUuid = UUIDUtil.uuidStringToBytes(responseMsg.getEnemyUuid());
 		Users enemy = usersRepository.findUsersByUuid(enemyUuid)
 			.orElseThrow( () -> new BusinessException(ResponseCode.MATCH_GENERAL_FAIL));
@@ -81,9 +81,12 @@ public class MatchService {
 		applier.subtractPoint(usePoint);
 		enemy.updatePickMe(enemy.getPickMe() - 1);
 
-		// fixme : sendUserChange 내부 익셉션으로 변경 필요
 		if(enemy.getPoint() == 0){
-			userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
+			Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
+			if(!isSuccess){
+				log.error("매칭 enemy 정보 AI 반영 에러 enemyId =  {}", responseMsg.getEnemyUuid());
+				throw new BusinessException(ResponseCode.MATCH_GENERAL_FAIL);
+			}
 		}
 
 		//history 생성
@@ -133,10 +136,6 @@ public class MatchService {
 		if(msg.getSameMajorOption()){
 			point += 200;
 		}
-
-		/*if(!msg.getMbti().equals("UNSELECTED")){
-			point += 200;
-		}*/
 
 		return point;
 	}
