@@ -1,5 +1,6 @@
 package comatching.comatching3.history.entity;
 
+import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.Column;
@@ -35,6 +36,10 @@ public class PointHistory extends BaseEntity {
 	@JoinColumn(name = "match_history_id")
 	private MatchingHistory matchingHistory;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "admin_id")
+	private Admin approver;
+
 	private Integer point;
 
 	private Integer pickMe;
@@ -42,11 +47,12 @@ public class PointHistory extends BaseEntity {
 	private Integer totalCost;
 
 	@Builder
-	public PointHistory(Users users, MatchingHistory matchingHistory, Integer point, Integer pickMe, Integer totalCost) {
+	public PointHistory(Users users, MatchingHistory matchingHistory, Admin approver,Integer point, Integer pickMe, Integer totalCost) {
 		this.users = users;
 		this.matchingHistory = matchingHistory;
 		this.point = point;
 		this.pickMe = pickMe;
 		this.totalCost = totalCost;
+		this.approver = approver;
 	}
 }
