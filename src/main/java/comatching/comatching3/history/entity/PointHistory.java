@@ -1,12 +1,9 @@
 package comatching.comatching3.history.entity;
 
 import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.history.enums.PointHistoryType;
 import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -38,19 +35,18 @@ public class PointHistory extends BaseEntity {
 	@JoinColumn(name = "match_history_id")
 	private MatchingHistory matchingHistory;
 
-	@Enumerated(EnumType.STRING)
-	private PointHistoryType payType;
+	private Integer point;
 
-	private Integer pointAmount;
+	private Integer pickMe;
 
-	private String tid;
+	private Integer totalCost;
 
 	@Builder
-	public PointHistory(Users users, MatchingHistory matchingHistory, PointHistoryType payType, Integer pointAmount, String tid) {
+	public PointHistory(Users users, MatchingHistory matchingHistory, Integer point, Integer pickMe, Integer totalCost) {
 		this.users = users;
 		this.matchingHistory = matchingHistory;
-		this.payType = payType;
-		this.pointAmount = pointAmount;
-		this.tid = tid;
+		this.point = point;
+		this.pickMe = pickMe;
+		this.totalCost = totalCost;
 	}
 }
