@@ -4,11 +4,12 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import comatching.comatching3.history.enums.PointHistoryType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.charge.dto.request.ChargeApprovalReq;
 import comatching.comatching3.charge.dto.request.ChargeCancelReq;
 import comatching.comatching3.charge.dto.request.ChargeReq;
@@ -25,6 +26,7 @@ import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChargeService {
@@ -88,22 +90,20 @@ public class ChargeService {
         Users user = usersRepository.findUsersByUuid(UUIDUtil.uuidStringToBytes(approvalReq.getUserId()))
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
-        Admin admin = securityUtil.getAdminFromContext();
+        PointHistory pointHistory = PointHistory.builder()
+                .users(user)
+                .pointHistoryType(PointHistoryType.CHARGE)
+                .changeAmount(approvalReq.getAmount())
+                .pickMe(user.getPickMe())
+                .build();
 
         //DB 반영
         user.addPoint(approvalReq.getAmount());
-        usersRepository.save(user);
-
+        pointHistory.setTotalPoint(user.getPoint());
         chargeRequestRepository.deleteByUsers(user);
-
-        PointHistory pointHistory = PointHistory.builder()
-            .point(approvalReq.getAmount())
-            .approver(admin)
-            .pickMe(0)
-            .totalCost(approvalReq.getAmount())
-            .build();
-
         pointHistoryRepository.save(pointHistory);
+
+        user.getPointHistoryList().add(pointHistory);
 
         //웹 소켓 반영
         simpMessagingTemplate.convertAndSend("/topic/approvalUpdate", approvalReq.getUserId());

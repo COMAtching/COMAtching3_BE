@@ -2,7 +2,11 @@ package comatching.comatching3.history.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import comatching.comatching3.history.dto.res.PointHistoryRes;
+import comatching.comatching3.history.entity.PointHistory;
+import comatching.comatching3.history.repository.PointHistoryRepository;
 import org.springframework.stereotype.Service;
 
 import comatching.comatching3.exception.BusinessException;
@@ -20,6 +24,7 @@ public class HistoryService {
 
 	private final SecurityUtil securityUtil;
 	private final MatchingHistoryRepository matchingHistoryRepository;
+	private final PointHistoryRepository pointHistoryRepository;
 
 	public List<MatchHistoryRes> inquiryMatchHistory(){
 		Users applier = securityUtil.getCurrentUsersEntity();
@@ -39,4 +44,28 @@ public class HistoryService {
 
 		return response;
 	}
+
+	public List<PointHistoryRes> getAllPointHistory() {
+		List<PointHistory> pointHistories = pointHistoryRepository.findAll();
+		return convertToPointHistoryRes(pointHistories);
+	}
+
+	public List<PointHistoryRes> getAllPointHistory(String username) {
+		List<PointHistory> pointHistories = pointHistoryRepository.findAllByUsername(username);
+		return convertToPointHistoryRes(pointHistories);
+	}
+
+	private List<PointHistoryRes> convertToPointHistoryRes(List<PointHistory> pointHistories) {
+		return pointHistories.stream()
+				.map(pointHistory -> PointHistoryRes.builder()
+						.username(pointHistory.getUsers().getUsername())
+						.pointHistoryType(pointHistory.getPointHistoryType())
+						.changeAmount(pointHistory.getChangeAmount())
+						.totalPoint(pointHistory.getTotalPoint())
+						.pickMe(pointHistory.getPickMe())
+						.timeStamp(pointHistory.getCreatedAt())
+						.build())
+				.collect(Collectors.toList());
+	}
+
 }

@@ -108,7 +108,6 @@ public class JwtFilter extends OncePerRequestFilter {
             throw new JwtException("TOKEN_INVALID");
         }
 
-        log.info("필터 잘 넘어가는중~!!");
         filterChain.doFilter(request, response);
     }
 
