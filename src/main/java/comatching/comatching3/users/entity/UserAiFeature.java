@@ -93,4 +93,8 @@ public class UserAiFeature {
 		this.admissionYear = admissionYear;
 	}
 
+	public void updateUuid(byte[] uuid){
+		this.uuid = uuid;
+	}
+
 }
