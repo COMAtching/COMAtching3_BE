@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import comatching.comatching3.history.enums.PointHistoryType;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +16,7 @@ import comatching.comatching3.charge.entity.ChargeRequest;
 import comatching.comatching3.charge.repository.ChargeRequestRepository;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.history.entity.PointHistory;
+import comatching.comatching3.history.enums.PointHistoryType;
 import comatching.comatching3.history.repository.PointHistoryRepository;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.repository.UsersRepository;
@@ -25,6 +24,7 @@ import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
