@@ -2,6 +2,7 @@ package comatching.comatching3.match.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.users.enums.UserCrudType;
+import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.RabbitMQ.MatchRabbitMQUtil;
 import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
@@ -40,6 +42,7 @@ public class MatchService {
 	private final SecurityUtil securityUtil;
 	private final MatchingHistoryRepository matchingHistoryRepository;
 	private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
+	private final UserAiFeatureRepository userAiFeatureRepository;
 
 	/**
 	 * 괸리자 매칭 서비스 리퀘스트 메서드
@@ -52,18 +55,22 @@ public class MatchService {
 	public MatchRes requestMatch(MatchReq matchReq){
 		String requestId = UUID.randomUUID().toString();
 		Users applier = securityUtil.getCurrentUsersEntity();
+		String applierUuid = UUIDUtil.bytesToHex(applier.getUserAiFeature().getUuid());
+
 		MatchRequestMsg requestMsg = new MatchRequestMsg();
-		requestMsg.fromMatchReq(matchReq);
+		requestMsg.fromMatchReq(matchReq, applier.getUserAiFeature());
 
 		//중복 유저 조회
-		List<MatchingHistory> matchingHistories = matchingHistoryRepository.findMatchingHistoriesByApplierId(applier.getId())
-			.orElse(null);
+		Optional<List<MatchingHistory>> matchingHistories = matchingHistoryRepository.findByApplier(applier);
+		Boolean isEmpty = matchingHistories.isEmpty();
 
-		if(matchingHistories == null){
+		if(isEmpty.booleanValue()){
 			requestMsg.updateNoDuplication();
+			log.info("[matching Histories isEmpty] = {}", matchingHistories.get());
 		}
 		else{
-			requestMsg.updateDuplicationListFromHistory(matchingHistories);
+			requestMsg.updateDuplicationListFromHistory(matchingHistories.get());
+			log.info("[matching Histories] = {}", matchingHistories.get().toString());
 		}
 
 		MatchResponseMsg responseMsg  = matchRabbitMQUtil.match(requestMsg, requestId);
@@ -73,15 +80,18 @@ public class MatchService {
 		//사용자 조회
 		byte[] enemyUuid = UUIDUtil.uuidStringToBytes(responseMsg.getEnemyUuid());
 		Users enemy = usersRepository.findUsersByUuid(enemyUuid)
-			.orElseThrow( () -> new BusinessException(ResponseCode.MATCH_GENERAL_FAIL));
-
+			.orElseThrow( () -> new BusinessException(ResponseCode.NO_ENEMY_AVAILABLE));
 
 		//포인트 & pickMe 차감
 		Integer usePoint = calcPoint(matchReq);
+
+		if(usePoint > applier.getPoint()){
+			throw new BusinessException(ResponseCode.INSUFFICIENT_POINT);
+		}
+
 		applier.subtractPoint(usePoint);
 		enemy.updatePickMe(enemy.getPickMe() - 1);
-
-		if(enemy.getPoint() == 0){
+		if(enemy.getPickMe() == 0){
 			Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
 			if(!isSuccess){
 				log.error("매칭 enemy 정보 AI 반영 에러 enemyId =  {}", responseMsg.getEnemyUuid());
@@ -98,20 +108,9 @@ public class MatchService {
 		matchingHistoryRepository.save(history);
 
 		MatchRes response = MatchRes.fromUsers(enemy);
+		log.info("[match request] - Success! applierUuid = {}, enemyUuid = {}", applierUuid, UUIDUtil.bytesToHex(enemyUuid));
 		return response;
 	}
-
-	public void matchRequestTest(MatchReq matchReq){
-		String requestId = UUID.randomUUID().toString();
-
-		MatchRequestMsg requestMsg = new MatchRequestMsg();
-		requestMsg.fromMatchReq(matchReq);
-		requestMsg.updateDuplicationList(matchReq.getDuplicationList());
-
-		MatchResponseMsg responseMsg  = matchRabbitMQUtil.match(requestMsg, requestId);
-		log.info("{match-queues} = enemyId:{}", responseMsg.getEnemyUuid());
-	}
-
 
 	/**
 	 * 매칭 포인트 계산 메서드
@@ -162,4 +161,26 @@ public class MatchService {
 
 		userCrudRabbitMQUtil.sendUserChange(userAiFeature,UserCrudType.CREATE);
 	}
+
+	public void testDataAdd(){
+
+		List<Users> users = usersRepository.findAll();
+		for(Users user: users){
+			updateUuid(user);
+			userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+			//log.info("[Test Data Add for Ai Server] uuid={}", UUIDUtil.bytesToHex(users.getUuid()));
+		}
+	}
+
+	@Transactional
+	public void updateUuid(Users users) {
+		String username = users.getUsername();
+		if (username.startsWith("user")) {
+			users.getUserAiFeature().updateUuid(UUIDUtil.createUUID());
+		}
+
+		usersRepository.save(users);
+		userAiFeatureRepository.save(users.getUserAiFeature());
+	}
+
 }
