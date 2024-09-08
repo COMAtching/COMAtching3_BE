@@ -7,7 +7,6 @@ import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.admin.enums.AdminRole;
-import comatching.comatching3.admin.exception.UniversityNotExistException;
 import comatching.comatching3.admin.repository.AdminRepository;
 import comatching.comatching3.admin.repository.UniversityRepository;
 import comatching.comatching3.exception.BusinessException;
@@ -54,7 +53,7 @@ public class AdminService {
         Optional<University> universityOptional = universityRepository.findByUniversityName(form.getUniversity());
 
         if (universityOptional.isEmpty()) {
-            throw new UniversityNotExistException("학교 정보가 존재하지 않습니다.");
+            throw new BusinessException(ResponseCode.SCHOOL_NOT_EXIST);
         }
 
         if (role.equals(AdminRole.ROLE_SEMI_ADMIN)) {
@@ -205,7 +204,7 @@ public class AdminService {
             }
 
             University university = universityRepository.findByUniversityName(admin.getUniversity().getUniversityName())
-                    .orElseThrow(() -> new UniversityNotExistException("존재하지 않는 대학교 정보"));
+                    .orElseThrow(() -> new BusinessException(ResponseCode.SCHOOL_NOT_EXIST));
 
             university.updateAppName(request.getAppName().get());
             universityRepository.save(university);

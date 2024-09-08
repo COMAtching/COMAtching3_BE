@@ -66,7 +66,7 @@ public class UserService {
                 .toList();
 
         University university = universityRepository.findByUniversityName(form.getUniversity())
-                .orElseThrow(() -> new BusinessException(ResponseCode.ARGUMENT_NOT_VALID));
+                .orElseThrow(() -> new BusinessException(ResponseCode.SCHOOL_NOT_EXIST));
 
         UserAiFeature userAiFeature = user.getUserAiFeature();
 
