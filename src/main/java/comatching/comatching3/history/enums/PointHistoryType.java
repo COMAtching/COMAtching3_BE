@@ -2,6 +2,6 @@ package comatching.comatching3.history.enums;
 
 public enum PointHistoryType {
 	CHARGE,
-	PAY,
-	REFUND;
+	BUY_PICK_ME,
+	MATCH;
 }

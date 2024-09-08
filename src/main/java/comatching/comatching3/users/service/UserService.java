@@ -2,6 +2,9 @@ package comatching.comatching3.users.service;
 
 import java.util.List;
 
+import comatching.comatching3.history.entity.PointHistory;
+import comatching.comatching3.history.enums.PointHistoryType;
+import comatching.comatching3.history.repository.PointHistoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +46,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
     private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
+    private final PointHistoryRepository pointHistoryRepository;
 
     public Long getParticipations() {
         return usersRepository.count();
@@ -157,7 +161,20 @@ public class UserService {
             }
         }
 
+        PointHistory pointHistory = PointHistory.builder()
+                .users(user)
+                .pointHistoryType(PointHistoryType.BUY_PICK_ME)
+                .changeAmount(reqPoint)
+                .build();
+
         user.subtractPoint(reqPoint);
         user.addPickMe(req.getAmount());
+
+        pointHistory.setTotalPoint(user.getPoint());
+        pointHistory.setPickMe(user.getPickMe());
+
+        user.getPointHistoryList().add(pointHistory);
+
+        pointHistoryRepository.save(pointHistory);
     }
 }

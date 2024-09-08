@@ -1,6 +1,6 @@
 package comatching.comatching3.history.entity;
 
-import comatching.comatching3.admin.entity.Admin;
+import comatching.comatching3.history.enums.PointHistoryType;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.Column;
@@ -11,7 +11,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -32,27 +31,39 @@ public class PointHistory extends BaseEntity {
 	@JoinColumn(name = "users_id")
 	private Users users;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "match_history_id")
-	private MatchingHistory matchingHistory;
+//	@OneToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "match_history_id")
+//	private MatchingHistory matchingHistory;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "admin_id")
-	private Admin approver;
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "admin_id")
+//	private Admin approver;
 
-	private Integer point;
+	private PointHistoryType pointHistoryType;
 
+	// 사용/소비한 포인트 양
+	private Integer changeAmount;
+
+	// 결과 픽미 횟수
 	private Integer pickMe;
 
-	private Integer totalCost;
+	// 결과적으로 남은 포인트
+	private Integer totalPoint;
 
 	@Builder
-	public PointHistory(Users users, MatchingHistory matchingHistory, Admin approver,Integer point, Integer pickMe, Integer totalCost) {
+	public PointHistory(Users users, PointHistoryType pointHistoryType, Integer changeAmount, Integer pickMe, Integer totalPoint) {
 		this.users = users;
-		this.matchingHistory = matchingHistory;
-		this.point = point;
+		this.pointHistoryType = pointHistoryType;
+		this.changeAmount = changeAmount;
 		this.pickMe = pickMe;
-		this.totalCost = totalCost;
-		this.approver = approver;
+		this.totalPoint = totalPoint;
+	}
+
+	public void setTotalPoint(Integer totalPoint) {
+		this.totalPoint = totalPoint;
+	}
+
+	public void setPickMe(Integer pickMe) {
+		this.pickMe = pickMe;
 	}
 }
