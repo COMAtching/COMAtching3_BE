@@ -38,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String requestURI = request.getRequestURI();
-        log.info("요청 URL = {}", requestURI);
+//        log.info("요청 URL = {}", requestURI);
         if (WHITELIST.stream().anyMatch(requestURI::startsWith)) {
             filterChain.doFilter(request, response);
             return;
@@ -50,13 +50,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             if (accessToken != null && !jwtUtil.isExpired(accessToken)) {
-                log.info("엑세스 토큰 유효");
+//                log.info("엑세스 토큰 유효");
                 securityUtil.setAuthentication(accessToken);
                 filterChain.doFilter(request, response);
                 return;
             }
         } catch (ExpiredJwtException e) {
-            log.info("엑세스 토큰 만료");
+//            log.info("엑세스 토큰 만료");
         } catch (SignatureException e) {
             log.info("엑세스 토큰 무결성 오류");
             throw new JwtException("TOKEN_INVALID");
@@ -70,17 +70,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             if (refreshToken != null && !jwtUtil.isExpired(refreshToken)) {
-                log.info("헤더 리프레시 토큰 유효");
+//                log.info("헤더 리프레시 토큰 유효");
                 String socialId = jwtUtil.getUUID(refreshToken);
                 String role = jwtUtil.getRole(refreshToken);
                 String redisRefreshToken = refreshTokenService.getRefreshToken(socialId);
 
                 if (redisRefreshToken != null && redisRefreshToken.equals(refreshToken)) {
-                    log.info("레디스 리프레시 토큰까지 유효, 엑세스 토큰 재발급");
+//                    log.info("레디스 리프레시 토큰까지 유효, 엑세스 토큰 재발급");
                     String newAccessToken = jwtUtil.generateAccessToken(socialId, role);
 //                    log.info("새 엑세스 토큰 출력 = {}", newAccessToken);
 
-                    log.info("리프레시 토큰을 사용했으므로 재발급");
+//                    log.info("리프레시 토큰을 사용했으므로 재발급");
                     String newRefreshToken = jwtUtil.generateRefreshToken(socialId, role);
 //                    log.info("새 리프레시 토큰 출력 = {}", newRefreshToken);
                     refreshTokenService.saveRefreshToken(socialId, newRefreshToken);
@@ -89,22 +89,22 @@ public class JwtFilter extends OncePerRequestFilter {
                     response.setHeader("Refresh-Token", newRefreshToken);
                     securityUtil.setAuthentication(newAccessToken);
                     Users user = securityUtil.getCurrentUsersEntity();
-                    log.info("새로 등록한 유저 정보 출력(필터 안) " + user.getUsername() + "권한 " + user.getRole());
+//                    log.info("새로 등록한 유저 정보 출력(필터 안) " + user.getUsername() + "권한 " + user.getRole());
                 } else {
-                    log.info("레디스와 리프레시 토큰 다름");
+//                    log.info("레디스와 리프레시 토큰 다름");
 //                    response.sendRedirect("/login");
                     throw new JwtException("TOKEN_INVALID");
                 }
             }
         } catch (ExpiredJwtException e) {
-            log.info("리프레시 토큰 만료");
+//            log.info("리프레시 토큰 만료");
 //            response.sendRedirect("/login");
             throw new JwtException("TOKEN_EXPIRED");
         } catch (SignatureException e) {
-            log.info("리프레시 토큰 무결성 오류");
+//            log.info("리프레시 토큰 무결성 오류");
             throw new JwtException("TOKEN_INVALID");
         } catch (JwtException e) {
-            log.info("리프레시 토큰 오류");
+//            log.info("리프레시 토큰 오류");
             throw new JwtException("TOKEN_INVALID");
         }
 

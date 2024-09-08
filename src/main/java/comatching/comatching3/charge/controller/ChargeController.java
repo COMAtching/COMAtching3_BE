@@ -28,7 +28,6 @@ public class ChargeController {
 
     @MessageMapping("/approveCharge")
     public void handleChargeApproval(ChargeApprovalReq approvalReq) {
-        log.info("[handleChargeApproval] = arrived");
         chargeService.createApprovalRequest(approvalReq);
     }
 
