@@ -66,16 +66,12 @@ public class MatchService {
 
 		if(isEmpty.booleanValue()){
 			requestMsg.updateNoDuplication();
-			log.info("[matching Histories isEmpty] = {}", matchingHistories.get());
 		}
 		else{
 			requestMsg.updateDuplicationListFromHistory(matchingHistories.get());
-			log.info("[matching Histories] = {}", matchingHistories.get().toString());
 		}
 
 		MatchResponseMsg responseMsg  = matchRabbitMQUtil.match(requestMsg, requestId);
-
-		log.info("{match-queues} = enemyId:{}", responseMsg.getEnemyUuid());
 
 		//사용자 조회
 		byte[] enemyUuid = UUIDUtil.uuidStringToBytes(responseMsg.getEnemyUuid());
@@ -94,7 +90,7 @@ public class MatchService {
 		if(enemy.getPickMe() == 0){
 			Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
 			if(!isSuccess){
-				log.error("매칭 enemy 정보 AI 반영 에러 enemyId =  {}", responseMsg.getEnemyUuid());
+				log.error("매칭 enemy 정보 AI 반영 에러 enemyUuid =  {} / enemyId = {}", responseMsg.getEnemyUuid(), enemy.getId());
 				throw new BusinessException(ResponseCode.MATCH_GENERAL_FAIL);
 			}
 		}
@@ -108,7 +104,7 @@ public class MatchService {
 		matchingHistoryRepository.save(history);
 
 		MatchRes response = MatchRes.fromUsers(enemy);
-		log.info("[match request] - Success! applierUuid = {}, enemyUuid = {}", applierUuid, UUIDUtil.bytesToHex(enemyUuid));
+		log.info("[MatchService] - Match Process Success!! applierUuid = {}, enemyUuid = {}", applierUuid, UUIDUtil.bytesToHex(enemyUuid));
 		return response;
 	}
 

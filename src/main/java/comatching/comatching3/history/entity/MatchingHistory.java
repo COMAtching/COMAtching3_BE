@@ -7,6 +7,7 @@ import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.match.enums.AgeOption;
 import comatching.comatching3.match.enums.ContactFrequencyOption;
+import comatching.comatching3.util.BaseEntity;
 import comatching.comatching3.util.HobbyListConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -27,7 +28,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MatchingHistory {
+public class MatchingHistory extends BaseEntity {
 	@Id
 	@Column(name = "comatch_history_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
