@@ -45,7 +45,6 @@ public class UserController {
      */
     @GetMapping("/auth/user/api/info")
     public Response<UserInfoRes> getUserInfo() {
-        log.info("컨트롤러 도착");
         UserInfoRes userInfo = userService.getUserInfo();
         return Response.ok(userInfo);
     }

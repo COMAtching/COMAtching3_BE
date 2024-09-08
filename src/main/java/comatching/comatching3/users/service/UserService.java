@@ -115,7 +115,7 @@ public class UserService {
     public UserInfoRes getUserInfo() {
 
         Users user = securityUtil.getCurrentUsersEntity();
-        log.info(user.getUsername());
+//        log.info(user.getUsername());
 
         Boolean canRequest = !chargeRequestRepository.existsByUsers(user);
 
