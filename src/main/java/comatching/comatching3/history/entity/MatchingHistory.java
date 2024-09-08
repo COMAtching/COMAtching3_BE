@@ -56,7 +56,8 @@ public class MatchingHistory {
 	private Boolean noSameMajorOption;
 
 	@Builder
-	public MatchingHistory(Users applier, Users enemy, String mbtiOption, AgeOption ageOption, ContactFrequencyOption contactFrequencyOption, List<Hobby> hobbyOption, Boolean noSameMajorOption){
+	public MatchingHistory(Users applier, Users enemy, String mbtiOption, AgeOption ageOption,
+		ContactFrequencyOption contactFrequencyOption, List<Hobby> hobbyOption, Boolean noSameMajorOption) {
 		this.applier = applier;
 		this.enemy = enemy;
 		this.mbtiOption = mbtiOption;
@@ -67,12 +68,27 @@ public class MatchingHistory {
 
 	}
 
-	public void updateOptionsFromRequestMsg(MatchRequestMsg matchRequestMsg){
+	public void updateOptionsFromRequestMsg(MatchRequestMsg matchRequestMsg) {
 		this.noSameMajorOption = matchRequestMsg.getSameMajorOption();
-		this.hobbyOption =Hobby.convertStringToHobbies(matchRequestMsg.getHobbyOption());
+		this.hobbyOption = Hobby.convertStringToHobbies(matchRequestMsg.getHobbyOption());
 		this.ageOption = matchRequestMsg.getAgeOption();
 		this.mbtiOption = matchRequestMsg.getMbtiOption();
 		this.contactFrequencyOption = matchRequestMsg.getContactFrequencyOption();
 	}
+
+	@Override
+	public String toString() {
+		return "MatchingHistory{" +
+			"id=" + id +
+			", applier=" + (applier != null ? applier.getId() : "null") +
+			", enemy=" + (enemy != null ? enemy.getId() : "null") +
+			", mbtiOption='" + mbtiOption + '\'' +
+			", ageOption=" + ageOption +
+			", contactFrequencyOption=" + contactFrequencyOption +
+			", hobbyOption=" + hobbyOption +
+			", noSameMajorOption=" + noSameMajorOption +
+			'}';
+	}
+
 
 }
