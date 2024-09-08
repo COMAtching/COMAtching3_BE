@@ -6,6 +6,7 @@ import comatching.comatching3.history.entity.MatchingHistory;
 import comatching.comatching3.match.dto.request.MatchReq;
 import comatching.comatching3.match.enums.AgeOption;
 import comatching.comatching3.match.enums.ContactFrequencyOption;
+import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.enums.Hobby;
 import comatching.comatching3.util.UUIDUtil;
 import lombok.Getter;
@@ -24,25 +25,31 @@ public class MatchRequestMsg{
 	private Integer myAge;
 	private String duplicationList;
 
-	public void fromMatchReq(MatchReq matchReq){
-		this.matcherUuid = matchReq.getUuid();
+	public void fromMatchReq(MatchReq matchReq, UserAiFeature applierFeature){
+		this.matcherUuid = UUIDUtil.bytesToHex(applierFeature.getUuid());
 		this.contactFrequencyOption = matchReq.getContactFrequencyOption();
-		this.genderOption = "FEMALE";
+		this.genderOption = applierFeature.getGender().getAiValue();
 		this.hobbyOption = Hobby.convertHobbiesString(matchReq.getHobbyOption());
 		this.sameMajorOption = matchReq.getSameMajorOption();
 		this.ageOption = matchReq.getAgeOption();
 		this.mbtiOption = matchReq.getMbtiOption();
-		this.myMajor = "정보통신전자공학부";
-		this.myAge = 24;
+		this.myMajor = applierFeature.getMajor();
+		this.myAge = applierFeature.getAge();
 	}
 
-	public void updateDuplicationListFromHistory(List<MatchingHistory> matchingHistories){
+	public void updateDuplicationListFromHistory(List<MatchingHistory> matchingHistories) {
 		StringBuilder duplicationList = new StringBuilder();
-		for(MatchingHistory history : matchingHistories){
+
+		for (MatchingHistory history : matchingHistories) {
 			String uuid = UUIDUtil.bytesToHex(history.getEnemy().getUserAiFeature().getUuid());
-			duplicationList.append(uuid + ",");
+			duplicationList.append(uuid).append(",");
 		}
-		duplicationList.deleteCharAt(duplicationList.length());
+
+		// 리스트가 비어 있지 않은 경우에만 마지막 쉼표를 제거
+		if (duplicationList.length() > 0) {
+			duplicationList.setLength(duplicationList.length() - 1);
+		}
+
 		this.duplicationList = duplicationList.toString();
 	}
 
