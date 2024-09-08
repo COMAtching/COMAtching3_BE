@@ -11,7 +11,9 @@ import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.util.ResponseCode;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class MatchRabbitMQUtil {
 
@@ -45,6 +47,7 @@ public class MatchRabbitMQUtil {
 			throw new BusinessException(ResponseCode.NO_MATCH_RESPONSE);
 		}
 
+		log.info("[MatchRabbitMQUtil] match success!! enemyUuid = {}", response.getEnemyUuid());
 		return response;
 	}
 }
