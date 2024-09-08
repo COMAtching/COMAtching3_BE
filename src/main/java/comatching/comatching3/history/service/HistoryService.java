@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import comatching.comatching3.history.dto.res.PointHistoryRes;
-import comatching.comatching3.history.entity.PointHistory;
-import comatching.comatching3.history.repository.PointHistoryRepository;
 import org.springframework.stereotype.Service;
 
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.history.dto.res.MatchHistoryRes;
+import comatching.comatching3.history.dto.res.PointHistoryRes;
 import comatching.comatching3.history.entity.MatchingHistory;
+import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.history.repository.MatchingHistoryRepository;
+import comatching.comatching3.history.repository.PointHistoryRepository;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;
@@ -29,7 +29,7 @@ public class HistoryService {
 	public List<MatchHistoryRes> inquiryMatchHistory(){
 		Users applier = securityUtil.getCurrentUsersEntity();
 
-		List<MatchingHistory> matchingHistories = matchingHistoryRepository.findMatchingHistoriesByApplierId(applier.getId())
+		List<MatchingHistory> matchingHistories = matchingHistoryRepository.findByApplierId(applier.getId())
 			.orElseThrow(()->{
 					throw new BusinessException(ResponseCode.MATCH_HISTORY_NOT_EXIST);
 			});
