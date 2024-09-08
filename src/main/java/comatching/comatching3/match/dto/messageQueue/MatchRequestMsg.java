@@ -16,7 +16,7 @@ public class MatchRequestMsg{
 
 	private String matcherUuid;
 	private ContactFrequencyOption contactFrequencyOption;
-	private String genderOption;
+	private String myGender;
 	private String hobbyOption;
 	private Boolean sameMajorOption;
 	private AgeOption ageOption;
@@ -28,7 +28,7 @@ public class MatchRequestMsg{
 	public void fromMatchReq(MatchReq matchReq, UserAiFeature applierFeature){
 		this.matcherUuid = UUIDUtil.bytesToHex(applierFeature.getUuid());
 		this.contactFrequencyOption = matchReq.getContactFrequencyOption();
-		this.genderOption = applierFeature.getGender().getAiValue();
+		this.myGender = applierFeature.getGender().getAiValue();
 		this.hobbyOption = Hobby.convertHobbiesString(matchReq.getHobbyOption());
 		this.sameMajorOption = matchReq.getSameMajorOption();
 		this.ageOption = matchReq.getAgeOption();
