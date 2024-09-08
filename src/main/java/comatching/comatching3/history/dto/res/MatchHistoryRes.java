@@ -21,6 +21,7 @@ public class MatchHistoryRes {
 	private Integer admissionYear;
 	private String comment;
 	private String song;
+	private String contactId;
 
 	public void updateFromUsers(Users users){
 		UserAiFeature userAiFeature = users.getUserAiFeature();
@@ -33,6 +34,7 @@ public class MatchHistoryRes {
 		this.admissionYear = userAiFeature.getAdmissionYear();
 		this.comment = users.getComment();
 		this.song = users.getSong();
+		this.contactId = users.getContactId();
 	}
 
 

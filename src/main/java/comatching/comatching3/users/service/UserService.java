@@ -2,9 +2,6 @@ package comatching.comatching3.users.service;
 
 import java.util.List;
 
-import comatching.comatching3.history.entity.PointHistory;
-import comatching.comatching3.history.enums.PointHistoryType;
-import comatching.comatching3.history.repository.PointHistoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +10,9 @@ import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.admin.repository.UniversityRepository;
 import comatching.comatching3.charge.repository.ChargeRequestRepository;
 import comatching.comatching3.exception.BusinessException;
+import comatching.comatching3.history.entity.PointHistory;
+import comatching.comatching3.history.enums.PointHistoryType;
+import comatching.comatching3.history.repository.PointHistoryRepository;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.users.dto.BuyPickMeReq;
@@ -130,6 +130,11 @@ public class UserService {
                 .pickMe(user.getPickMe())
                 .canRequestCharge(canRequest)
                 .participations(getParticipations())
+                .admissionYear(user.getUserAiFeature().getAdmissionYear())
+                .comment(user.getComment())
+                .contactFrequency(user.getUserAiFeature().getContactFrequency())
+                .hobbies(user.getUserAiFeature().getHobby())
+                .gender(user.getUserAiFeature().getGender())
                 .build();
     }
 
