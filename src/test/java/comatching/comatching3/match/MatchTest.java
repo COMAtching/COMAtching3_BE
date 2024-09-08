@@ -128,7 +128,7 @@ public class MatchTest {
 		Integer originalPoint = applier.getPoint();
 		Integer originalPickMe = applier.getPickMe();
 
-		when(matchRabbitMQUtil.match(any(MatchReq.class), anyString())).thenReturn(matchResponseMsg);
+		//when(matchRabbitMQUtil.match(any(MatchReq.class), anyString())).thenReturn(matchResponseMsg);
 		when(usersRepository.findUsersByUuid(enemyUuid)).thenReturn(Optional.of(enemy));
 		when(securityUtil.getCurrentUsersEntity()).thenReturn(applier);
 
@@ -141,7 +141,7 @@ public class MatchTest {
 
 		//then
 		applier = em.find(Users.class, this.applier.getId());
-		MatchingHistory matchingHistory = matchingHistoryRepository.findMatchingHistoriesByApplierId(applier.getId()).get().get(0);
+		MatchingHistory matchingHistory = matchingHistoryRepository.findByApplierId(applier.getId()).get().get(0);
 
 		assertThat(applier.getPoint()).isEqualTo(originalPoint-800);
 		assertThat(applier.getPickMe()).isEqualTo(originalPickMe-1);
