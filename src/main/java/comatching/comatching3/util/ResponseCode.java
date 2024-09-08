@@ -30,6 +30,7 @@ public enum ResponseCode {
 
 	//Validation exception response
 	ARGUMENT_NOT_VALID(400, "VAL-001", HttpStatus.BAD_REQUEST, "Argument not valid"),
+	SCHOOL_NOT_EXIST(400, "VAL-002", HttpStatus.BAD_REQUEST, "School not exist"),
 
 	//Match service exception response
 	MATCH_GENERAL_FAIL(400, "MAT-001", HttpStatus.BAD_REQUEST, "Matching request process is failed"),
