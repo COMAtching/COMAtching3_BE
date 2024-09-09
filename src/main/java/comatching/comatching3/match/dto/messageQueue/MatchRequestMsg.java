@@ -3,6 +3,7 @@ package comatching.comatching3.match.dto.messageQueue;
 import java.util.List;
 
 import comatching.comatching3.history.entity.MatchingHistory;
+import comatching.comatching3.match.dto.request.AdminMatchReq;
 import comatching.comatching3.match.dto.request.MatchReq;
 import comatching.comatching3.match.enums.AgeOption;
 import comatching.comatching3.match.enums.ContactFrequencyOption;
@@ -25,7 +26,7 @@ public class MatchRequestMsg{
 	private Integer myAge;
 	private String duplicationList;
 
-	public void fromMatchReq(MatchReq matchReq, UserAiFeature applierFeature){
+	public void fromMatchReqAndUserAiFeature(MatchReq matchReq, UserAiFeature applierFeature){
 		this.matcherUuid = UUIDUtil.bytesToHex(applierFeature.getUuid());
 		this.contactFrequencyOption = matchReq.getContactFrequencyOption();
 		this.myGender = applierFeature.getGender().getAiValue();
@@ -33,6 +34,18 @@ public class MatchRequestMsg{
 		this.sameMajorOption = matchReq.getSameMajorOption();
 		this.ageOption = matchReq.getAgeOption();
 		this.mbtiOption = matchReq.getMbtiOption();
+		this.myMajor = applierFeature.getMajor();
+		this.myAge = applierFeature.getAge();
+	}
+
+	public void fromAdminMatchReqAndUserAiFeature(AdminMatchReq adminMatchReq, UserAiFeature applierFeature){
+		this.matcherUuid = UUIDUtil.bytesToHex(applierFeature.getUuid());
+		this.contactFrequencyOption = adminMatchReq.getContactFrequencyOption();
+		this.myGender = applierFeature.getGender().getAiValue();
+		this.hobbyOption = Hobby.convertHobbiesString(adminMatchReq.getHobbyOption());
+		this.sameMajorOption = adminMatchReq.getSameMajorOption();
+		this.ageOption = adminMatchReq.getAgeOption();
+		this.mbtiOption = adminMatchReq.getMbtiOption();
 		this.myMajor = applierFeature.getMajor();
 		this.myAge = applierFeature.getAge();
 	}
