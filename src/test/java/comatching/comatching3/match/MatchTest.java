@@ -18,7 +18,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import comatching.comatching3.history.entity.MatchingHistory;
 import comatching.comatching3.history.repository.MatchingHistoryRepository;
 import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.match.dto.request.MatchReq;
@@ -111,7 +110,6 @@ public class MatchTest {
 
 		//given
 		MatchReq testMatchReq = MatchReq.builder()
-				.uuid(UUIDUtil.bytesToHex(applierUuid))
 				.ageOption(AgeOption.EQUAL)
 				.mbtiOption("EN")
 				.hobbyOption(List.of(Hobby.게임, Hobby.독서))
@@ -141,7 +139,6 @@ public class MatchTest {
 
 		//then
 		applier = em.find(Users.class, this.applier.getId());
-//		MatchingHistory matchingHistory = matchingHistoryRepository.findMatchingHistoriesByApplierId(applier.getId()).get().get(0);
 
 		assertThat(applier.getPoint()).isEqualTo(originalPoint-800);
 		assertThat(applier.getPickMe()).isEqualTo(originalPickMe-1);
