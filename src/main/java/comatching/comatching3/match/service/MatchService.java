@@ -164,6 +164,12 @@ public class MatchService {
 		for(Users user: users){
 			updateUuid(user);
 			userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+			try{
+				Thread.sleep(300);
+			} catch (InterruptedException e){
+				e.printStackTrace();
+			}
+
 			//log.info("[Test Data Add for Ai Server] uuid={}", UUIDUtil.bytesToHex(users.getUuid()));
 		}
 	}
