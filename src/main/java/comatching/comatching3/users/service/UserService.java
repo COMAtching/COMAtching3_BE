@@ -152,7 +152,7 @@ public class UserService {
         Users user = securityUtil.getCurrentUsersEntity();
         int price = 500;
         int userPoint = user.getPoint();
-        int reqPoint = req.getAmount() * price;
+        int reqPoint = (req.getAmount() / 3) * (price * 2) + (req.getAmount() % 3) * price;
 
         if (reqPoint > userPoint) {
             throw new BusinessException(ResponseCode.NOT_ENOUGH_POINT);
