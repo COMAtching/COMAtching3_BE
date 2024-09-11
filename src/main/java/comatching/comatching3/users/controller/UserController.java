@@ -81,4 +81,10 @@ public class UserController {
         userService.requestEventPickMe();
         return Response.ok();
     }
+
+    @GetMapping("/auth/user/api/event/no-pickMe")
+    public Response<Void> notRequestEventPickMe(){
+        userService.notRequestEventPickMe();
+        return Response.ok();
+    }
 }

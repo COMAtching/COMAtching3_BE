@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import comatching.comatching3.match.dto.request.AdminMatchReq;
 import comatching.comatching3.match.dto.request.CodeCheckReq;
+import comatching.comatching3.match.dto.request.DeleteCsvReq;
 import comatching.comatching3.match.dto.request.RecoverReq;
 import comatching.comatching3.match.dto.response.CodeCheckRes;
 import comatching.comatching3.match.dto.response.MatchRes;
@@ -64,7 +65,7 @@ public class MatchAdminController {
 	}
 
 	@PostMapping("/delete/user")
-	public Response<Void> deleteUserCsv(@RequestBody  RecoverReq req){
+	public Response<Void> deleteUserCsv(@RequestBody DeleteCsvReq req){
 		matchService.deleteUserCsv(req);
 		return Response.ok();
 	}
