@@ -122,8 +122,10 @@ public class UserService {
         Boolean canRequest = !chargeRequestRepository.existsByUsers(user);
 
         if(user.getPickMe() <= 0){
-            userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.DELETE);
-            if(user.getPickMe() < 0) user.updatePickMe(0);
+            if(user.getPickMe() < 0) {
+                user.updatePickMe(0);
+                userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.DELETE);
+            }
         }
 
         return UserInfoRes.builder()
@@ -210,5 +212,11 @@ public class UserService {
         }
         users.updateEvent1(true);
 
+    }
+
+    @Transactional
+    public void notRequestEventPickMe(){
+        Users users = securityUtil.getCurrentUsersEntity();
+        users.updateEvent1(true);
     }
 }

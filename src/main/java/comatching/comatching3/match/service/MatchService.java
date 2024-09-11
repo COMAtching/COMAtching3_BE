@@ -17,6 +17,7 @@ import comatching.comatching3.match.dto.cache.CodeCheckInfo;
 import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.match.dto.request.AdminMatchReq;
+import comatching.comatching3.match.dto.request.DeleteCsvReq;
 import comatching.comatching3.match.dto.request.MatchReq;
 import comatching.comatching3.match.dto.request.RecoverReq;
 import comatching.comatching3.match.dto.response.MatchRes;
@@ -317,8 +318,8 @@ public class MatchService {
 		return UUIDUtil.bytesToHex(users.getUserAiFeature().getUuid());
 	}
 
-	public void deleteUserCsv(RecoverReq req){
-		Users users = usersRepository.findById(req.getUserId())
+	public void deleteUserCsv(DeleteCsvReq req){
+		Users users = usersRepository.findUsersByUuid(UUIDUtil.uuidStringToBytes(req.getUuid()))
 			.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
 		userCrudRabbitMQUtil.sendUserChange(users.getUserAiFeature(),UserCrudType.DELETE);
