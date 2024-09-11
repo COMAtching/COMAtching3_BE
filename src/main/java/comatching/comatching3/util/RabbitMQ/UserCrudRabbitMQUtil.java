@@ -2,7 +2,6 @@ package comatching.comatching3.util.RabbitMQ;
 
 import java.util.UUID;
 
-import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +42,10 @@ public class UserCrudRabbitMQUtil {
 		CompensationMsg response = 	rabbitTemplate.convertSendAndReceiveAsType(
 			userCrudQueue,
 			userCrudMsg,
-			(MessagePostProcessor) null,
+			message -> {
+				message.getMessageProperties().setExpiration(String.valueOf(120000));
+				return message;
+			},
 			correlationData,
 			responseType);
 

@@ -18,6 +18,7 @@ import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.match.dto.request.AdminMatchReq;
 import comatching.comatching3.match.dto.request.MatchReq;
+import comatching.comatching3.match.dto.request.RecoverReq;
 import comatching.comatching3.match.dto.response.MatchRes;
 import comatching.comatching3.match.enums.AgeOption;
 import comatching.comatching3.match.enums.ContactFrequencyOption;
@@ -92,8 +93,12 @@ public class MatchService {
 		}
 
 		applier.subtractPoint(usePoint);
+		if(applier.getPickMe() <= 0){
+			userCrudRabbitMQUtil.sendUserChange(applier.getUserAiFeature(), UserCrudType.CREATE);
+		}
+		applier.updatePickMe(applier.getPickMe() + 1);
 		enemy.updatePickMe(enemy.getPickMe() - 1);
-		if(enemy.getPickMe() == 0){
+		if(enemy.getPickMe() <= 0){
 			Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
 			if(!isSuccess){
 				log.error("매칭 enemy 정보 AI 반영 에러 enemyUuid =  {} / enemyId = {}", responseMsg.getEnemyUuid(), enemy.getId());
@@ -110,6 +115,7 @@ public class MatchService {
 		matchingHistoryRepository.save(history);
 
 		MatchRes response = MatchRes.fromUsers(enemy);
+		response.updateCurrentPoint(applier.getPoint());
 		log.info("[MatchService] - Match Process Success!! applierUuid = {}, enemyUuid = {}", applierUuid, UUIDUtil.bytesToHex(enemyUuid));
 		return response;
 	}
@@ -161,6 +167,10 @@ public class MatchService {
 			}
 
 			applier.subtractPoint(usePoint);
+			if(applier.getPickMe() <= 0){
+				userCrudRabbitMQUtil.sendUserChange(applier.getUserAiFeature(), UserCrudType.CREATE);
+			}
+			applier.updatePickMe(applier.getPickMe() + 1);
 			enemy.updatePickMe(enemy.getPickMe() - 1);
 			if(enemy.getPickMe() == 0){
 				Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
@@ -179,6 +189,7 @@ public class MatchService {
 			matchingHistoryRepository.save(history);
 
 			MatchRes response = MatchRes.fromUsers(enemy);
+			response.updateCurrentPoint(applier.getPoint());
 			log.info("[MatchService - requestAdminMatch] - Match Process Success!! applierUuid = {}, enemyUuid = {}", applierUuid, UUIDUtil.bytesToHex(enemyUuid));
 			return response;
 
@@ -289,6 +300,28 @@ public class MatchService {
 
 		usersRepository.save(users);
 		userAiFeatureRepository.save(users.getUserAiFeature());
+	}
+
+	@Transactional
+	public void recoverMatch(RecoverReq req){
+		Users users = usersRepository.findById(req.getUserId())
+				.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+		userCrudRabbitMQUtil.sendUserChange(users.getUserAiFeature(), UserCrudType.CREATE);
+		users.updatePickMe(1);
+	}
+
+	public String inquiryUuid(RecoverReq req){
+		Users users = usersRepository.findById(req.getUserId())
+			.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+		return UUIDUtil.bytesToHex(users.getUserAiFeature().getUuid());
+	}
+
+	public void deleteUserCsv(RecoverReq req){
+		Users users = usersRepository.findById(req.getUserId())
+			.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+		userCrudRabbitMQUtil.sendUserChange(users.getUserAiFeature(),UserCrudType.DELETE);
 	}
 
 }

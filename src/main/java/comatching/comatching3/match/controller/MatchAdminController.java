@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import comatching.comatching3.match.dto.request.AdminMatchReq;
 import comatching.comatching3.match.dto.request.CodeCheckReq;
+import comatching.comatching3.match.dto.request.RecoverReq;
 import comatching.comatching3.match.dto.response.CodeCheckRes;
 import comatching.comatching3.match.dto.response.MatchRes;
 import comatching.comatching3.match.service.AuthCodeService;
@@ -18,7 +19,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/match")
+@RequestMapping("/auth/admin/api/match/")
 @RequiredArgsConstructor
 public class MatchAdminController {
 
@@ -32,7 +33,7 @@ public class MatchAdminController {
 		return Response.ok();
 	}
 
-	@GetMapping("/test/data/add")
+	@GetMapping("/data/add")
 	public Response requestTestData(){
 		matchService.testDataAdd();
 		return Response.ok();
@@ -48,6 +49,24 @@ public class MatchAdminController {
 	public Response<MatchRes> requestMatch(@RequestBody @Valid AdminMatchReq req){
 		MatchRes res = matchService.requestAdminMatch(req);
 		return Response.ok(res);
+	}
+
+	@PostMapping("/recovery/match")
+	public Response<Void> recoverMatch(@RequestBody RecoverReq req){
+		matchService.recoverMatch(req);
+		return Response.ok();
+	}
+
+	@PostMapping("/find/uuid")
+	public Response<String> inquiryUuid(@RequestBody  RecoverReq req){
+		String uuid = matchService.inquiryUuid(req);
+		return Response.ok(uuid);
+	}
+
+	@PostMapping("/delete/user")
+	public Response<Void> deleteUserCsv(@RequestBody  RecoverReq req){
+		matchService.deleteUserCsv(req);
+		return Response.ok();
 	}
 
 }

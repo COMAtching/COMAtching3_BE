@@ -33,10 +33,13 @@ public class MatchRes {
 			.hobby(users.getUserAiFeature().getHobby())
 			.age(users.getUserAiFeature().getAge())
 			.major(users.getUserAiFeature().getMajor())
-			.currentPoint(users.getPoint())
 			.contactId(users.getContactId())
 			.admissionYear(users.getUserAiFeature().getAdmissionYear())
 			.gender(users.getUserAiFeature().getGender())
 			.build();
+	}
+
+	public void updateCurrentPoint(Integer point){
+		this.currentPoint = point;
 	}
 }
