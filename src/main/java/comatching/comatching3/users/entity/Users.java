@@ -80,6 +80,7 @@ public class Users extends BaseEntity {
 
 	private String contactId;
 
+	private Boolean event1 = false;
 
 	@Builder
 	public Users(String socialId, String role, String username) {
@@ -133,6 +134,10 @@ public class Users extends BaseEntity {
 	}
 
 	public void updateContactId(String contactId) {this.contactId = contactId;}
+
+	public void updateEvent1(Boolean event1){
+		this.event1 = event1;
+	}
 
 
 }

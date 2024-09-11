@@ -16,6 +16,7 @@ import comatching.comatching3.history.repository.PointHistoryRepository;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.users.dto.BuyPickMeReq;
+import comatching.comatching3.users.dto.CurrentPointRes;
 import comatching.comatching3.users.dto.UserFeatureReq;
 import comatching.comatching3.users.dto.UserInfoRes;
 import comatching.comatching3.users.entity.UserAiFeature;
@@ -112,12 +113,18 @@ public class UserService {
      * 메인 페이지 유저 정보 조회
      * @return 유저 정보 조회
      */
+    @Transactional
     public UserInfoRes getUserInfo() {
 
         Users user = securityUtil.getCurrentUsersEntity();
 //        log.info(user.getUsername());
 
         Boolean canRequest = !chargeRequestRepository.existsByUsers(user);
+
+        if(user.getPickMe() <= 0){
+            userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.DELETE);
+            if(user.getPickMe() < 0) user.updatePickMe(0);
+        }
 
         return UserInfoRes.builder()
                 .username(user.getUsername())
@@ -135,6 +142,7 @@ public class UserService {
                 .contactFrequency(user.getUserAiFeature().getContactFrequency())
                 .hobbies(user.getUserAiFeature().getHobby())
                 .gender(user.getUserAiFeature().getGender())
+                .event1(user.getEvent1())
                 .build();
     }
 
@@ -181,5 +189,26 @@ public class UserService {
         user.getPointHistoryList().add(pointHistory);
 
         pointHistoryRepository.save(pointHistory);
+    }
+
+    public CurrentPointRes inquiryCurrentPoint(){
+        Users users = securityUtil.getCurrentUsersEntity();
+        return new CurrentPointRes(users.getPoint());
+    }
+
+
+    @Transactional
+    public void requestEventPickMe(){
+        Users users = securityUtil.getCurrentUsersEntity();
+
+        if(users.getPickMe() <= 0){
+            userCrudRabbitMQUtil.sendUserChange(users.getUserAiFeature(), UserCrudType.CREATE);
+            users.updatePickMe(0);
+        }
+        else{
+            users.updatePickMe(users.getPickMe() + 3);
+        }
+        users.updateEvent1(true);
+
     }
 }
