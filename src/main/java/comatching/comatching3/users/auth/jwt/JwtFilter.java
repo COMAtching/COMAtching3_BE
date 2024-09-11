@@ -1,7 +1,9 @@
 package comatching.comatching3.users.auth.jwt;
 
+import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.users.entity.Users;
+import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -56,6 +58,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
         } catch (ExpiredJwtException e) {
+            throw new BusinessException(ResponseCode.TOKEN_NOT_AVAILABLE);
 //            log.info("엑세스 토큰 만료");
         } catch (SignatureException e) {
             log.info("엑세스 토큰 무결성 오류");
