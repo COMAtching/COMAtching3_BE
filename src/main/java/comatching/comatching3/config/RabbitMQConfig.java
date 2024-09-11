@@ -47,15 +47,6 @@ public class RabbitMQConfig {
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(jackson2JsonMessageConverter());
 
-		/*rabbitTemplate.setConfirmCallback(((correlationData, ack, cause) -> {
-			if(!ack){
-				Message message = correlationData.getReturned().getMessage();
-				byte[] body = message.getBody();
-				log.error("메세지 발행에 실패했습니다.ID {}", correlationData.getId());
-			}
-			correlationData.getFuture().complete(new CorrelationData.Confirm(true, "success"));
-			log.info("received ack");
-		}));*/
 		return rabbitTemplate;
 	}
 }

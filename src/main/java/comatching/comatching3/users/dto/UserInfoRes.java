@@ -28,4 +28,5 @@ public class UserInfoRes {
     private Gender gender;
     private String comment;
     private Integer admissionYear;
+    private Boolean event1;
 }
