@@ -58,7 +58,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
         } catch (ExpiredJwtException e) {
-            throw new BusinessException(ResponseCode.TOKEN_NOT_AVAILABLE);
+            throw new JwtException("TOKEN_EXPIRED");
 //            log.info("엑세스 토큰 만료");
         } catch (SignatureException e) {
             log.info("엑세스 토큰 무결성 오류");
