@@ -202,6 +202,9 @@ public class UserService {
     @Transactional
     public void requestEventPickMe(){
         Users users = securityUtil.getCurrentUsersEntity();
+        if (users.getEvent1()) {
+            throw new BusinessException(ResponseCode.ALREADY_PARTICIPATED);
+        }
 
         if(users.getPickMe() <= 0){
             userCrudRabbitMQUtil.sendUserChange(users.getUserAiFeature(), UserCrudType.CREATE);
