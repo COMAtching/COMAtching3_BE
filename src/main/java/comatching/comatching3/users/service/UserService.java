@@ -159,6 +159,11 @@ public class UserService {
 
     @Transactional
     public void buyPickMe(BuyPickMeReq req) {
+
+        if (req == null || req.getAmount() == null) {
+            throw new BusinessException(ResponseCode.BAD_REQUEST_PiCKME);
+        }
+
         Users user = securityUtil.getCurrentUsersEntity();
         int price = 500;
         int userPoint = user.getPoint();
