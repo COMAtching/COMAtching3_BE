@@ -1,9 +1,6 @@
 package comatching.comatching3.users.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.users.dto.BuyPickMeReq;
@@ -41,6 +38,17 @@ public class UserController {
 
         response.addHeader("Authorization", "Bearer " + tokens.getAccessToken());
         response.addHeader("Refresh-Token", tokens.getRefreshToken());
+        return Response.ok();
+    }
+
+    /**
+     * contactId 변경
+     * @param contactId 소셜 ID
+     * @return 200
+     */
+    @PatchMapping("/auth/user/api/user/info/{contactId}")
+    public Response<Void> updateContactId(@PathVariable String contactId) {
+        userService.updateContactId(contactId);
         return Response.ok();
     }
 
@@ -85,6 +93,27 @@ public class UserController {
     @GetMapping("/auth/user/api/event/no-pickMe")
     public Response<Void> notRequestEventPickMe(){
         userService.notRequestEventPickMe();
+        return Response.ok();
+    }
+
+    /**
+     * 더이상 안뽑히기 (사실상 탈퇴)
+     * @return 200
+     */
+    @GetMapping("/auth/user/api/stop-pickMe")
+    public Response<Void> stopPickMe() {
+        userService.stopPickMe();
+        return Response.ok();
+    }
+
+    /**
+     * 다시 뽑히기
+     * pickMe가 있어야 csv에 추가됨
+     * @return 200
+     */
+    @GetMapping("/auth/user/api/restart-pickMe")
+    public Response<Void> restartAccount() {
+        userService.restartPickMe();
         return Response.ok();
     }
 }

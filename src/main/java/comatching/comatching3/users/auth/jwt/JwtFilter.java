@@ -91,7 +91,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     response.setHeader("Authorization", "Bearer " + newAccessToken);
                     response.setHeader("Refresh-Token", newRefreshToken);
                     securityUtil.setAuthentication(newAccessToken);
-                    Users user = securityUtil.getCurrentUsersEntity();
+//                    Users user = securityUtil.getCurrentUsersEntity();
 //                    log.info("새로 등록한 유저 정보 출력(필터 안) " + user.getUsername() + "권한 " + user.getRole());
                 } else {
 //                    log.info("레디스와 리프레시 토큰 다름");

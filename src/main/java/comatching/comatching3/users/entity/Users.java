@@ -80,6 +80,8 @@ public class Users extends BaseEntity {
 
 	private String contactId;
 
+	private Boolean isDeactivated = false;
+
 	private Boolean event1 = false;
 
 	@Builder
@@ -139,5 +141,7 @@ public class Users extends BaseEntity {
 		this.event1 = event1;
 	}
 
-
+	public void updateDeactivated(Boolean deactivated) {
+		isDeactivated = deactivated;
+	}
 }
