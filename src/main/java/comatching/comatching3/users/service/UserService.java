@@ -148,6 +148,13 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
+    public void updateContactId(String contactId) {
+        Users user = securityUtil.getCurrentUsersEntity();
+        user.updateContactId(contactId);
+    }
+
+
     /**
      * 유저 포인트 조회
      * @return 유저 포인트
@@ -161,7 +168,7 @@ public class UserService {
     public void buyPickMe(BuyPickMeReq req) {
 
         if (req == null || req.getAmount() == null) {
-            throw new BusinessException(ResponseCode.BAD_REQUEST_PiCKME);
+            throw new BusinessException(ResponseCode.BAD_REQUEST_PICKME);
         }
 
         Users user = securityUtil.getCurrentUsersEntity();
@@ -226,5 +233,22 @@ public class UserService {
     public void notRequestEventPickMe(){
         Users users = securityUtil.getCurrentUsersEntity();
         users.updateEvent1(true);
+    }
+
+    @Transactional
+    public void stopPickMe() {
+        Users user = securityUtil.getCurrentUsersEntity();
+        user.updateDeactivated(true);
+        userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.DELETE);
+    }
+
+    @Transactional
+    public void restartPickMe() {
+        Users user = securityUtil.getCurrentUsersEntity();
+        user.updateDeactivated(false);
+
+        if (user.getPickMe() > 0) {
+            userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+        }
     }
 }
