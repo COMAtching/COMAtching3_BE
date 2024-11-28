@@ -27,19 +27,6 @@ public class MatchAdminController {
 	private final MatchService matchService;
 	private final AuthCodeService authCodeService;
 
-	@PostMapping("/test/crud")
-	public Response<Void> requestCrud(@RequestBody UserFeatureReq req){
-		System.out.println(req.getGender());
-		matchService.testCrud(req);
-		return Response.ok();
-	}
-
-	@GetMapping("/data/add")
-	public Response requestTestData(){
-		matchService.testDataAdd();
-		return Response.ok();
-	}
-
 	@PostMapping("/check-code")
 	public Response<CodeCheckRes> checkCode(@RequestBody CodeCheckReq req){
 		CodeCheckRes res = authCodeService.checkCode(req);
@@ -51,23 +38,4 @@ public class MatchAdminController {
 		MatchRes res = matchService.requestAdminMatch(req);
 		return Response.ok(res);
 	}
-
-	@PostMapping("/recovery/match")
-	public Response<Void> recoverMatch(@RequestBody RecoverReq req){
-		matchService.recoverMatch(req);
-		return Response.ok();
-	}
-
-	@PostMapping("/find/uuid")
-	public Response<String> inquiryUuid(@RequestBody  RecoverReq req){
-		String uuid = matchService.inquiryUuid(req);
-		return Response.ok(uuid);
-	}
-
-	@PostMapping("/delete/user")
-	public Response<Void> deleteUserCsv(@RequestBody DeleteCsvReq req){
-		matchService.deleteUserCsv(req);
-		return Response.ok();
-	}
-
 }
