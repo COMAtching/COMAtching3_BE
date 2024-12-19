@@ -4,7 +4,7 @@ import java.util.List;
 
 import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.enums.Hobby;
+import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.match.enums.AgeOption;
 import comatching.comatching3.match.enums.ContactFrequencyOption;
 import comatching.comatching3.util.BaseEntity;
@@ -52,26 +52,26 @@ public class MatchingHistory extends BaseEntity {
 	private ContactFrequencyOption contactFrequencyOption;
 
 	@Convert(converter = HobbyListConverter.class)
-	private List<Hobby> hobbyOption;
+	private List<HobbyEnum> hobbyEnumOption;
 
 	private Boolean noSameMajorOption;
 
 	@Builder
 	public MatchingHistory(Users applier, Users enemy, String mbtiOption, AgeOption ageOption,
-		ContactFrequencyOption contactFrequencyOption, List<Hobby> hobbyOption, Boolean noSameMajorOption) {
+		ContactFrequencyOption contactFrequencyOption, List<HobbyEnum> hobbyEnumOption, Boolean noSameMajorOption) {
 		this.applier = applier;
 		this.enemy = enemy;
 		this.mbtiOption = mbtiOption;
 		this.ageOption = ageOption;
 		this.contactFrequencyOption = contactFrequencyOption;
-		this.hobbyOption = hobbyOption;
+		this.hobbyEnumOption = hobbyEnumOption;
 		this.noSameMajorOption = noSameMajorOption;
 
 	}
 
 	public void updateOptionsFromRequestMsg(MatchRequestMsg matchRequestMsg) {
 		this.noSameMajorOption = matchRequestMsg.getSameMajorOption();
-		this.hobbyOption = Hobby.convertStringToHobbies(matchRequestMsg.getHobbyOption());
+		this.hobbyEnumOption = HobbyEnum.convertStringToHobbies(matchRequestMsg.getHobbyOption());
 		this.ageOption = matchRequestMsg.getAgeOption();
 		this.mbtiOption = matchRequestMsg.getMbtiOption();
 		this.contactFrequencyOption = matchRequestMsg.getContactFrequencyOption();
@@ -86,7 +86,7 @@ public class MatchingHistory extends BaseEntity {
 			", mbtiOption='" + mbtiOption + '\'' +
 			", ageOption=" + ageOption +
 			", contactFrequencyOption=" + contactFrequencyOption +
-			", hobbyOption=" + hobbyOption +
+			", hobbyOption=" + hobbyEnumOption +
 			", noSameMajorOption=" + noSameMajorOption +
 			'}';
 	}
