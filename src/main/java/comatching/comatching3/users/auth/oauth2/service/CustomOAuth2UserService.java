@@ -1,87 +1,86 @@
 package comatching.comatching3.users.auth.oauth2.service;
 
-import comatching.comatching3.users.auth.oauth2.dto.CustomOAuth2User;
-import comatching.comatching3.users.auth.oauth2.dto.KakaoResponse;
-import comatching.comatching3.users.auth.oauth2.dto.UserDto;
-import comatching.comatching3.users.auth.oauth2.dto.OAuth2Response;
-import comatching.comatching3.users.entity.UserAiFeature;
-import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.enums.Role;
-import comatching.comatching3.users.repository.UserAiFeatureRepository;
-import comatching.comatching3.users.repository.UsersRepository;
-import comatching.comatching3.util.UUIDUtil;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Optional;
+
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-
-import java.util.Optional;
+import comatching.comatching3.exception.BusinessException;
+import comatching.comatching3.users.auth.oauth2.dto.UserDto;
+import comatching.comatching3.users.auth.oauth2.provider.CustomUser;
+import comatching.comatching3.users.auth.oauth2.provider.OAuth2ProviderFactory;
+import comatching.comatching3.users.auth.oauth2.provider.OAuth2ProviderUser;
+import comatching.comatching3.users.entity.UserAiFeature;
+import comatching.comatching3.users.entity.Users;
+import comatching.comatching3.users.enums.Role;
+import comatching.comatching3.users.repository.UserAiFeatureRepository;
+import comatching.comatching3.users.repository.UsersRepository;
+import comatching.comatching3.util.ResponseCode;
+import comatching.comatching3.util.UUIDUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final UsersRepository usersRepository;
-    private final UserAiFeatureRepository userAiFeatureRepository;
+	private final UsersRepository usersRepository;
+	private final UserAiFeatureRepository userAiFeatureRepository;
 
-    @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = super.loadUser(userRequest);
+	@Override
+	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+		OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        OAuth2Response oAuth2Response = null;
+		return processOAuth2User(userRequest, oAuth2User);
+	}
 
-        if(userRequest.getClientRegistration().getRegistrationId().equals("kakao")) {
-            oAuth2Response = new KakaoResponse(oAuth2User.getAttributes());
-        } else {
-            return null;
-        }
+	private OAuth2User processOAuth2User(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
+		ClientRegistration clientRegistration = userRequest.getClientRegistration();
 
-        String socialId = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
-        String username = oAuth2Response.getNickname();
+		OAuth2ProviderUser oAuth2UserInfo = OAuth2ProviderFactory.getOAuth2UserInfo(clientRegistration, oAuth2User);
 
-        Optional<Users> user = usersRepository.findBySocialId(socialId);
-        UserDto userDto;
+		Optional<Users> userOpt = usersRepository.findBySocialId(oAuth2UserInfo.getSocialId());
 
+		Users user = userOpt.orElseGet(() -> register(oAuth2UserInfo));
 
-        if (user.isEmpty()) {
-            Users newUser = Users.builder()
-                    .socialId(socialId)
-                    .role(Role.SOCIAL.getRoleName())
-                    .username(username)
-                    .build();
+		if (!StringUtils.hasText(oAuth2UserInfo.getSocialId())) {
+			throw new BusinessException(ResponseCode.INTERNAL_SERVER_ERROR);
+		}
 
-            byte[] uuid = UUIDUtil.createUUID();
-            UserAiFeature userAiFeature = UserAiFeature.builder()
-                    .users(newUser)
-                    .uuid(uuid)
-                    .build();
+		UserDto userDto = UserDto.builder()
+			.uuid(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()))
+			.role(user.getRole())
+			.build();
 
-            newUser.updateUserAiFeature(userAiFeature);
+		return new CustomUser(userDto);
+	}
 
-            usersRepository.save(newUser);
-            userAiFeatureRepository.save(userAiFeature);
+	private Users register(OAuth2ProviderUser userInfo) {
+		Users newUser = Users.builder()
+			.username(userInfo.getUsername())
+			.socialId(userInfo.getSocialId())
+			.provider(userInfo.getProvider())
+			.email(userInfo.getEmail())
+			.role(Role.SOCIAL.getRoleName())
+			.build();
 
-            userDto = UserDto.builder()
-                    .uuid(UUIDUtil.bytesToHex(uuid))
-                    .role(newUser.getRole())
-                    .nickname(username)
-                    .build();
-        } else {
-            Users existUser = user.get();
-            byte[] uuid = existUser.getUserAiFeature().getUuid();
+		byte[] uuid = UUIDUtil.createUUID();
+		UserAiFeature userAiFeature = UserAiFeature.builder()
+			.users(newUser)
+			.uuid(uuid)
+			.build();
 
-            userDto = UserDto.builder()
-                    .uuid(UUIDUtil.bytesToHex(uuid))
-                    .role(user.get().getRole())
-                    .nickname(username)
-                    .build();
-        }
+		newUser.updateUserAiFeature(userAiFeature);
 
-        return new CustomOAuth2User(userDto);
-    }
+		usersRepository.save(newUser);
+		userAiFeatureRepository.save(userAiFeature);
+
+		return newUser;
+	}
 }

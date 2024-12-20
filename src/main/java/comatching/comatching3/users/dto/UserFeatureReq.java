@@ -13,13 +13,13 @@ public class UserFeatureReq {
     private String university;
     private String major;
     private String contactId;
-    private Gender gender;
+    private String gender;
 
     @Min(20) @Max(30)
     private Integer age;
     private String mbti;
     private List<String> hobby;
-    private ContactFrequency contactFrequency;
+    private String contactFrequency;
     private String song;
     private String comment;
     private Integer admissionYear;

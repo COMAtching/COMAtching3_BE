@@ -27,6 +27,8 @@ import comatching.comatching3.users.dto.UserFeatureReq;
 import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
+import comatching.comatching3.users.enums.ContactFrequency;
+import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.HobbyRepository;

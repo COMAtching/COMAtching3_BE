@@ -28,6 +28,15 @@ public enum Gender {
 		return null;
 	}
 
+	public static Gender fromAiValue(String aiValue) {
+		for (Gender gender : Gender.values()) {
+			if (gender.getAiValue().equals(aiValue)) {
+				return gender;
+			}
+		}
+		return null; // aiValue가 일치하지 않을 경우 null 반환
+	}
+
 	@JsonValue
 	public String getValue() {
 		return value;

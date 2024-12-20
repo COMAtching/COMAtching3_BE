@@ -1,12 +1,12 @@
 package comatching.comatching3.util.security;
 
+import comatching.comatching3.admin.auth.CustomAdmin;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.repository.AdminRepository;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
-import comatching.comatching3.users.auth.oauth2.dto.CustomOAuth2User;
-import comatching.comatching3.users.auth.oauth2.dto.UserDto;
+import comatching.comatching3.users.auth.oauth2.provider.CustomUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -49,19 +49,6 @@ public class SecurityUtil {
         return Optional.ofNullable(userDetails).map(UserDetails::getUsername);
     }
 
-    public void setAuthentication(String accessToken) {
-        String uuid = jwtUtil.getUUID(accessToken);
-        String role = jwtUtil.getRole(accessToken);
-
-        UserDto userDto = new UserDto();
-        userDto.setUuid(uuid);
-        userDto.setRole(role);
-
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDto);
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-    }
-
     /**
      *
      * @return 현재 Users Entity 반환
@@ -69,8 +56,8 @@ public class SecurityUtil {
     public Users getCurrentUsersEntity(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
-            byte[] uuid = UUIDUtil.uuidStringToBytes(userDetails.getUsername());
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUser customUser) {
+            byte[] uuid = UUIDUtil.uuidStringToBytes(customUser.getUsername());
 
             return usersRepository.findUsersByUuid(uuid)
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
@@ -80,10 +67,15 @@ public class SecurityUtil {
     }
 
     public Admin getAdminFromContext() {
-        String adminUuid = getCurrentUserUUID()
-                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        return adminRepository.findByUuid(UUIDUtil.uuidStringToBytes(adminUuid))
+        if (authentication != null && authentication.getPrincipal() instanceof CustomAdmin customAdmin) {
+            String uuid = customAdmin.getUuid();
+
+            return adminRepository.findByUuid(UUIDUtil.uuidStringToBytes(uuid))
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+        }
+
+        throw new BusinessException(ResponseCode.USER_NOT_FOUND);
     }
 }

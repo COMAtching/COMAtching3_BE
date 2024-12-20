@@ -41,17 +41,14 @@ public class AdminController {
      * @param response 응답 헤더 설정
      * @return ok
      */
-    @PostMapping("/admin/login")
-    public Response<TokenRes> adminLogin(@RequestBody AdminLoginReq form,
-                           HttpServletResponse response) {
-
-        TokenRes tokens = adminService.adminLogin(form);
-
-        response.addHeader("Authorization", "Bearer " + tokens.getAccessToken());
-        response.addHeader("Refresh-Token", tokens.getRefreshToken());
-
-        return Response.ok(tokens);
-    }
+    // @PostMapping("/admin/login")
+    // public Response<TokenRes> adminLogin(@RequestBody AdminLoginReq form,
+    //                        HttpServletResponse response) {
+    //
+    //     TokenRes tokens = adminService.adminLogin(form);
+    //
+    //     return Response.ok(tokens);
+    // }
 
     /**
      * 승인 대기중인 오퍼레이터 조회 메소드
