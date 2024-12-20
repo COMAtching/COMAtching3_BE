@@ -30,6 +30,15 @@ public enum ContactFrequency {
 		return null;
 	}
 
+	public static ContactFrequency fromAiValue(String aiValue) {
+		for (ContactFrequency status : ContactFrequency.values()) {
+			if (status.getAiValue().equals(aiValue)) {
+				return status;
+			}
+		}
+		return null; // aiValue가 일치하지 않을 경우 null 반환
+	}
+
 	@JsonValue
 	public String getValue() {
 		return value;

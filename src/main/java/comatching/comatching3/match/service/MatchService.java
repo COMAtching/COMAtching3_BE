@@ -27,6 +27,8 @@ import comatching.comatching3.users.dto.UserFeatureReq;
 import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
+import comatching.comatching3.users.enums.ContactFrequency;
+import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.HobbyRepository;
@@ -270,10 +272,10 @@ public class MatchService {
 				.toList();
 
 		userAiFeature.updateMbti(req.getMbti());
-		userAiFeature.updateContactFrequency(req.getContactFrequency());
+		userAiFeature.updateContactFrequency(ContactFrequency.fromAiValue(req.getContactFrequency()));
 		userAiFeature.updateHobby(hobbies);
 		userAiFeature.updateAge(req.getAge());
-		userAiFeature.updateGender(req.getGender());
+		userAiFeature.updateGender(Gender.fromAiValue(req.getGender()));
 		userAiFeature.updateMajor(req.getMajor());
 		userAiFeature.updateAdmissionYear(req.getAdmissionYear());
 
