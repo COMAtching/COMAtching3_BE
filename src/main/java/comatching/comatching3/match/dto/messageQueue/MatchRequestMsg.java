@@ -8,7 +8,7 @@ import comatching.comatching3.match.dto.request.MatchReq;
 import comatching.comatching3.match.enums.AgeOption;
 import comatching.comatching3.match.enums.ContactFrequencyOption;
 import comatching.comatching3.users.entity.UserAiFeature;
-import comatching.comatching3.users.enums.Hobby;
+import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.util.UUIDUtil;
 import lombok.Getter;
 
@@ -30,7 +30,7 @@ public class MatchRequestMsg{
 		this.matcherUuid = UUIDUtil.bytesToHex(applierFeature.getUuid());
 		this.contactFrequencyOption = matchReq.getContactFrequencyOption();
 		this.myGender = applierFeature.getGender().getAiValue();
-		this.hobbyOption = Hobby.convertHobbiesString(matchReq.getHobbyOption());
+		this.hobbyOption = HobbyEnum.convertHobbiesString(matchReq.getHobbyEnumOption());
 		this.sameMajorOption = matchReq.getSameMajorOption();
 		this.ageOption = matchReq.getAgeOption();
 		this.mbtiOption = matchReq.getMbtiOption();
@@ -42,7 +42,7 @@ public class MatchRequestMsg{
 		this.matcherUuid = UUIDUtil.bytesToHex(applierFeature.getUuid());
 		this.contactFrequencyOption = adminMatchReq.getContactFrequencyOption();
 		this.myGender = applierFeature.getGender().getAiValue();
-		this.hobbyOption = Hobby.convertHobbiesString(adminMatchReq.getHobbyOption());
+		this.hobbyOption = HobbyEnum.convertHobbiesString(adminMatchReq.getHobbyEnumOption());
 		this.sameMajorOption = adminMatchReq.getSameMajorOption();
 		this.ageOption = adminMatchReq.getAgeOption();
 		this.mbtiOption = adminMatchReq.getMbtiOption();

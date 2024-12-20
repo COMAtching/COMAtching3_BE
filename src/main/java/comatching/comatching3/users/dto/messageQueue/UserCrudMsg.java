@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.entity.UserAiFeature;
-import comatching.comatching3.users.enums.Hobby;
+import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.util.UUIDUtil;
 import lombok.Getter;
@@ -31,7 +32,7 @@ public class UserCrudMsg {
 		//this.uuid = "11ef6b568b0cdc2985f9c1ab3fa5c8fc";
 		this.mbti = userAiFeature.getMbti();
 		this.contactFrequency = userAiFeature.getContactFrequency().getAiValue();
-		this.hobby = toHobbyString(userAiFeature.getHobby());
+		this.hobby = toHobbyString(userAiFeature.getHobbyList());
 		this.age = userAiFeature.getAge();
 		this.gender = userAiFeature.getGender().getAiValue();
 		this.major = userAiFeature.getMajor();
@@ -40,27 +41,27 @@ public class UserCrudMsg {
 	private String toHobbyString(List<Hobby> hobbies){
 		StringBuilder hobbyString = new StringBuilder();
 		for(Hobby h : hobbies){
-			hobbyString.append(h + ",");
+			hobbyString.append(h.getHobbyName() + ",");
 		}
 
 		return hobbyString.toString();
 	}
 
-	public List<Hobby> getHobbyAsList(){
+	/*public List<HobbyEnum> getHobbyAsList(){
 		String hobbyString = this.hobby;
 		if (hobbyString.endsWith(",")) {
 			hobbyString = hobbyString.substring(0, hobbyString.length() - 1);
 		}
 
-		List<Hobby> hobbyList = new ArrayList<>();
+		List<HobbyEnum> hobbyEnumList = new ArrayList<>();
 		List<String> hobbies = Arrays.asList(hobbyString.split(","));
 
 		for (String hobby : hobbies) {
-			Hobby h = Hobby.from(hobby);
+			HobbyEnum h = HobbyEnum.from(hobby);
 			if (h != null) {
-				hobbyList.add(h);
+				hobbyEnumList.add(h);
 			}
 		}
-		return hobbyList;
-	}
+		return hobbyEnumList;
+	}*/
 }
