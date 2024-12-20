@@ -47,7 +47,7 @@ public class MatchRabbitMQUtil {
 			throw new BusinessException(ResponseCode.NO_MATCH_RESPONSE);
 		}
 
-		log.info("[MatchRabbitMQUtil] match success!! enemyUuid = {}", response.getEnemyUuid());
+		log.info("[MatchRabbitMQUtil] match success enemyUuid = {}", response.getEnemyUuid());
 		return response;
 	}
 }
