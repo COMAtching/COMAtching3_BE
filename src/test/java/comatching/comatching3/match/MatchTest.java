@@ -27,7 +27,7 @@ import comatching.comatching3.match.enums.ContactFrequencyOption;
 import comatching.comatching3.match.service.MatchService;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.enums.Hobby;
+import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.users.enums.Role;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.RabbitMQ.MatchRabbitMQUtil;
@@ -112,7 +112,7 @@ public class MatchTest {
 		MatchReq testMatchReq = MatchReq.builder()
 				.ageOption(AgeOption.EQUAL)
 				.mbtiOption("EN")
-				.hobbyOption(List.of(Hobby.게임, Hobby.독서))
+				.hobbyEnumOption(List.of(HobbyEnum.게임, HobbyEnum.독서))
 				.contactFrequencyOption(ContactFrequencyOption.FREQUENT)
 				.sameMajorOption(false)
 				.build();

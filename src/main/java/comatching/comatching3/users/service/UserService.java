@@ -19,11 +19,13 @@ import comatching.comatching3.users.dto.BuyPickMeReq;
 import comatching.comatching3.users.dto.CurrentPointRes;
 import comatching.comatching3.users.dto.UserFeatureReq;
 import comatching.comatching3.users.dto.UserInfoRes;
+import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.enums.Hobby;
+import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.users.enums.Role;
 import comatching.comatching3.users.enums.UserCrudType;
+import comatching.comatching3.users.repository.HobbyRepository;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
@@ -42,6 +44,7 @@ public class UserService {
     private final UsersRepository usersRepository;
     private final UserAiFeatureRepository userAiFeatureRepository;
     private final ChargeRequestRepository chargeRequestRepository;
+    private final HobbyRepository hobbyRepository;
     private final UniversityRepository universityRepository;
     private final SecurityUtil securityUtil;
     private final JwtUtil jwtUtil;
@@ -62,14 +65,21 @@ public class UserService {
     public TokenRes inputUserInfo(UserFeatureReq form) {
 
         Users user = securityUtil.getCurrentUsersEntity();
-        List<Hobby> hobbyList = form.getHobby().stream()
-                .map(Hobby::valueOf)
-                .toList();
+
 
         University university = universityRepository.findByUniversityName(form.getUniversity())
                 .orElseThrow(() -> new BusinessException(ResponseCode.SCHOOL_NOT_EXIST));
 
         UserAiFeature userAiFeature = user.getUserAiFeature();
+
+        List<Hobby> hobbyList = form.getHobby().stream()
+            .map(hobby -> Hobby.builder()
+                .hobbyName(hobby)
+                .userAiFeature(userAiFeature)
+                .build())
+            .toList();
+
+        hobbyRepository.saveAll(hobbyList);
 
         userAiFeature.updateMajor(form.getMajor());
         userAiFeature.updateGender(form.getGender());
@@ -128,6 +138,8 @@ public class UserService {
             }
         }
 
+        List<Hobby> hobbyList = hobbyRepository.findAllByUserAiFeature(user.getUserAiFeature());
+
         return UserInfoRes.builder()
                 .username(user.getUsername())
                 .major(user.getUserAiFeature().getMajor())
@@ -142,7 +154,7 @@ public class UserService {
                 .admissionYear(user.getUserAiFeature().getAdmissionYear())
                 .comment(user.getComment())
                 .contactFrequency(user.getUserAiFeature().getContactFrequency())
-                .hobbies(user.getUserAiFeature().getHobby())
+                .hobbies(hobbyList)
                 .gender(user.getUserAiFeature().getGender())
                 .event1(user.getEvent1())
                 .build();
