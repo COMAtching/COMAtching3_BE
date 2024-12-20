@@ -62,6 +62,8 @@ public class Users extends BaseEntity {
 
 	private String socialId;
 
+	private String provider;
+
 	private String username;
 
 	private String email;
@@ -85,8 +87,10 @@ public class Users extends BaseEntity {
 	private Boolean event1 = false;
 
 	@Builder
-	public Users(String socialId, String role, String username) {
+	public Users(String provider, String socialId, String email, String role, String username) {
+		this.provider = provider;
 		this.socialId = socialId;
+		this.email = email;
 		this.role = role;
 		this.username = username;
 	}
@@ -135,9 +139,11 @@ public class Users extends BaseEntity {
 		this.pickMe -= pickMe;
 	}
 
-	public void updateContactId(String contactId) {this.contactId = contactId;}
+	public void updateContactId(String contactId) {
+		this.contactId = contactId;
+	}
 
-	public void updateEvent1(Boolean event1){
+	public void updateEvent1(Boolean event1) {
 		this.event1 = event1;
 	}
 

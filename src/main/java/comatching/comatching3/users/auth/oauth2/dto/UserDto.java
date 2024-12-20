@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class UserDto {
     private String uuid;
     private String role;
-    private String nickname;
 }

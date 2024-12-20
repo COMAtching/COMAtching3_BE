@@ -1,13 +1,17 @@
 package comatching.comatching3.users.auth.oauth2.handler;
 
+import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
-import comatching.comatching3.users.auth.oauth2.dto.CustomOAuth2User;
+import comatching.comatching3.users.auth.oauth2.provider.CustomUser;
+import comatching.comatching3.users.auth.oauth2.service.TokenService;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
-import comatching.comatching3.users.enums.Role;
+import comatching.comatching3.util.CookieUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -15,38 +19,44 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
+    private final TokenService tokenService;
+    private final CookieUtil cookieUtil;
 
     @Value("${redirect-url.frontend}")
      private String REDIRECT_URL;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        CustomOAuth2User user = (CustomOAuth2User) authentication.getPrincipal();
-        String uuid = user.getName();
-        String role = user.getRole();
+        CustomUser customUser = getOAuth2UserPrincipal(authentication);
 
-        String accessToken = jwtUtil.generateAccessToken(uuid, role);
-        String refreshToken = refreshTokenService.getRefreshToken(uuid);
-
-        if (refreshToken == null) {
-            refreshToken = jwtUtil.generateRefreshToken(uuid, role);
-            refreshTokenService.saveRefreshToken(uuid, refreshToken);
+        if (customUser == null) {
+            log.error("Failed to get PrincipalUser from authentication");
+            response.sendRedirect("/oauth2-error");
         }
 
-        String userRole = "USER";
-        if (role.equals(Role.SOCIAL.getRoleName())) {
-            userRole = "SOCIAL";
-        }
+        TokenRes tokenRes = tokenService.makeTokenRes(customUser.getUuid(), customUser.getRole());
+        response.addHeader("Set-Cookie", cookieUtil.setAccessResponseCookie(tokenRes.getAccessToken()).toString());
+        response.addHeader("Set-Cookie", cookieUtil.setRefreshResponseCookie(tokenRes.getRefreshToken()).toString());
+        refreshTokenService.saveRefreshTokenInRedis(customUser.getUuid(), tokenRes.getRefreshToken());
 
-        response.addHeader("Authorization", "Bearer " + accessToken);
-        response.addHeader("Refresh-Token", refreshToken);
-        response.sendRedirect(REDIRECT_URL + "/?accessToken=" + accessToken + "&refreshToken=" + refreshToken + "&userRole=" + userRole);
+        log.info("카카오 로그인 성공");
+        response.sendRedirect(REDIRECT_URL);
+    }
+
+    private CustomUser getOAuth2UserPrincipal(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof CustomUser) {
+            return (CustomUser)principal;
+        }
+        return null;
     }
 
 }
