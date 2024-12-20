@@ -7,17 +7,25 @@ import comatching.comatching3.admin.dto.request.SchoolEmailReq;
 import comatching.comatching3.admin.dto.response.AfterVerifyEmailRes;
 import comatching.comatching3.admin.dto.response.EmailTokenRes;
 import comatching.comatching3.admin.service.OperatorService;
+import comatching.comatching3.util.CookieUtil;
 import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class OperatorController {
 
     private final OperatorService operatorService;
+    private final CookieUtil cookieUtil;
 
     /**
      * 관리자 학교 메일 인증 메소드
@@ -26,6 +34,9 @@ public class OperatorController {
      */
     @PostMapping("/auth/semi/email/code")
     public Response<EmailTokenRes> sendVerificationCode(@RequestBody SchoolEmailReq schoolEmailReq) {
+
+        log.info("Current authentication: {}", SecurityContextHolder.getContext().getAuthentication());
+
 
         Boolean isDuplicated = operatorService.checkEmailDuplicate(schoolEmailReq.getSchoolEmail());
         Boolean checkEmailDomain = operatorService.checkEmailDomain(schoolEmailReq.getSchoolEmail());
@@ -44,14 +55,16 @@ public class OperatorController {
      * @return 인증 성공 시 ok, 실패 시 VAL-001
      */
     @PostMapping("/auth/semi/email/verify/code")
-    public Response<Void> verifyCode(@RequestBody EmailVerifyReq request,
-                                     HttpServletResponse response) {
+    public Response<Void> verifyCode(@RequestBody EmailVerifyReq request, HttpServletResponse response) {
 
         AfterVerifyEmailRes result = operatorService.verifyCode(request);
 
         if (result.getSuccess()) {
-            response.addHeader("Authorization", "Bearer " + result.getAccessToken());
-            response.addHeader("Refresh-Token", result.getRefreshToken());
+            ResponseCookie accessCookie = cookieUtil.setAccessResponseCookie(result.getAccessToken());
+            ResponseCookie refreshCookie = cookieUtil.setRefreshResponseCookie(result.getRefreshToken());
+
+            response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
             return Response.ok();
         } else {
             return Response.errorResponse(ResponseCode.ARGUMENT_NOT_VALID);

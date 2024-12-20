@@ -8,6 +8,7 @@ import comatching.comatching3.users.dto.CurrentPointRes;
 import comatching.comatching3.users.dto.UserFeatureReq;
 import comatching.comatching3.users.dto.UserInfoRes;
 import comatching.comatching3.users.service.UserService;
+import comatching.comatching3.util.CookieUtil;
 import comatching.comatching3.util.Response;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
 
     private final UserService userService;
+    private final CookieUtil cookieUtil;
 
     @GetMapping("/api/participations")
     public Response<Long> getParticipations() {
@@ -34,10 +36,11 @@ public class UserController {
     @PostMapping("/auth/social/api/user/info")
     public Response<Void> inputUserInfo(@RequestBody UserFeatureReq form,
                                         HttpServletResponse response) {
-        TokenRes tokens = userService.inputUserInfo(form);
+        TokenRes tokenRes = userService.inputUserInfo(form);
 
-        response.addHeader("Authorization", "Bearer " + tokens.getAccessToken());
-        response.addHeader("Refresh-Token", tokens.getRefreshToken());
+        response.addHeader("Set-Cookie", cookieUtil.setAccessResponseCookie(tokenRes.getAccessToken()).toString());
+        response.addHeader("Set-Cookie", cookieUtil.setRefreshResponseCookie(tokenRes.getRefreshToken()).toString());
+
         return Response.ok();
     }
 

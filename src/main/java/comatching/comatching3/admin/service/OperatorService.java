@@ -72,10 +72,9 @@ public class OperatorService {
             String uuid = UUIDUtil.bytesToHex(admin.getUuid());
             String accessToken = jwtUtil.generateAccessToken(uuid, String.valueOf(admin.getAdminRole()));
             String refreshToken = refreshTokenService.getRefreshToken(uuid);
-
-            securityUtil.setAuthentication(accessToken);
-
             redisTemplate.delete(redisKey);
+            refreshTokenService.saveRefreshTokenInRedis(uuid, refreshToken);
+
             response.setAccessToken(accessToken);
             response.setRefreshToken(refreshToken);
             response.setSuccess(true);
