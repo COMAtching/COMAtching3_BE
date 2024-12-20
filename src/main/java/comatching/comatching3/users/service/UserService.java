@@ -14,6 +14,7 @@ import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.history.enums.PointHistoryType;
 import comatching.comatching3.history.repository.PointHistoryRepository;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
+import comatching.comatching3.users.auth.oauth2.provider.kakao.KakaoLogoutService;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.users.dto.BuyPickMeReq;
 import comatching.comatching3.users.dto.CurrentPointRes;
@@ -25,7 +26,6 @@ import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
-import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.users.enums.Role;
 import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.HobbyRepository;
@@ -54,6 +54,7 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
     private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
     private final PointHistoryRepository pointHistoryRepository;
+    private final KakaoLogoutService logoutService;
 
     public Long getParticipations() {
         return usersRepository.count();

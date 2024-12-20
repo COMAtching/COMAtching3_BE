@@ -4,7 +4,9 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import comatching.comatching3.exception.BusinessException;
+import comatching.comatching3.users.auth.oauth2.provider.google.GoogleUser;
 import comatching.comatching3.users.auth.oauth2.provider.kakao.KakaoUser;
+import comatching.comatching3.users.auth.oauth2.provider.naver.NaverUser;
 import comatching.comatching3.util.ResponseCode;
 
 public class OAuth2ProviderFactory {
@@ -14,7 +16,15 @@ public class OAuth2ProviderFactory {
 
 		if (registrationId.equals(OAuth2Provider.KAKAO.getRegistrationId())) {
 			return new KakaoUser(oAuth2User, clientRegistration);
-		} else {
+		} else if (registrationId.equals(OAuth2Provider.NAVER.getRegistrationId())) {
+			return new NaverUser(oAuth2User, clientRegistration);
+		} else if (registrationId.equals(OAuth2Provider.GOOGLE.getRegistrationId())) {
+			return new GoogleUser(oAuth2User, clientRegistration);
+		}
+		// else if (registrationId.equals(OAuth2Provider.APPLE.getRegistrationId())) {
+		// 	return new NaverUser(oAuth2User, clientRegistration);
+		// }
+		else {
 			throw new BusinessException(ResponseCode.NOT_SUPPORTED_PROVIDER);
 		}
 	}

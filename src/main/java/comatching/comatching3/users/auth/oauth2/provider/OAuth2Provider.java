@@ -6,7 +6,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum OAuth2Provider {
-	KAKAO("kakao");
+	KAKAO("kakao"),
+	NAVER("naver"),
+	GOOGLE("google"),
+	APPLE("apple");
 
 	private final String registrationId;
 }
