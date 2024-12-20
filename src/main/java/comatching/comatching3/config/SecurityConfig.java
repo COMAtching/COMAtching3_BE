@@ -32,6 +32,7 @@ import comatching.comatching3.users.auth.oauth2.handler.OAuth2SuccessHandler;
 import comatching.comatching3.users.auth.oauth2.service.CustomOAuth2UserService;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.util.CookieUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -44,7 +45,7 @@ public class SecurityConfig {
 	);
 	private static final List<String> WHITELIST = List.of(
 		"/login", "/admin/**", "/charge-monitor/**", "/app/**", "/login-success",
-		"/api/participations", "/auth/refresh"
+		"/api/participations", "/auth/refresh", "/main-page"
 	);
 	private final JwtUtil jwtUtil;
 	private final RefreshTokenService refreshTokenService;
@@ -65,6 +66,17 @@ public class SecurityConfig {
 		AuthenticationConfiguration authenticationConfiguration) throws Exception {
 		AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
 
+		http
+			.authorizeHttpRequests(auth -> auth
+				.requestMatchers(WHITELIST.toArray(new String[0])).permitAll()
+				.requestMatchers("/auth/admin/**").hasRole("ADMIN")
+				.requestMatchers("/auth/operator/**").hasAnyRole("OPERATOR", "ADMIN")
+				.requestMatchers("/auth/semi/**").hasAnyRole("SEMI_OPERATOR", "SEMI_ADMIN")
+				.requestMatchers("/auth/social/**").hasRole("SOCIAL")
+				.requestMatchers("/auth/user/**").hasRole("USER")
+				.anyRequest().authenticated()
+			);
+
 		// 관리자 인증 필터 설정
 		AdminAuthenticationFilter adminAuthFilter = new AdminAuthenticationFilter(authenticationManager,
 			adminUserDetailsService, jwtUtil,
@@ -76,6 +88,7 @@ public class SecurityConfig {
 
 		http
 			.csrf(AbstractHttpConfigurer::disable)
+			//todo: 로그인 페이지 등록 필요
 			.formLogin(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable);
 
@@ -91,17 +104,6 @@ public class SecurityConfig {
 					.userService(customOAuth2UserService))
 				.successHandler(oAuth2SuccessHandler)
 				.failureHandler(oAuth2FailureHandler)
-			);
-
-		http
-			.authorizeHttpRequests(auth -> auth
-				.requestMatchers(WHITELIST.toArray(new String[0])).permitAll()
-				.requestMatchers("/auth/admin/**").hasRole("ADMIN")
-				.requestMatchers("/auth/operator/**").hasAnyRole("OPERATOR", "ADMIN")
-				.requestMatchers("/auth/semi/**").hasAnyRole("SEMI_OPERATOR", "SEMI_ADMIN")
-				.requestMatchers("/auth/social/**").hasRole("SOCIAL")
-				.requestMatchers("/auth/user/**").hasRole("USER")
-				.anyRequest().authenticated()
 			);
 
 		http

@@ -22,7 +22,7 @@ public class KakaoUser extends OAuth2ProviderUser {
 
     @Override
     public String getSocialId() {
-        return "kakao " + getAttributes().get("id");
+        return "" + getAttributes().get("id");
     }
 
     @Override
