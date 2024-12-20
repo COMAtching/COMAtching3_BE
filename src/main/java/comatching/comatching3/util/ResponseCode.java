@@ -21,6 +21,8 @@ public enum ResponseCode {
 	//Security response
 	TOKEN_EXPIRED(401, "SEC-001", HttpStatus.UNAUTHORIZED, "token is expired or not available"),
 	TOKEN_NOT_AVAILABLE(401, "SEC-002", HttpStatus.UNAUTHORIZED, "token is not available"),
+	NOT_SUPPORTED_PROVIDER(401, "SEC-003", HttpStatus.UNAUTHORIZED, "not supported provider"),
+	JWT_ERROR(401, "SEC-003", HttpStatus.UNAUTHORIZED, "jwt error"),
 
 	//User Exception
 	USER_REGISTER_FAIL(400, "USR-001", HttpStatus.BAD_REQUEST, "User register is fail"),
