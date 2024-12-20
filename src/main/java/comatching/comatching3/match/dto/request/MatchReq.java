@@ -4,7 +4,7 @@ import java.util.List;
 
 import comatching.comatching3.match.enums.AgeOption;
 import comatching.comatching3.match.enums.ContactFrequencyOption;
-import comatching.comatching3.users.enums.Hobby;
+import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.util.validation.ValidEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,8 +20,8 @@ public class MatchReq {
 	private AgeOption ageOption;
 	private String mbtiOption;
 
-	@ValidEnum(enumClass =  Hobby.class)
-	private List<Hobby> hobbyOption;
+	@ValidEnum(enumClass =  HobbyEnum.class)
+	private List<HobbyEnum> hobbyEnumOption;
 
 	@ValidEnum(enumClass = ContactFrequencyOption.class)
 	private ContactFrequencyOption contactFrequencyOption;

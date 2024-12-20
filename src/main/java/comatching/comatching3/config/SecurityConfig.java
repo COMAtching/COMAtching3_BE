@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
+                    .defaultSuccessUrl("/login-success")
                 );
 
         http

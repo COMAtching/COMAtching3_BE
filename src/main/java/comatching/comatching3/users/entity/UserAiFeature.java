@@ -1,11 +1,13 @@
 package comatching.comatching3.users.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
-import comatching.comatching3.users.enums.Hobby;
+import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.util.HobbyListConverter;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -16,6 +18,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -45,8 +48,8 @@ public class UserAiFeature {
 	@Enumerated(EnumType.STRING)
 	private ContactFrequency contactFrequency;
 
-	@Convert(converter = HobbyListConverter.class)
-	private List<Hobby> hobby;
+	@OneToMany(mappedBy = "userAiFeature", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Hobby> hobbyList = new ArrayList<>();
 
 	@Min(20) @Max(30)
 	private Integer age;
@@ -73,8 +76,8 @@ public class UserAiFeature {
 		this.contactFrequency = contactFrequency;
 	}
 
-	public void updateHobby(List<Hobby> hobby) {
-		this.hobby = hobby;
+	public void updateHobby(List<Hobby> hobbies) {
+		hobbyList.addAll(hobbies);
 	}
 
 	public void updateAge(Integer age) {

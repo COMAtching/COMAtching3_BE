@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
-public enum Hobby {
+public enum HobbyEnum {
 	운동(1, "운동"),
 	스포츠시청(2, "스포츠시청"),
 	요리(3, "요리"),
@@ -31,16 +31,16 @@ public enum Hobby {
 	private final Integer vector;
 	private final String value;
 
-	Hobby(Integer vector, String value) {
+	HobbyEnum(Integer vector, String value) {
 		this.vector = vector;
 		this.value = value;
 	}
 
  	@JsonCreator
-	public static Hobby from(String value) {
-		for (Hobby hobby : Hobby.values()) {
-			if (hobby.getValue().equals(value)) {
-				return hobby;
+	public static HobbyEnum from(String value) {
+		for (HobbyEnum hobbyEnum : HobbyEnum.values()) {
+			if (hobbyEnum.getValue().equals(value)) {
+				return hobbyEnum;
 			}
 		}
 		return null;
@@ -51,7 +51,7 @@ public enum Hobby {
 		return value;
 	}
 
-	public static String convertHobbiesString(List<Hobby> hobbies) {
+	public static String convertHobbiesString(List<HobbyEnum> hobbies) {
 		StringBuilder hobbiesString = new StringBuilder();
 
 		for (int i = 0; i < hobbies.size(); i++) {
@@ -63,16 +63,16 @@ public enum Hobby {
 
 		return hobbiesString.toString();
 	}
-	public static List<Hobby> convertStringToHobbies(String hobbiesString) {
-		List<Hobby> hobbiesList = new ArrayList<>();
+	public static List<HobbyEnum> convertStringToHobbies(String hobbiesString) {
+		List<HobbyEnum> hobbiesList = new ArrayList<>();
 
 		// 문자열을 콤마로 분리
 		List<String> hobbyNames = Arrays.asList(hobbiesString.split(","));
 
 		for (String hobbyName : hobbyNames) {
-			Hobby hobby = Hobby.from(hobbyName);
-			if (hobby != null) {
-				hobbiesList.add(hobby);
+			HobbyEnum hobbyEnum = HobbyEnum.from(hobbyName);
+			if (hobbyEnum != null) {
+				hobbiesList.add(hobbyEnum);
 			}
 		}
 

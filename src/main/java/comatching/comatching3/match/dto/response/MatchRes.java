@@ -2,10 +2,11 @@ package comatching.comatching3.match.dto.response;
 
 import java.util.List;
 
+import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
-import comatching.comatching3.users.enums.Hobby;
+import comatching.comatching3.users.enums.HobbyEnum;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,7 +17,7 @@ public class MatchRes {
 	private String comment;
 	private String mbti;
 	private ContactFrequency contactFrequency;
-	private List<Hobby> hobby;
+	private List<Hobby> hobbyList;
 	private Integer age;
 	private Gender gender;
 	private String major;
@@ -30,7 +31,7 @@ public class MatchRes {
 			.comment(users.getComment())
 			.mbti(users.getUserAiFeature().getMbti())
 			.contactFrequency(users.getUserAiFeature().getContactFrequency())
-			.hobby(users.getUserAiFeature().getHobby())
+			.hobbyList(users.getUserAiFeature().getHobbyList())
 			.age(users.getUserAiFeature().getAge())
 			.major(users.getUserAiFeature().getMajor())
 			.contactId(users.getContactId())

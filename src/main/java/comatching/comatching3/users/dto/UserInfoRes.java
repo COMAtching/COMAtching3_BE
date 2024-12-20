@@ -2,9 +2,10 @@ package comatching.comatching3.users.dto;
 
 import java.util.List;
 
+import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
-import comatching.comatching3.users.enums.Hobby;
+import comatching.comatching3.users.enums.HobbyEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

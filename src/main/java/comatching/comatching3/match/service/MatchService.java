@@ -24,10 +24,12 @@ import comatching.comatching3.match.dto.response.MatchRes;
 import comatching.comatching3.match.enums.AgeOption;
 import comatching.comatching3.match.enums.ContactFrequencyOption;
 import comatching.comatching3.users.dto.UserFeatureReq;
+import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.enums.Hobby;
+import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.users.enums.UserCrudType;
+import comatching.comatching3.users.repository.HobbyRepository;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.RabbitMQ.MatchRabbitMQUtil;
@@ -46,6 +48,7 @@ public class MatchService {
 
 	private final UsersRepository usersRepository;
 	private final MatchRabbitMQUtil matchRabbitMQUtil;
+	private final HobbyRepository hobbyRepository;
 	private final SecurityUtil securityUtil;
 	private final MatchingHistoryRepository matchingHistoryRepository;
 	private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
@@ -215,7 +218,7 @@ public class MatchService {
 			point += 100;
 		}
 
-		if(!msg.getHobbyOption().get(0).equals(Hobby.UNSELECTED)){
+		if(!msg.getHobbyEnumOption().get(0).equals(HobbyEnum.UNSELECTED)){
 			point += 100;
 		}
 
@@ -242,7 +245,7 @@ public class MatchService {
 			point += 100;
 		}
 
-		if(!msg.getHobbyOption().get(0).equals(Hobby.UNSELECTED)){
+		if(!msg.getHobbyEnumOption().get(0).equals(HobbyEnum.UNSELECTED)){
 			point += 100;
 		}
 
