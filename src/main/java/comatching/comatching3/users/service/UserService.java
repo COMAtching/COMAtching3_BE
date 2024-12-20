@@ -17,11 +17,14 @@ import comatching.comatching3.users.auth.jwt.JwtUtil;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.users.dto.BuyPickMeReq;
 import comatching.comatching3.users.dto.CurrentPointRes;
+import comatching.comatching3.users.dto.HobbyRes;
 import comatching.comatching3.users.dto.UserFeatureReq;
 import comatching.comatching3.users.dto.UserInfoRes;
 import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
+import comatching.comatching3.users.enums.ContactFrequency;
+import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.users.enums.Role;
 import comatching.comatching3.users.enums.UserCrudType;
@@ -64,29 +67,32 @@ public class UserService {
     @Transactional
     public TokenRes inputUserInfo(UserFeatureReq form) {
 
-        Users user = securityUtil.getCurrentUsersEntity();
+        log.info("gender = " + form.getGender());
 
+        Users user = securityUtil.getCurrentUsersEntity();
 
         University university = universityRepository.findByUniversityName(form.getUniversity())
                 .orElseThrow(() -> new BusinessException(ResponseCode.SCHOOL_NOT_EXIST));
 
         UserAiFeature userAiFeature = user.getUserAiFeature();
 
-        List<Hobby> hobbyList = form.getHobby().stream()
+        List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
+        List<Hobby> newHobbyList = form.getHobby().stream()
             .map(hobby -> Hobby.builder()
                 .hobbyName(hobby)
                 .userAiFeature(userAiFeature)
                 .build())
             .toList();
 
-        hobbyRepository.saveAll(hobbyList);
+        hobbyRepository.deleteAll(existingHobbies);
+        hobbyRepository.saveAll(newHobbyList);
 
         userAiFeature.updateMajor(form.getMajor());
-        userAiFeature.updateGender(form.getGender());
+        userAiFeature.updateGender(Gender.fromAiValue(form.getGender()));
         userAiFeature.updateAge(form.getAge());
         userAiFeature.updateMbti(form.getMbti());
-        userAiFeature.updateHobby(hobbyList);
-        userAiFeature.updateContactFrequency(form.getContactFrequency());
+        userAiFeature.updateHobby(newHobbyList);
+        userAiFeature.updateContactFrequency(ContactFrequency.fromAiValue(form.getContactFrequency()));
         userAiFeature.updateAdmissionYear(form.getAdmissionYear());
 
         userAiFeatureRepository.save(userAiFeature);
@@ -96,6 +102,7 @@ public class UserService {
         user.updateRole(Role.USER.getRoleName());
         user.updateUniversity(university);
         user.updateContactId(form.getContactId());
+        user.updateUserAiFeature(userAiFeature);
 
         usersRepository.save(user);
 
@@ -104,20 +111,18 @@ public class UserService {
         String accessToken = jwtUtil.generateAccessToken(uuid, Role.USER.getRoleName());
         String refreshToken = refreshTokenService.getRefreshToken(uuid);
 
-        securityUtil.setAuthentication(accessToken);
 
-        Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
-        if(!isSuccess){
-            throw new BusinessException(ResponseCode.INPUT_FEATURE_FAIL);
-        }
+        // todo: rabbitMQ 연결 후 해제
+        // Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+        // if(!isSuccess){
+        //     throw new BusinessException(ResponseCode.INPUT_FEATURE_FAIL);
+        // }
 
         return TokenRes.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
     }
-
-
 
     /**
      * 메인 페이지 유저 정보 조회
@@ -138,7 +143,11 @@ public class UserService {
             }
         }
 
-        List<Hobby> hobbyList = hobbyRepository.findAllByUserAiFeature(user.getUserAiFeature());
+        List<HobbyRes> hobbyResList = hobbyRepository.findAllByUserAiFeature(user.getUserAiFeature()).stream().map(
+            hobby -> HobbyRes.builder()
+                .hobbyName(hobby.getHobbyName())
+                .build()
+        ).toList();
 
         return UserInfoRes.builder()
                 .username(user.getUsername())
@@ -154,7 +163,7 @@ public class UserService {
                 .admissionYear(user.getUserAiFeature().getAdmissionYear())
                 .comment(user.getComment())
                 .contactFrequency(user.getUserAiFeature().getContactFrequency())
-                .hobbies(hobbyList)
+                .hobbies(hobbyResList)
                 .gender(user.getUserAiFeature().getGender())
                 .event1(user.getEvent1())
                 .build();
