@@ -2,6 +2,7 @@ package comatching.comatching3.util.RabbitMQ;
 
 import java.util.UUID;
 
+import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,21 +32,16 @@ public class UserCrudRabbitMQUtil {
 	 * @param type : CSV 반영 방법 (UserCrudType 참고)
 	 */
 	public Boolean sendUserChange(UserAiFeature feature, UserCrudType type){
-		rabbitTemplate.setReplyTimeout(10000);
 
 		String requestId = UUID.randomUUID().toString();
 		CorrelationData correlationData = new CorrelationData(requestId);
 		ParameterizedTypeReference<CompensationMsg> responseType = new ParameterizedTypeReference<CompensationMsg>(){};
 		UserCrudMsg userCrudMsg = new UserCrudMsg();
 		userCrudMsg.updateFromUserAIFeatureAndType(type, feature);
-
 		CompensationMsg response = 	rabbitTemplate.convertSendAndReceiveAsType(
 			userCrudQueue,
 			userCrudMsg,
-			message -> {
-				message.getMessageProperties().setExpiration(String.valueOf(120000));
-				return message;
-			},
+			(MessagePostProcessor) null,
 			correlationData,
 			responseType);
 
@@ -54,7 +50,6 @@ public class UserCrudRabbitMQUtil {
 			return false;
 		}
 
-		log.info("[UserCrudResponse Success]= errorCode: {} errorMsg: {}\njson = {}",response.getErrorCode(), response.getErrorMessage(), response.toJson());
 		return true;
 	}
 }
