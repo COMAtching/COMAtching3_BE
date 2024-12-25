@@ -63,7 +63,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
 				if (!jwtUtil.isExpired(accessToken)) {
 					// 복호화된 토큰 유효성 검증
-					log.info("액세스 토큰 사용");
 					setAuthentication(accessToken);
 					filterChain.doFilter(request, response);
 					return;
