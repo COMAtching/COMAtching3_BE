@@ -42,4 +42,9 @@ public class GlobalExceptionHandler {
     public Response<ResponseCode> handleCustomException(BusinessException ex) {
         return new Response<>(ex.getResponseCode());
     }
+
+    @ExceptionHandler(TossPaymentException.class)
+    public Response<TossPaymentExceptionDto> handleTossPaymentException(TossPaymentException ex) {
+        return new Response<>(ex.getTossPaymentExceptionDto());
+    }
 }

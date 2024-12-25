@@ -3,6 +3,8 @@ package comatching.comatching3.util;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import comatching.comatching3.exception.TossPaymentExceptionDto;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -53,6 +55,13 @@ public class Response<T> {
 		this.code = responseCode.getCode();
 		this.status = responseCode.getStatus();
 		this.message = responseCode.getMessage();
+		this.data = null;
+	}
+
+	public Response(TossPaymentExceptionDto tossPaymentExceptionDto) {
+		this.code = tossPaymentExceptionDto.getCode();
+		this.status = tossPaymentExceptionDto.getStatus();
+		this.message = tossPaymentExceptionDto.getMessage();
 		this.data = null;
 	}
 
