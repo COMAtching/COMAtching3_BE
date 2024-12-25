@@ -109,6 +109,7 @@ public class PayService {
 		validateOrder(order, idempotencyKey, amount);
 
 		ResponseEntity<TossPaymentRes> response = requestTossPaymentApprove(paymentKey, idempotencyKey, order, amount);
+		String tossPaymentTraceId = response.getHeaders().get("X-TossPayments-Trace-Id").get(0);
 		HttpStatus statusCode = (HttpStatus)response.getStatusCode();
 		TossPaymentRes tossPaymentRes = response.getBody();
 
@@ -116,7 +117,7 @@ public class PayService {
 			try {
 				// 주문 상태 업데이트 및 TossPayment 정보 저장
 				order.updateOrderStatus(OrderStatus.ORDER_COMPLETE);
-				updateTossPayment(order, tossPaymentRes, null);
+				updateTossPayment(order, tossPaymentRes, tossPaymentTraceId, null);
 
 				// 포인트 증가 로직
 				Users user = order.getUsers();
@@ -132,7 +133,7 @@ public class PayService {
 				String tempIdempotencyKey = UUID.randomUUID().toString();
 				requestTossPaymentCancel(paymentKey, tempIdempotencyKey, order, cancelReason);
 				order.updateOrderStatus(OrderStatus.ORDER_REFUND);
-				updateTossPayment(order, tossPaymentRes, cancelReason);
+				updateTossPayment(order, tossPaymentRes, tossPaymentTraceId, cancelReason);
 
 				return false;
 			}
@@ -158,11 +159,12 @@ public class PayService {
 		}
 	}
 
-	private void updateTossPayment(Orders order, TossPaymentRes tossPaymentRes, String cancelReason) {
+	private void updateTossPayment(Orders order, TossPaymentRes tossPaymentRes, String traceId, String cancelReason) {
 
 		TossPayment tossPayment = order.getTossPayment();
 
 		tossPayment.updateTossPaymentKey(tossPaymentRes.getPaymentKey());
+		tossPayment.updateTossTraceId(traceId);
 		tossPayment.updateTossPaymentStatus(tossPaymentRes.getStatus());
 		tossPayment.updateTossPaymentMethod(tossPaymentRes.getMethod());
 		tossPayment.updateTotalAmount(tossPaymentRes.getTotalAmount());

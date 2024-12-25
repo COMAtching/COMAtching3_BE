@@ -27,6 +27,8 @@ public class TossPayment {
 
 	private String tossPaymentKey;
 
+	private String tossTraceId;
+
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id", nullable = false)
 	private Orders order;
@@ -66,6 +68,10 @@ public class TossPayment {
 
 	public void updateTossPaymentMethod(String tossPaymentMethod) {
 		this.tossPaymentMethod = tossPaymentMethod;
+	}
+
+	public void updateTossTraceId(String tossTraceId) {
+		this.tossTraceId = tossTraceId;
 	}
 
 	public void updateTossPaymentStatus(String tossPaymentStatus) {
