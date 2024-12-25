@@ -91,7 +91,7 @@ public class UserController {
 	 */
 	@GetMapping("/auth/user/api/points")
 	public Response<String> getPoints() {
-		Integer points = userService.getPoints();
+		Long points = userService.getPoints();
 		return Response.ok("point : " + points);
 	}
 

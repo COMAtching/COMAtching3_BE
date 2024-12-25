@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import comatching.comatching3.admin.entity.University;
-import comatching.comatching3.charge.entity.ChargeRequest;
 import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.match_message.entity.MessageMap;
+import comatching.comatching3.pay.entity.Orders;
 import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -53,8 +53,11 @@ public class Users extends BaseEntity {
 	@OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MessageMap> receivedMessageMap = new ArrayList<MessageMap>();
 
+/*	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ChargeRequest> chargeRequestList = new ArrayList<>();*/
+
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ChargeRequest> chargeRequestList = new ArrayList<>();
+	private List<Orders> orderList = new ArrayList<>();
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "university_id")
@@ -76,7 +79,9 @@ public class Users extends BaseEntity {
 
 	private String comment;
 
-	private Integer point = 0;
+	private Long point = 0L;
+
+	private Long payedPoint = 0L;
 
 	private String schoolMail;
 
@@ -93,6 +98,10 @@ public class Users extends BaseEntity {
 		this.email = email;
 		this.role = role;
 		this.username = username;
+	}
+
+	public void addNewOrder(Orders order) {
+		orderList.add(order);
 	}
 
 	public void updateUserAiFeature(UserAiFeature userAiFeature) {
@@ -123,11 +132,11 @@ public class Users extends BaseEntity {
 		this.comment = comment;
 	}
 
-	public void addPoint(Integer point) {
+	public void addPoint(Long point) {
 		this.point += point;
 	}
 
-	public void subtractPoint(Integer point) {
+	public void subtractPoint(Long point) {
 		this.point -= point;
 	}
 
@@ -149,5 +158,13 @@ public class Users extends BaseEntity {
 
 	public void updateDeactivated(Boolean deactivated) {
 		isDeactivated = deactivated;
+	}
+
+	public void addPayedPoint(Long payedPoint) {
+		this.payedPoint += payedPoint;
+	}
+
+	public void subtractPayedPoint(Long payedPoint) {
+		this.payedPoint -= payedPoint;
 	}
 }
