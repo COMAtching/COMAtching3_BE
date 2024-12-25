@@ -24,6 +24,9 @@ import comatching.comatching3.config.TossPaymentConfig;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.exception.TossPaymentException;
 import comatching.comatching3.exception.TossPaymentExceptionDto;
+import comatching.comatching3.history.entity.PointHistory;
+import comatching.comatching3.history.enums.PointHistoryType;
+import comatching.comatching3.history.repository.PointHistoryRepository;
 import comatching.comatching3.pay.dto.req.ConfirmPaymentReq;
 import comatching.comatching3.pay.dto.req.OrderReq;
 import comatching.comatching3.pay.dto.res.OrderRes;
@@ -49,6 +52,7 @@ public class PayService {
 	private final TossPaymentRepository tossPaymentRepository;
 	private final PayErrorService payErrorService;
 	private final PayRedisService payRedisService;
+	private final PointHistoryRepository pointHistoryRepository;
 
 	@Value("${payment.toss.secret-key}")
 	private String secretKey;
@@ -119,6 +123,9 @@ public class PayService {
 				user.addPayedPoint(amount);
 				user.addPoint(amount);
 
+				// 포인트 증가 내역 저장
+				makePointHistory(user, PointHistoryType.CHARGE, amount);
+
 				return true;
 			} catch (Exception e) {
 				// DB 저장 or 포인트 증가 실패 시 자동 결제 취소 요청
@@ -164,8 +171,6 @@ public class PayService {
 
 		if (cancelReason != null) {
 			tossPayment.updateCancelReason(cancelReason);
-		} else {
-			throw new BusinessException(ResponseCode.ARGUMENT_NOT_VALID);
 		}
 	}
 
@@ -195,6 +200,18 @@ public class PayService {
 		} catch (Exception e) {
 			throw new BusinessException(ResponseCode.PAYMENT_FAIL);
 		}
+	}
+
+	private void makePointHistory(Users user, PointHistoryType pointHistoryType, Long amount) {
+		PointHistory pointHistory = PointHistory.builder()
+			.users(user)
+			.pointHistoryType(pointHistoryType)
+			.changeAmount(amount)
+			.pickMe(user.getPickMe())
+			.totalPoint(user.getPoint())
+			.build();
+
+		pointHistoryRepository.save(pointHistory);
 	}
 
 	/**

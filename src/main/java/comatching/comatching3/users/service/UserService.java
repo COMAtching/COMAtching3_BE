@@ -181,6 +181,10 @@ public class UserService {
         return user.getPoint();
     }
 
+    /**
+     * 뽑힐 기회 구매
+     * @param req
+     */
     @Transactional
     public void buyPickMe(BuyPickMeReq req) {
 
