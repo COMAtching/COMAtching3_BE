@@ -1,31 +1,32 @@
-# 1단계: 빌드 이미지 설정
-#FROM openjdk:17-jdk-slim AS builder
+# 빌드 스테이지
+FROM gradle:7.6-jdk17 AS builder
 
 # 작업 디렉토리 설정
-#WORKDIR /app
+WORKDIR /app
 
-# Gradle Wrapper 및 소스 파일 복사
-#COPY gradlew .
-#COPY gradle ./gradle
-#COPY build.gradle .
-#COPY settings.gradle .
-#COPY src ./src
+# Gradle 캐시 활용을 위해 Gradle 파일 복사
+COPY build.gradle.kts settings.gradle.kts gradle.properties /app/
 
-# 빌드 실행
-#RUN chmod +x ./gradlew
-#RUN gradlew build -x test
+# 의존성 캐시 미리 로드
+RUN gradle dependencies --no-daemon || true
 
-# 2단계: 실행 이미지 설정
+# 애플리케이션 소스 코드 복사
+COPY src /app/src
+
+# JAR 파일 빌드
+RUN gradle bootJar --no-daemon
+
+# 실행 스테이지
 FROM openjdk:17-jdk-slim
 
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# 빌드 결과물 복사
-COPY build/libs/comatching3-0.0.1-SNAPSHOT.jar comatching3.jar
+# 빌드된 JAR 파일 복사
+COPY --from=builder /app/build/libs/*.jar app.jar
 
 # 애플리케이션 실행 명령어 설정
-ENTRYPOINT ["java", "-Dspring.profiles.active=docker", "-jar", "comatching3.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=docker", "-jar", "app.jar"]
 
 # 포트 노출
 EXPOSE 8080
