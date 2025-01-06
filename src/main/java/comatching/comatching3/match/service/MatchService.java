@@ -1,6 +1,5 @@
 package comatching.comatching3.match.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,18 +16,11 @@ import comatching.comatching3.match.dto.cache.CodeCheckInfo;
 import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.match.dto.request.AdminMatchReq;
-import comatching.comatching3.match.dto.request.DeleteCsvReq;
 import comatching.comatching3.match.dto.request.MatchReq;
-import comatching.comatching3.match.dto.request.RecoverReq;
 import comatching.comatching3.match.dto.response.MatchRes;
 import comatching.comatching3.match.enums.AgeOption;
 import comatching.comatching3.match.enums.ContactFrequencyOption;
-import comatching.comatching3.users.dto.UserFeatureReq;
-import comatching.comatching3.users.entity.Hobby;
-import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.enums.ContactFrequency;
-import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.HobbyRepository;

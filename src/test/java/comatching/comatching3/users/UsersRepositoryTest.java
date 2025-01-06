@@ -52,4 +52,13 @@ public class UsersRepositoryTest {
 		assertThat(checkUser.getUserAiFeature().getUuid()).isEqualTo(testUuid);
 		assertThat(checkUser.getId()).isEqualTo(testUser.getId());
 	}
+
+	@Test
+	void countUserByUsername() {
+		String username = "adfadsf";
+
+		Long count = usersRepository.countUserByUsername(username);
+
+		assertThat(count).isEqualTo(0);
+	}
 }

@@ -2,6 +2,7 @@ package comatching.comatching3.users.controller;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,10 +17,10 @@ import comatching.comatching3.users.auth.oauth2.provider.OAuth2Provider;
 import comatching.comatching3.users.auth.oauth2.service.LogoutService;
 import comatching.comatching3.users.auth.oauth2.service.LogoutServiceFactory;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
-import comatching.comatching3.users.dto.BuyPickMeReq;
-import comatching.comatching3.users.dto.CurrentPointRes;
-import comatching.comatching3.users.dto.UserFeatureReq;
-import comatching.comatching3.users.dto.UserInfoRes;
+import comatching.comatching3.users.dto.request.BuyPickMeReq;
+import comatching.comatching3.users.dto.response.CurrentPointRes;
+import comatching.comatching3.users.dto.request.UserFeatureReq;
+import comatching.comatching3.users.dto.response.UserInfoRes;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.service.UserService;
 import comatching.comatching3.util.CookieUtil;
@@ -41,6 +42,9 @@ public class UserController {
 	private final LogoutServiceFactory logoutServiceFactory;
 	private final SecurityUtil securityUtil;
 	private final RefreshTokenService refreshTokenService;
+
+	@Value("${redirect-url.frontend}")
+	private String REDIRECT_URL;
 
 	@GetMapping("/api/participations")
 	public Response<Long> getParticipations() {
@@ -100,7 +104,7 @@ public class UserController {
 	 * 전략 패턴 적용
 	 * @return ok
 	 */
-	@GetMapping("/auth/user/api/logout")
+	@GetMapping("/auth/allUser/api/logout")
 	public Response<Void> userLogout(HttpServletResponse response) throws IOException {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -132,7 +136,7 @@ public class UserController {
 		// SecurityContext 비우기
 		SecurityContextHolder.clearContext();
 
-		response.sendRedirect("/main-page");
+		response.sendRedirect(REDIRECT_URL);
 
 		return Response.ok();
 	}

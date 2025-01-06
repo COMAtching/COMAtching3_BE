@@ -99,4 +99,6 @@ public class Admin extends BaseEntity {
 	public void accessOk() {
 		this.access = true;
 	}
+
+	public void universityAuthOk() {this.universityAuth = true;}
 }

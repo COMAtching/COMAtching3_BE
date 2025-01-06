@@ -1,6 +1,5 @@
 package comatching.comatching3.admin.service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -11,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import comatching.comatching3.admin.dto.request.AdminInfoUpdateReq;
 import comatching.comatching3.admin.dto.request.AdminRegisterReq;
+import comatching.comatching3.admin.dto.request.BlackUserReq;
 import comatching.comatching3.admin.dto.response.AdminInfoRes;
 import comatching.comatching3.admin.dto.response.OperatorRes;
 import comatching.comatching3.admin.entity.Admin;
@@ -19,8 +19,7 @@ import comatching.comatching3.admin.enums.AdminRole;
 import comatching.comatching3.admin.repository.AdminRepository;
 import comatching.comatching3.admin.repository.UniversityRepository;
 import comatching.comatching3.exception.BusinessException;
-import comatching.comatching3.users.auth.jwt.JwtUtil;
-import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
+import comatching.comatching3.users.service.BlackListService;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
@@ -35,9 +34,8 @@ public class AdminService {
 	private final AdminRepository adminRepository;
 	private final UniversityRepository universityRepository;
 	private final PasswordEncoder passwordEncoder;
-	private final JwtUtil jwtUtil;
-	private final RefreshTokenService refreshTokenService;
 	private final SecurityUtil securityUtil;
+	private final BlackListService blackListService;
 
 	/**
 	 * 관리자 회원가입
@@ -115,7 +113,25 @@ public class AdminService {
 			.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
 		operator.accessOk();
+		operator.universityAuthOk();
+		operator.changeAdminRole(AdminRole.ROLE_OPERATOR);
 		adminRepository.save(operator);
+	}
+
+	/**
+	 * 오퍼레이터 가입 거절 (오퍼레이터 계정은 삭제됨)
+	 * @param uuid 오퍼레이터 id
+	 */
+	@Transactional
+	public void denyOperator(String uuid) {
+		byte[] operatorUuid = UUIDUtil.uuidStringToBytes(uuid);
+		Admin operator = adminRepository.findByUuid(operatorUuid)
+			.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+		if (operator.getAdminRole().equals(AdminRole.ROLE_ADMIN) || operator.getAccess()) {
+			throw new BusinessException(ResponseCode.NO_PERMISSION);
+		}
+		adminRepository.delete(operator);
 	}
 
 	/**
@@ -161,7 +177,6 @@ public class AdminService {
 	 */
 	public AdminInfoRes getAdminInfo() {
 		Admin admin = securityUtil.getAdminFromContext();
-		System.out.println("real admin uuid = " + Arrays.toString(admin.getUuid()));
 
 		return AdminInfoRes.builder()
 			.accountId(admin.getAccountId())
@@ -187,7 +202,7 @@ public class AdminService {
 
 		if (request.getAccountId().isPresent()) {
 			if (admin.getAccountIdChanged()) {
-				throw new BusinessException(ResponseCode.BAD_REQUEST);
+				throw new BusinessException(ResponseCode.ALREADY_CHANGED);
 			}
 			admin.updateAccountId(request.getAccountId().get());
 			admin.accountIdChange();

@@ -9,5 +9,5 @@ public class AdminInfoUpdateReq {
     private Optional<String> accountId;
     private Optional<String> nickname;
     private Optional<String> contactEmail;
-    private Optional<String > appName;
+    private Optional<String> appName;
 }
