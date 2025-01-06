@@ -1,4 +1,4 @@
-package comatching.comatching3.users.dto;
+package comatching.comatching3.users.dto.request;
 
 import java.util.List;
 

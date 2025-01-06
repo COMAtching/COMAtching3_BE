@@ -14,9 +14,12 @@ public enum ResponseCode {
 
 	//Auth response
 	ACCOUNT_ID_DUPLICATED(409, "AUTH-001", HttpStatus.CONFLICT, "AccountId is duplicated"),
-	INVALID_LOGIN(401, "AUTH-002", HttpStatus.UNAUTHORIZED, "Invalid AccountId or Password"),
+	INVALID_LOGIN(403, "AUTH-002", HttpStatus.FORBIDDEN, "Invalid AccountId or Password"),
 	USER_NOT_FOUND(404, "AUTH-003", HttpStatus.NOT_FOUND, "Cannot found user"),
-	PENDING_OPERATOR(400, "AUTH-004", HttpStatus.BAD_REQUEST, "승인되지 않은 관리자"),
+	PENDING_OPERATOR(400, "AUTH-004", HttpStatus.FORBIDDEN, "승인되지 않은 관리자"),
+	ALREADY_CHANGED(400, "AUTH-005", HttpStatus.BAD_REQUEST, "관리자의 아이디는 한 번만 바꿀 수 있습니다."),
+	NO_PERMISSION(400, "AUTH-006", HttpStatus.FORBIDDEN, "권한이 없습니다."),
+
 
 	//Security response
 	TOKEN_EXPIRED(401, "SEC-001", HttpStatus.UNAUTHORIZED, "token is expired or not available"),
@@ -24,6 +27,7 @@ public enum ResponseCode {
 	NOT_SUPPORTED_PROVIDER(401, "SEC-003", HttpStatus.UNAUTHORIZED, "not supported provider"),
 	JWT_ERROR(401, "SEC-004", HttpStatus.UNAUTHORIZED, "jwt error"),
 	ALREADY_LOGOUT(401, "SEC-005", HttpStatus.UNAUTHORIZED, "user already logout"),
+	BLACK_USER(403, "SEC-006", HttpStatus.FORBIDDEN, "블랙리스트에 있는 유저입니다."),
 
 	//User Exception
 	USER_REGISTER_FAIL(400, "USR-001", HttpStatus.BAD_REQUEST, "User register is fail"),

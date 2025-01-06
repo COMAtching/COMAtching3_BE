@@ -89,6 +89,8 @@ public class Users extends BaseEntity {
 
 	private Boolean isDeactivated = false;
 
+	private int warningCount = 0;
+
 	private Boolean event1 = false;
 
 	@Builder
@@ -166,5 +168,9 @@ public class Users extends BaseEntity {
 
 	public void subtractPayedPoint(Long payedPoint) {
 		this.payedPoint -= payedPoint;
+	}
+
+	public void addWarningCount() {
+		this.warningCount += 1;
 	}
 }

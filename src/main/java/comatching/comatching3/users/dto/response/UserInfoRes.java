@@ -1,7 +1,8 @@
-package comatching.comatching3.users.dto;
+package comatching.comatching3.users.dto.response;
 
 import java.util.List;
 
+import comatching.comatching3.users.dto.response.HobbyRes;
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
 import lombok.AllArgsConstructor;

@@ -5,6 +5,8 @@ import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -39,6 +41,7 @@ public class PointHistory extends BaseEntity {
 //	@JoinColumn(name = "admin_id")
 //	private Admin approver;
 
+	@Enumerated(EnumType.STRING)
 	private PointHistoryType pointHistoryType;
 
 	// 사용/소비한 포인트 양

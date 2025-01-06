@@ -39,8 +39,6 @@ public class JwtFilter extends OncePerRequestFilter {
 		"/auth/refresh"
 	);
 	private final JwtUtil jwtUtil;
-	private final RefreshTokenService refreshTokenService;
-	private final CookieUtil cookieUtil;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request,
@@ -85,7 +83,6 @@ public class JwtFilter extends OncePerRequestFilter {
 	private void setAuthentication(String accessToken) {
 		String uuid = jwtUtil.getUUID(accessToken);
 		String role = jwtUtil.getRole(accessToken);
-		log.info("role = " + role);
 
 		if (AdminRole.isValidRole(role)) {
 			AdminDto adminDto = AdminDto.builder()

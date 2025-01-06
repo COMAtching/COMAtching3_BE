@@ -37,6 +37,7 @@ import comatching.comatching3.pay.enums.OrderStatus;
 import comatching.comatching3.pay.repository.OrderRepository;
 import comatching.comatching3.pay.repository.TossPaymentRepository;
 import comatching.comatching3.users.entity.Users;
+import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;
 import jakarta.persistence.EntityManager;
@@ -54,12 +55,17 @@ public class PayService {
 	private final PayRedisService payRedisService;
 	private final PointHistoryRepository pointHistoryRepository;
 
+	//테스트용
+	// private final UsersRepository usersRepository;
+
 	@Value("${payment.toss.secret-key}")
 	private String secretKey;
 
 	@Transactional
 	public OrderRes makeOrder(OrderReq orderReq) {
 		Users user = securityUtil.getCurrentUsersEntity();
+		// Users user = usersRepository.findBySocialId("3490175542")
+		// 	.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
 		String product = orderReq.getProductName();
 		Long amount = orderReq.getAmount();

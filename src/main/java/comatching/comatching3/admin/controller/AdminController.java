@@ -3,10 +3,8 @@ package comatching.comatching3.admin.controller;
 import comatching.comatching3.admin.dto.request.*;
 import comatching.comatching3.admin.dto.response.AdminInfoRes;
 import comatching.comatching3.admin.dto.response.OperatorRes;
-import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.admin.service.AdminService;
 import comatching.comatching3.util.Response;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,6 +67,19 @@ public class AdminController {
     @PatchMapping("/auth/admin/pending-operator/{operatorId}")
     public Response<Void> accessOperator(@PathVariable String operatorId) {
         adminService.accessOperator(operatorId);
+
+        return Response.ok();
+    }
+
+    /**
+     * 오퍼레이터 거절 메서드
+     * 거절된 오퍼레이터 계정은 삭제됨
+     * @param operatorId uuid
+     * @return ok
+     */
+    @DeleteMapping("/auth/admin/pending-operator/{operatorId}")
+    public Response<Void> denyOperator(@PathVariable String operatorId) {
+        adminService.denyOperator(operatorId);
 
         return Response.ok();
     }

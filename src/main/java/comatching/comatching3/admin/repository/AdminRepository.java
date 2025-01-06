@@ -20,4 +20,6 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
     List<Admin> findAllAdminsByAccessFalse();
 
     Boolean existsAdminByUniversity(University university);
+
+    Boolean existsByUuid(byte[] uuid);
 }
