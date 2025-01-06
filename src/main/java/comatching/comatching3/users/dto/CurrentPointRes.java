@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CurrentPointRes {
-	private Integer currentPoint;
+	private Long currentPoint;
 }

@@ -18,9 +18,9 @@ public class UserInfoRes {
 	private String song;
 	private String mbti;
 	private String contactId;
-	private Integer point;
+	private Long point;
 	private Integer pickMe;
-	private Boolean canRequestCharge;
+	// private Boolean canRequestCharge;
 	private Long participations;
 	private List<HobbyRes> hobbies;
 	private ContactFrequency contactFrequency;

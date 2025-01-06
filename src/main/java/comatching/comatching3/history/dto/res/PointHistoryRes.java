@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 public class PointHistoryRes {
     private String username;
     private PointHistoryType pointHistoryType;
-    private Integer changeAmount;
-    private Integer totalPoint;
+    private Long changeAmount;
+    private Long totalPoint;
     private Integer pickMe;
     private LocalDateTime timeStamp;
 }

@@ -48,7 +48,11 @@ public enum ResponseCode {
 
 
 	//History exception response
-	MATCH_HISTORY_NOT_EXIST(200, "MAH-003", HttpStatus.BAD_REQUEST, "Matching history is not exist");
+	MATCH_HISTORY_NOT_EXIST(200, "MAH-003", HttpStatus.BAD_REQUEST, "Matching history is not exist"),
+
+	//Payment exception response
+	PAYMENT_FAIL(400, "PAY-001", HttpStatus.BAD_REQUEST, "Payment failed"),
+	;
 
 
 	private final Integer status;

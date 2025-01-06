@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.admin.repository.UniversityRepository;
-import comatching.comatching3.charge.repository.ChargeRequestRepository;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.history.enums.PointHistoryType;
@@ -46,7 +45,6 @@ public class UserService {
 
     private final UsersRepository usersRepository;
     private final UserAiFeatureRepository userAiFeatureRepository;
-    private final ChargeRequestRepository chargeRequestRepository;
     private final HobbyRepository hobbyRepository;
     private final UniversityRepository universityRepository;
     private final SecurityUtil securityUtil;
@@ -67,9 +65,6 @@ public class UserService {
      */
     @Transactional
     public TokenRes inputUserInfo(UserFeatureReq form) {
-
-        log.info("gender = " + form.getGender());
-
         Users user = securityUtil.getCurrentUsersEntity();
 
         University university = universityRepository.findByUniversityName(form.getUniversity())
@@ -135,7 +130,7 @@ public class UserService {
         Users user = securityUtil.getCurrentUsersEntity();
 //        log.info(user.getUsername());
 
-        Boolean canRequest = !chargeRequestRepository.existsByUsers(user);
+        // Boolean canRequest = !chargeRequestRepository.existsByUsers(user);
 
         if(user.getPickMe() <= 0){
             if(user.getPickMe() < 0) {
@@ -159,7 +154,7 @@ public class UserService {
                 .contactId(user.getContactId())
                 .point(user.getPoint())
                 .pickMe(user.getPickMe())
-                .canRequestCharge(canRequest)
+                // .canRequestCharge(canRequest)
                 .participations(getParticipations())
                 .admissionYear(user.getUserAiFeature().getAdmissionYear())
                 .comment(user.getComment())
@@ -181,11 +176,15 @@ public class UserService {
      * 유저 포인트 조회
      * @return 유저 포인트
      */
-    public Integer getPoints() {
+    public Long getPoints() {
         Users user = securityUtil.getCurrentUsersEntity();
         return user.getPoint();
     }
 
+    /**
+     * 뽑힐 기회 구매
+     * @param req
+     */
     @Transactional
     public void buyPickMe(BuyPickMeReq req) {
 
@@ -194,9 +193,9 @@ public class UserService {
         }
 
         Users user = securityUtil.getCurrentUsersEntity();
-        int price = 500;
-        int userPoint = user.getPoint();
-        int reqPoint = (req.getAmount() / 3) * (price * 2) + (req.getAmount() % 3) * price;
+        Long price = 500L;
+        Long userPoint = user.getPoint();
+        Long reqPoint = (req.getAmount() / 3) * (price * 2) + (req.getAmount() % 3) * price;
 
         if (reqPoint > userPoint) {
             throw new BusinessException(ResponseCode.NOT_ENOUGH_POINT);

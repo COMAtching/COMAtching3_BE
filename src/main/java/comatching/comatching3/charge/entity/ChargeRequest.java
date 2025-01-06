@@ -1,14 +1,6 @@
 package comatching.comatching3.charge.entity;
 
-import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.util.BaseEntity;
-import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-@Entity
+/*@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChargeRequest extends BaseEntity {
@@ -27,4 +19,4 @@ public class ChargeRequest extends BaseEntity {
         this.users = users;
         this.amount = amount;
     }
-}
+}*/
