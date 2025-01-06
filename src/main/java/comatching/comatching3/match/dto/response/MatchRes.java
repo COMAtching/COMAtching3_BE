@@ -21,7 +21,7 @@ public class MatchRes {
 	private Integer age;
 	private Gender gender;
 	private String major;
-	private Integer currentPoint;
+	private Long currentPoint;
 	private Integer admissionYear;
 	private String contactId;
 
@@ -40,7 +40,7 @@ public class MatchRes {
 			.build();
 	}
 
-	public void updateCurrentPoint(Integer point){
+	public void updateCurrentPoint(Long point){
 		this.currentPoint = point;
 	}
 }

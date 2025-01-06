@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CodeCheckRes {
-	private Integer currentPoint;
+	private Long currentPoint;
 }

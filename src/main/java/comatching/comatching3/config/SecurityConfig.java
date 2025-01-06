@@ -45,7 +45,7 @@ public class SecurityConfig {
 	);
 	private static final List<String> WHITELIST = List.of(
 		"/login", "/admin/**", "/charge-monitor/**", "/app/**", "/login-success",
-		"/api/participations", "/auth/refresh", "/main-page"
+		"/api/participations", "/auth/refresh", "/main-page", "/pay-success"
 	);
 	private final JwtUtil jwtUtil;
 	private final RefreshTokenService refreshTokenService;
@@ -73,7 +73,7 @@ public class SecurityConfig {
 				.requestMatchers("/auth/operator/**").hasAnyRole("OPERATOR", "ADMIN")
 				.requestMatchers("/auth/semi/**").hasAnyRole("SEMI_OPERATOR", "SEMI_ADMIN")
 				.requestMatchers("/auth/social/**").hasRole("SOCIAL")
-				.requestMatchers("/auth/user/**").hasRole("USER")
+				.requestMatchers("/auth/user/**", "/payments/**").hasRole("USER")
 				.anyRequest().authenticated()
 			);
 

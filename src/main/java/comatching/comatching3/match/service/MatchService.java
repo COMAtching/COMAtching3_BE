@@ -92,7 +92,7 @@ public class MatchService {
 			.orElseThrow( () -> new BusinessException(ResponseCode.NO_ENEMY_AVAILABLE));
 
 		//포인트 & pickMe 차감
-		Integer usePoint = calcPoint(matchReq);
+		Long usePoint = calcPoint(matchReq);
 
 		if(usePoint > applier.getPoint()){
 			throw new BusinessException(ResponseCode.INSUFFICIENT_POINT);
@@ -166,7 +166,7 @@ public class MatchService {
 				.orElseThrow( () -> new BusinessException(ResponseCode.NO_ENEMY_AVAILABLE));
 
 			//포인트 & pickMe 차감
-			Integer usePoint = calcPoint(req);
+			Long usePoint = calcPoint(req);
 
 			if(usePoint > applier.getPoint()){
 				throw new BusinessException(ResponseCode.INSUFFICIENT_POINT);
@@ -209,8 +209,8 @@ public class MatchService {
 	 * @param msg : 리퀘스트 정보
 	 * @return : 요청된 매칭 포인트
 	 */
-	private Integer calcPoint(MatchReq msg){
-		Integer point = 500;
+	private Long calcPoint(MatchReq msg){
+		Long point = 500L;
 
 		if(!msg.getAgeOption().equals(AgeOption.UNSELECTED)){
 			point += 100;
@@ -236,8 +236,8 @@ public class MatchService {
 	 * @param msg : 리퀘스트 정보
 	 * @return : 요청된 매칭 포인트
 	 */
-	private Integer calcPoint(AdminMatchReq msg){
-		Integer point = 500;
+	private Long calcPoint(AdminMatchReq msg){
+		Long point = 500L;
 
 		if(!msg.getAgeOption().equals(AgeOption.UNSELECTED)){
 			point += 100;

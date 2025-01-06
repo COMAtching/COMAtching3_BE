@@ -1,13 +1,6 @@
 package comatching.comatching3.charge.dto.response;
 
-import comatching.comatching3.util.UUIDUtil;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-
-import java.time.LocalDateTime;
-
-@Getter
+/*@Getter
 public class ChargePendingInfo {
     private String userId;
     private String username;
@@ -23,4 +16,4 @@ public class ChargePendingInfo {
         this.existingPoints = existingPoints;
         this.createdAt = createdAt;
     }
-}
+}*/
