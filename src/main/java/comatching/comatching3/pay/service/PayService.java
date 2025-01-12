@@ -24,9 +24,8 @@ import comatching.comatching3.config.TossPaymentConfig;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.exception.TossPaymentException;
 import comatching.comatching3.exception.TossPaymentExceptionDto;
-import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.history.enums.PointHistoryType;
-import comatching.comatching3.history.repository.PointHistoryRepository;
+import comatching.comatching3.history.service.PointHistoryService;
 import comatching.comatching3.pay.dto.req.ConfirmPaymentReq;
 import comatching.comatching3.pay.dto.req.OrderReq;
 import comatching.comatching3.pay.dto.res.OrderRes;
@@ -37,11 +36,8 @@ import comatching.comatching3.pay.enums.OrderStatus;
 import comatching.comatching3.pay.repository.OrderRepository;
 import comatching.comatching3.pay.repository.TossPaymentRepository;
 import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -53,7 +49,7 @@ public class PayService {
 	private final TossPaymentRepository tossPaymentRepository;
 	private final PayErrorService payErrorService;
 	private final PayRedisService payRedisService;
-	private final PointHistoryRepository pointHistoryRepository;
+	private final PointHistoryService pointHistoryService;
 
 	//테스트용
 	// private final UsersRepository usersRepository;
@@ -64,6 +60,7 @@ public class PayService {
 	@Transactional
 	public OrderRes makeOrder(OrderReq orderReq) {
 		Users user = securityUtil.getCurrentUsersEntity();
+		// 테스트용
 		// Users user = usersRepository.findBySocialId("3490175542")
 		// 	.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
@@ -131,7 +128,7 @@ public class PayService {
 				user.addPoint(amount);
 
 				// 포인트 증가 내역 저장
-				makePointHistory(user, PointHistoryType.CHARGE, amount);
+				pointHistoryService.makePointHistory(user, PointHistoryType.CHARGE, amount);
 
 				return true;
 			} catch (Exception e) {
@@ -208,18 +205,6 @@ public class PayService {
 		} catch (Exception e) {
 			throw new BusinessException(ResponseCode.PAYMENT_FAIL);
 		}
-	}
-
-	private void makePointHistory(Users user, PointHistoryType pointHistoryType, Long amount) {
-		PointHistory pointHistory = PointHistory.builder()
-			.users(user)
-			.pointHistoryType(pointHistoryType)
-			.changeAmount(amount)
-			.pickMe(user.getPickMe())
-			.totalPoint(user.getPoint())
-			.build();
-
-		pointHistoryRepository.save(pointHistory);
 	}
 
 	/**

@@ -13,6 +13,7 @@ import comatching.comatching3.history.entity.MatchingHistory;
 import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.history.repository.MatchingHistoryRepository;
 import comatching.comatching3.history.repository.PointHistoryRepository;
+import comatching.comatching3.pay.dto.res.PayHistoryRes;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
@@ -46,16 +47,10 @@ public class HistoryService {
 		return response;
 	}
 
-	public List<PointHistoryRes> getAllPointHistory() {
-		List<PointHistory> pointHistories = pointHistoryRepository.findAll();
-		return convertToPointHistoryRes(pointHistories);
-	}
-
 	public List<PointHistoryRes> getAllPointHistory(byte[] uuid) {
 		List<PointHistory> pointHistories = pointHistoryRepository.findAllByUuid(uuid);
 		return convertToPointHistoryRes(pointHistories);
 	}
-
 
 	private List<PointHistoryRes> convertToPointHistoryRes(List<PointHistory> pointHistories) {
 		return pointHistories.stream()
