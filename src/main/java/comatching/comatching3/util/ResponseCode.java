@@ -19,6 +19,7 @@ public enum ResponseCode {
 	PENDING_OPERATOR(400, "AUTH-004", HttpStatus.FORBIDDEN, "승인되지 않은 관리자"),
 	ALREADY_CHANGED(400, "AUTH-005", HttpStatus.BAD_REQUEST, "관리자의 아이디는 한 번만 바꿀 수 있습니다."),
 	NO_PERMISSION(400, "AUTH-006", HttpStatus.FORBIDDEN, "권한이 없습니다."),
+	OVER_REQUEST_LIMIT(400, "AUTH-007", HttpStatus.BAD_REQUEST, "요청할 수 있는 제한을 초과했습니다."),
 
 
 	//Security response
@@ -36,6 +37,7 @@ public enum ResponseCode {
 	ADD_PICKME_FAIL(400, "USR-004", HttpStatus.BAD_REQUEST, "Add pickMe failed"),
 	ALREADY_PARTICIPATED(400, "USR-005", HttpStatus.BAD_REQUEST, "already participated event"),
 	BAD_REQUEST_PICKME(400, "USR-006", HttpStatus.BAD_REQUEST, "Request object or Amount cannot be null"),
+	INVALID_USERNAME(400, "USR-007", HttpStatus.BAD_REQUEST, "사용할 수 없는 닉네임"),
 
 	//Validation exception response
 	ARGUMENT_NOT_VALID(400, "VAL-001", HttpStatus.BAD_REQUEST, "Argument not valid"),

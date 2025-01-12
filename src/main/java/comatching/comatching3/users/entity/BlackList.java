@@ -22,6 +22,8 @@ public class BlackList extends BaseEntity {
 
 	private byte[] uuid;
 
+	private String university;
+
 	private String provider;
 
 	private String username;
@@ -33,8 +35,9 @@ public class BlackList extends BaseEntity {
 	private String reason;
 
 	@Builder
-	public BlackList(byte[] uuid, String provider, String username, String email, String role, String reason) {
+	public BlackList(byte[] uuid, String university, String provider, String username, String email, String role, String reason) {
 		this.uuid = uuid;
+		this.university = university;
 		this.provider = provider;
 		this.username = username;
 		this.email = email;

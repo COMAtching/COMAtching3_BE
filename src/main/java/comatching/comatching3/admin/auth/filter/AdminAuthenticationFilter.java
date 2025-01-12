@@ -1,7 +1,6 @@
 package comatching.comatching3.admin.auth.filter;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
@@ -119,7 +118,7 @@ public class AdminAuthenticationFilter extends UsernamePasswordAuthenticationFil
 
 	private boolean isInBlackListed(String uuid) {
 		byte[] byteUuid = UUIDUtil.uuidStringToBytes(uuid);
-		return blackListService.checkBlackList(byteUuid);
+		return blackListService.checkBlackListByUuid(byteUuid);
 	}
 
 }
