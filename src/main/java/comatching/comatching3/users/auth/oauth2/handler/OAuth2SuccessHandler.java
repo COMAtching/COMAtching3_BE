@@ -2,7 +2,6 @@ package comatching.comatching3.users.auth.oauth2.handler;
 
 import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.exception.BusinessException;
-import comatching.comatching3.users.auth.jwt.JwtUtil;
 import comatching.comatching3.users.auth.oauth2.provider.CustomUser;
 import comatching.comatching3.users.auth.oauth2.service.TokenService;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
@@ -86,6 +85,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private boolean isInBlackListed(String uuid) {
         byte[] byteUuid = UUIDUtil.uuidStringToBytes(uuid);
-        return blackListService.checkBlackList(byteUuid);
+        return blackListService.checkBlackListByUuid(byteUuid);
     }
 }
