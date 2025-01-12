@@ -17,7 +17,6 @@ public class UserBasicInfoRes {
 	private String email;
 	private String provider;
 	private Long point;
-	private Integer pickMe;
 	private Integer warnCount;
 	private LocalDateTime registerAt;
 }

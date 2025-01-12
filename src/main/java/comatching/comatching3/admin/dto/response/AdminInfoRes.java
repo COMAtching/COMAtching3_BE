@@ -13,8 +13,5 @@ public class AdminInfoRes {
     private String university;
     private String role;
     private String schoolEmail;
-    private String contactEmail;
     private Boolean universityAuth;
-    private Boolean accountIdChanged;
-    private String appName;
 }

@@ -1,17 +1,23 @@
 package comatching.comatching3.admin.service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vane.badwordfiltering.BadWordFiltering;
+
 import comatching.comatching3.admin.dto.request.AdminInfoUpdateReq;
 import comatching.comatching3.admin.dto.request.AdminRegisterReq;
-import comatching.comatching3.admin.dto.request.BlackUserReq;
+import comatching.comatching3.admin.dto.request.EmailVerifyReq;
 import comatching.comatching3.admin.dto.response.AdminInfoRes;
+import comatching.comatching3.admin.dto.response.AfterVerifyEmailRes;
 import comatching.comatching3.admin.dto.response.OperatorRes;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.entity.University;
@@ -19,10 +25,13 @@ import comatching.comatching3.admin.enums.AdminRole;
 import comatching.comatching3.admin.repository.AdminRepository;
 import comatching.comatching3.admin.repository.UniversityRepository;
 import comatching.comatching3.exception.BusinessException;
-import comatching.comatching3.users.service.BlackListService;
+import comatching.comatching3.users.auth.jwt.JwtUtil;
+import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
+import comatching.comatching3.util.EmailUtil;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
+import comatching.comatching3.util.validation.AdditionalBadWords;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,19 +40,24 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AdminService {
 
+	private final RedisTemplate<String, Object> redisTemplate;
 	private final AdminRepository adminRepository;
 	private final UniversityRepository universityRepository;
-	private final PasswordEncoder passwordEncoder;
 	private final SecurityUtil securityUtil;
-	private final BlackListService blackListService;
+	private final JwtUtil jwtUtil;
+	private final EmailUtil emailUtil;
+	private final PasswordEncoder passwordEncoder;
+	private final UniversityService universityService;
+	private final RefreshTokenService refreshTokenService;
 
 	/**
 	 * 관리자 회원가입
-	 * 다른 학교의 관리자를 가입시킬 때, 우리쪽에서 다른 학교 관리자 계정 임시로 생성해주는 것도 가능
 	 * @param form 관리자 회원 가입에 필요한 DTO
 	 */
 	@Transactional
 	public void adminRegister(AdminRegisterReq form) {
+
+		checkNicknameFilter(form.getNickname());
 
 		Boolean exist = adminRepository.existsAdminByAccountId(form.getAccountId());
 		if (exist) {
@@ -52,14 +66,12 @@ public class AdminService {
 
 		String encryptedPassword = passwordEncoder.encode(form.getPassword());
 		AdminRole role = AdminRole.valueOf(form.getRole());
-		Optional<University> universityOptional = universityRepository.findByUniversityName(form.getUniversity());
 
-		if (universityOptional.isEmpty()) {
-			throw new BusinessException(ResponseCode.SCHOOL_NOT_EXIST);
-		}
+		University university = universityRepository.findByUniversityName(form.getUniversity())
+			.orElseThrow(() -> new BusinessException(ResponseCode.SCHOOL_NOT_EXIST));
 
 		if (role.equals(AdminRole.ROLE_SEMI_ADMIN)) {
-			Boolean adminExist = adminRepository.existsAdminByUniversity(universityOptional.get());
+			Boolean adminExist = adminRepository.existsAdminByUniversity(university);
 			if (adminExist) {
 				throw new BusinessException(ResponseCode.BAD_REQUEST);
 			}
@@ -70,16 +82,14 @@ public class AdminService {
 			.password(encryptedPassword)
 			.uuid(UUIDUtil.createUUID())
 			.nickname(form.getNickname())
+			.university(university)
 			.adminRole(role)
-			.university(universityOptional.get())
+			.schoolEmail(form.getSchoolEmail())
 			.build();
 
 		if (role.equals(AdminRole.ROLE_SEMI_ADMIN)) {
 			admin.accessOk();
 		}
-		// else if (role.equals(AdminRole.ROLE_SEMI_OPERATOR)) {
-		//     admin.accountIdChange();
-		// }
 
 		adminRepository.save(admin);
 	}
@@ -89,15 +99,77 @@ public class AdminService {
 	}
 
 	/**
+	 * 인증용 이메일 전송
+	 */
+	@Transactional
+	public String sendVerifyEmail() {
+		Admin admin = securityUtil.getAdminFromContext();
+
+		String email = admin.getSchoolEmail();
+		String universityName = admin.getUniversity().getUniversityName();
+
+		Boolean checkEmailDomain = universityService.checkEmailDomain(email, universityName);
+
+		if (!checkEmailDomain) {
+			throw new BusinessException(ResponseCode.ARGUMENT_NOT_VALID);
+		}
+
+		String verificationCode = String.valueOf(new Random().nextInt(900000) + 100000);
+		String token = UUID.randomUUID().toString();
+		String redisKey = "email-verification:" + token;
+
+		redisTemplate.opsForValue().set(redisKey, verificationCode, 3, TimeUnit.MINUTES);
+		emailUtil.sendEmail(email, "COMAtching 관리자 인증 메일", "Your verification code is " + verificationCode);
+
+		return token;
+	}
+
+	/**
+	 * 이메일 인증번호 검사
+	 */
+	@Transactional
+	public AfterVerifyEmailRes verifyCode(EmailVerifyReq request) {
+		String redisKey = "email-verification:" + request.getToken();
+		String storedCode = (String)redisTemplate.opsForValue().get(redisKey);
+
+		AfterVerifyEmailRes response = new AfterVerifyEmailRes();
+		if (storedCode != null && storedCode.equals(request.getCode())) {
+			Admin admin = securityUtil.getAdminFromContext();
+			admin.changeAdminRole(AdminRole.ROLE_ADMIN);
+			admin.universityAuthOk();
+			adminRepository.save(admin);
+
+			String uuid = UUIDUtil.bytesToHex(admin.getUuid());
+			String accessToken = jwtUtil.generateAccessToken(uuid, String.valueOf(admin.getAdminRole()));
+			String refreshToken = refreshTokenService.getRefreshToken(uuid);
+			redisTemplate.delete(redisKey);
+			refreshTokenService.saveRefreshTokenInRedis(uuid, refreshToken);
+
+			response.setAccessToken(accessToken);
+			response.setRefreshToken(refreshToken);
+			response.setSuccess(true);
+			return response;
+		}
+		response.setAccessToken(null);
+		response.setRefreshToken(null);
+		response.setSuccess(false);
+		return response;
+	}
+
+	/**
 	 * 승인 대기중인 오퍼레이터 목록 조회
-	 * @return 승인 대기중인 오퍼레이터 목록 (uuid, 닉네임, 승인 여부)
+	 * @return 승인 대기중인 오퍼레이터 목록 (uuid, accountId, 닉네임, 요청 시각)
 	 */
 	public List<OperatorRes> getPendingOperators() {
-		return adminRepository.findAllAdminsByAccessFalse().stream()
+		University university = securityUtil.getAdminFromContext().getUniversity();
+
+		return adminRepository.findAllAdminsByUniversityAndAccessFalseOrderByCreatedAtDesc(university).stream()
 			.map(admin -> OperatorRes.builder()
 				.uuid(UUIDUtil.bytesToHex(admin.getUuid()))
+				.accountId(admin.getAccountId())
 				.nickname(admin.getNickname())
-				.access(admin.getAccess())
+				.email(admin.getSchoolEmail())
+				.requestAt(admin.getCreatedAt())
 				.build())
 			.collect(Collectors.toList());
 	}
@@ -108,9 +180,16 @@ public class AdminService {
 	 */
 	@Transactional
 	public void accessOperator(String uuid) {
+
+		University university = securityUtil.getAdminFromContext().getUniversity();
+
 		byte[] operatorUuid = UUIDUtil.uuidStringToBytes(uuid);
 		Admin operator = adminRepository.findByUuid(operatorUuid)
 			.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+		if (!university.equals(operator.getUniversity())) {
+			throw new BusinessException(ResponseCode.NO_PERMISSION);
+		}
 
 		operator.accessOk();
 		operator.universityAuthOk();
@@ -124,52 +203,22 @@ public class AdminService {
 	 */
 	@Transactional
 	public void denyOperator(String uuid) {
+
+		University university = securityUtil.getAdminFromContext().getUniversity();
+
 		byte[] operatorUuid = UUIDUtil.uuidStringToBytes(uuid);
 		Admin operator = adminRepository.findByUuid(operatorUuid)
 			.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+		if (!university.equals(operator.getUniversity())) {
+			throw new BusinessException(ResponseCode.NO_PERMISSION);
+		}
 
 		if (operator.getAdminRole().equals(AdminRole.ROLE_ADMIN) || operator.getAccess()) {
 			throw new BusinessException(ResponseCode.NO_PERMISSION);
 		}
 		adminRepository.delete(operator);
 	}
-
-	/**
-	 * 관리자 로그인
-	 * @param form 관리자 ID, PW
-	 * @return ACCESS, REFRESH TOKEN
-	 */
-
-    /*@Transactional
-    public TokenRes adminLogin(AdminLoginReq form) {
-
-        log.info("admin login service logic 도착하니?");
-
-        Admin admin = adminRepository.findByAccountId(form.getAccountId())
-            .orElseThrow(() -> new BusinessException(ResponseCode.INVALID_LOGIN));
-
-        if (!passwordEncoder.matches(form.getPassword(), admin.getPassword())) {
-            throw new BusinessException(ResponseCode.INVALID_LOGIN);
-        }
-
-        if (!admin.getAccess()) {
-            throw new BusinessException(ResponseCode.PENDING_OPERATOR);
-        }
-
-        String adminUuid = UUIDUtil.bytesToHex(admin.getUuid());
-        String accessToken = jwtUtil.generateAccessToken(adminUuid, admin.getAdminRole().getRoleName());
-        String refreshToken = refreshTokenService.getRefreshToken(adminUuid);
-
-        if (refreshToken == null) {
-            refreshToken = jwtUtil.generateRefreshToken(adminUuid, admin.getAdminRole().getRoleName());
-            refreshTokenService.saveRefreshToken(adminUuid, refreshToken);
-        }
-
-        return TokenRes.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }*/
 
 	/**
 	 * 관리자 정보 조회
@@ -184,50 +233,31 @@ public class AdminService {
 			.university(admin.getUniversity().getUniversityName())
 			.role(admin.getAdminRole().toString())
 			.schoolEmail(admin.getSchoolEmail())
-			.contactEmail(admin.getContactEmail().orElse(null))
 			.universityAuth(admin.getUniversityAuth())
-			.accountIdChanged(admin.getAccountIdChanged())
-			.appName(admin.getUniversity().getAppName())
 			.build();
 
 	}
 
 	/**
-	 * 관리자 정보 변경 메소드 (계정 ID는 1번만 가능, 닉네임, 연락용 이메일, 앱 이름)
-	 * @param request 바꿀 항목의 정보 (바꾸지 않을 항목은 null)
+	 * 관리자 정보 변경 메소드
+	 * todo: 닉네임 검열
+	 * @param request 닉네임만 바꿀 수 있음
 	 */
 	@Transactional
 	public void updateAdminInfo(AdminInfoUpdateReq request) {
 		Admin admin = securityUtil.getAdminFromContext();
 
-		if (request.getAccountId().isPresent()) {
-			if (admin.getAccountIdChanged()) {
-				throw new BusinessException(ResponseCode.ALREADY_CHANGED);
-			}
-			admin.updateAccountId(request.getAccountId().get());
-			admin.accountIdChange();
-		}
-
-		if (request.getNickname().isPresent()) {
-			admin.updateNickname(request.getNickname().get());
-		}
-
-		if (request.getContactEmail().isPresent()) {
-			admin.updateContactEmail(request.getContactEmail().get());
-		}
-
-		if (request.getAppName().isPresent()) {
-			if (!admin.getAdminRole().equals(AdminRole.ROLE_ADMIN)) {
-				throw new BusinessException(ResponseCode.BAD_REQUEST);
-			}
-
-			University university = universityRepository.findByUniversityName(admin.getUniversity().getUniversityName())
-				.orElseThrow(() -> new BusinessException(ResponseCode.SCHOOL_NOT_EXIST));
-
-			university.updateAppName(request.getAppName().get());
-			universityRepository.save(university);
-		}
-
+		checkNicknameFilter(request.getNickname());
+		admin.updateNickname(request.getNickname());
 		adminRepository.save(admin);
+	}
+
+	private void checkNicknameFilter(String nickname) {
+		BadWordFiltering badWordFiltering = new BadWordFiltering();
+		badWordFiltering.addAll(List.of(AdditionalBadWords.koreaWord2));
+
+		if (badWordFiltering.check(nickname)) {
+			throw new BusinessException(ResponseCode.INVALID_USERNAME);
+		}
 	}
 }
