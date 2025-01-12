@@ -126,6 +126,7 @@ public class PayService {
 				Users user = order.getUsers();
 				user.addPayedPoint(amount);
 				user.addPoint(amount);
+				user.addNewOrder(order);
 
 				// 포인트 증가 내역 저장
 				pointHistoryService.makePointHistory(user, PointHistoryType.CHARGE, amount);
