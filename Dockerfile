@@ -4,8 +4,11 @@ FROM gradle:7.6-jdk17 AS builder
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# Gradle 캐시 활용을 위해 Gradle 파일 복사
-COPY build.gradle.kts settings.gradle.kts gradle.properties /app/
+#gradle 복사
+COPY gradlew .
+COPY gradle ./gradle
+COPY build.gradle .
+COPY settings.gradle .
 
 # 의존성 캐시 미리 로드
 RUN gradle dependencies --no-daemon || true
