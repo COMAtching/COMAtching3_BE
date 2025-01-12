@@ -46,7 +46,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addHeader("Set-Cookie", cookieUtil.setRefreshResponseCookie(tokenRes.getRefreshToken()).toString());
         refreshTokenService.saveRefreshTokenInRedis(customUser.getUuid(), tokenRes.getRefreshToken());
 
-        log.info("카카오 로그인 성공");
         response.sendRedirect(REDIRECT_URL);
     }
 

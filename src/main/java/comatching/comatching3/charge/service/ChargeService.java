@@ -1,32 +1,6 @@
 package comatching.comatching3.charge.service;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import comatching.comatching3.charge.dto.request.ChargeApprovalReq;
-import comatching.comatching3.charge.dto.request.ChargeCancelReq;
-import comatching.comatching3.charge.dto.request.ChargeReq;
-import comatching.comatching3.charge.dto.response.ChargePendingInfo;
-import comatching.comatching3.charge.entity.ChargeRequest;
-import comatching.comatching3.charge.repository.ChargeRequestRepository;
-import comatching.comatching3.exception.BusinessException;
-import comatching.comatching3.history.entity.PointHistory;
-import comatching.comatching3.history.enums.PointHistoryType;
-import comatching.comatching3.history.repository.PointHistoryRepository;
-import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.repository.UsersRepository;
-import comatching.comatching3.util.ResponseCode;
-import comatching.comatching3.util.UUIDUtil;
-import comatching.comatching3.util.security.SecurityUtil;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
+/*@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChargeService {
@@ -37,10 +11,10 @@ public class ChargeService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final PointHistoryRepository pointHistoryRepository;
 
-    /**
-     * 유저의 충전 요청 메소드
-     * @param chargeReq
-     */
+    *//**
+ * 유저의 충전 요청 메소드
+ * @param chargeReq
+ *//*
     @Transactional
     public void createChargeRequest(ChargeReq chargeReq) {
         Users user = securityUtil.getCurrentUsersEntity();
@@ -73,18 +47,18 @@ public class ChargeService {
         simpMessagingTemplate.convertAndSend("/topic/chargeRequests", chargePendingInfos);
     }
 
-    /**
-     * 충전 요청 목록 조회 메소드
-     * @return 충전 요청 목록
-     */
+    *//**
+ * 충전 요청 목록 조회 메소드
+ * @return 충전 요청 목록
+ *//*
     public List<ChargePendingInfo> getAllChargeRequests() {
         return chargeRequestRepository.findAllChargePendingInfo();
     }
 
-    /**
-     * 관리자의 충전 요청 승인 메소드
-     * @param approvalReq 웹 소켓으로 들어온 정보
-     */
+    *//**
+ * 관리자의 충전 요청 승인 메소드
+ * @param approvalReq 웹 소켓으로 들어온 정보
+ *//*
     @Transactional
     public void createApprovalRequest(ChargeApprovalReq approvalReq) {
         Users user = usersRepository.findUsersByUuid(UUIDUtil.uuidStringToBytes(approvalReq.getUserId()))
@@ -117,4 +91,4 @@ public class ChargeService {
         chargeRequestRepository.deleteByUsers(user);
         simpMessagingTemplate.convertAndSend("/topic/cancelUpdate", chargeCancelReq.getUserId());
     }
-}
+}*/

@@ -38,8 +38,6 @@ public class RefreshTokenService {
     public void saveRefreshTokenInRedis(String uuid, String refreshToken) {
         String key = REFRESH_TOKEN_PREFIX + uuid;
         redisTemplate.opsForValue().set(key, refreshToken, REFRESH_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
-
-        log.info("refreshToken 저장 완료!, key = " + key);
     }
 
     public String getRefreshToken(String uuid) {

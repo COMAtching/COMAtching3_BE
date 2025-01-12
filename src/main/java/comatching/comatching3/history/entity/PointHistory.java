@@ -42,16 +42,16 @@ public class PointHistory extends BaseEntity {
 	private PointHistoryType pointHistoryType;
 
 	// 사용/소비한 포인트 양
-	private Integer changeAmount;
+	private Long changeAmount;
 
 	// 결과 픽미 횟수
 	private Integer pickMe;
 
 	// 결과적으로 남은 포인트
-	private Integer totalPoint;
+	private Long totalPoint;
 
 	@Builder
-	public PointHistory(Users users, PointHistoryType pointHistoryType, Integer changeAmount, Integer pickMe, Integer totalPoint) {
+	public PointHistory(Users users, PointHistoryType pointHistoryType, Long changeAmount, Integer pickMe, Long totalPoint) {
 		this.users = users;
 		this.pointHistoryType = pointHistoryType;
 		this.changeAmount = changeAmount;
@@ -59,7 +59,7 @@ public class PointHistory extends BaseEntity {
 		this.totalPoint = totalPoint;
 	}
 
-	public void setTotalPoint(Integer totalPoint) {
+	public void setTotalPoint(Long totalPoint) {
 		this.totalPoint = totalPoint;
 	}
 
