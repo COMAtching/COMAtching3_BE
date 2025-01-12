@@ -1,4 +1,4 @@
-package comatching.comatching3.users.dto;
+package comatching.comatching3.history.dto.res;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HobbyRes {
-	private String hobbyName;
+public class GenderRes {
+	private int man;
+	private int woman;
 }

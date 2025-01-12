@@ -26,6 +26,8 @@ repositories {
 dependencies {
     //DB dependency
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+
 
     //Web dependency
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -54,11 +56,15 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
     implementation "com.fasterxml.uuid:java-uuid-generator:4.0.1"
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.0.2'
     testImplementation 'org.springframework.security:spring-security-test'
 
     //aws S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
     implementation 'software.amazon.awssdk:s3:2.17.89'
+
+    // filter
+    implementation 'io.github.vaneproject:badwordfiltering:1.0.0'
 
     //Swagger - API Documentation
     //implementation 'io.springfox:springfox-swagger-ui:2.9.2'

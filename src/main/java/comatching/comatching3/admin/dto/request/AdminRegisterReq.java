@@ -1,14 +1,34 @@
 package comatching.comatching3.admin.dto.request;
 
+import comatching.comatching3.admin.dto.valid.ValidRole;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
 public class AdminRegisterReq {
-    private String accountId;
-    private String password;
-    private String nickname;
-    private String role;
-    private String university;
+	@NotNull
+	@NotBlank
+	private String accountId;
+
+	@NotNull
+	@NotBlank
+	private String password;
+
+	@NotNull
+	@NotBlank
+	private String schoolEmail;
+
+	@NotNull
+	@NotBlank
+	private String nickname;
+
+	@ValidRole
+	@NotNull
+	@NotBlank
+	private String role;
+
+	@NotNull
+	@NotBlank
+	private String university;
 }

@@ -1,7 +1,6 @@
 package comatching.comatching3.admin.auth.filter;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
@@ -20,7 +19,11 @@ import comatching.comatching3.admin.auth.CustomAdmin;
 import comatching.comatching3.admin.auth.service.AdminUserDetailsService;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
+import comatching.comatching3.users.service.BlackListService;
 import comatching.comatching3.util.CookieUtil;
+import comatching.comatching3.util.Response;
+import comatching.comatching3.util.ResponseCode;
+import comatching.comatching3.util.UUIDUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,6 +40,7 @@ public class AdminAuthenticationFilter extends UsernamePasswordAuthenticationFil
 	private final JwtUtil jwtUtil;
 	private final CookieUtil cookieUtil;
 	private final RefreshTokenService refreshTokenService;
+	private final BlackListService blackListService;
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws
@@ -62,6 +66,12 @@ public class AdminAuthenticationFilter extends UsernamePasswordAuthenticationFil
 		ServletException {
 		// 인증 성공 시 JWT 토큰 생성 및 응답
 		CustomAdmin customAdmin = (CustomAdmin)authResult.getPrincipal();
+
+		if (checkBlackListForAdmin(customAdmin, response)) {
+			// 블랙리스트에 포함된 경우 차단 후 로직 종료
+			return;
+		}
+
 		String accessToken = jwtUtil.generateAccessToken(customAdmin.getUuid(), customAdmin.getRole());
 		String refreshToken = jwtUtil.generateRefreshToken(customAdmin.getUuid(), customAdmin.getRole());
 		refreshTokenService.saveRefreshTokenInRedis(customAdmin.getUuid(), refreshToken);
@@ -76,9 +86,8 @@ public class AdminAuthenticationFilter extends UsernamePasswordAuthenticationFil
 		// 응답을 종료하여 다음 필터로 전달되지 않도록 함
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("application/json");
-		Map<String, String> successMap = new HashMap<>();
-		successMap.put("message", "로그인에 성공했습니다.");
-		new ObjectMapper().writeValue(response.getOutputStream(), successMap);
+		response.getWriter().write(Response.ok(ResponseCode.SUCCESS).convertToJson());
+		response.getWriter().flush();
 	}
 
 	@Override
@@ -87,10 +96,29 @@ public class AdminAuthenticationFilter extends UsernamePasswordAuthenticationFil
 		// 인증 실패 시 처리 로직
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType("application/json");
-		Map<String, String> errorMap = new HashMap<>();
-		errorMap.put("error", "인증에 실패했습니다.");
-		new ObjectMapper().writeValue(response.getOutputStream(), errorMap);
+		response.getWriter().write(Response.errorResponse(ResponseCode.INVALID_LOGIN).convertToJson());
+		response.getWriter().flush();
 	}
 
+	private boolean checkBlackListForAdmin(CustomAdmin admin, HttpServletResponse response) throws IOException {
+		if (isInBlackListed(admin.getUuid())) {
+			log.info("블랙된 관리자");
+			blockAccess(response);
+			return true;
+		}
+		return false;
+	}
+
+	private void blockAccess(HttpServletResponse response) throws IOException {
+		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		response.sendRedirect("/");
+		response.getWriter().write(Response.errorResponse(ResponseCode.BLACK_USER).convertToJson());
+		response.getWriter().flush();
+	}
+
+	private boolean isInBlackListed(String uuid) {
+		byte[] byteUuid = UUIDUtil.uuidStringToBytes(uuid);
+		return blackListService.checkBlackListByUuid(byteUuid);
+	}
 
 }
