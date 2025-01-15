@@ -1,4 +1,4 @@
-package comatching.comatching3.match.dto.request;
+package comatching.comatching3.matching.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

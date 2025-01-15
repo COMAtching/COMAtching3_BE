@@ -1,4 +1,4 @@
-package comatching.comatching3.match;
+package comatching.comatching3.matching;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,12 +19,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import comatching.comatching3.history.repository.MatchingHistoryRepository;
-import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
-import comatching.comatching3.match.dto.request.MatchReq;
-import comatching.comatching3.match.dto.response.MatchRes;
-import comatching.comatching3.match.enums.AgeOption;
-import comatching.comatching3.match.enums.ContactFrequencyOption;
-import comatching.comatching3.match.service.MatchService;
+import comatching.comatching3.matching.dto.messageQueue.MatchResponseMsg;
+import comatching.comatching3.matching.dto.request.MatchReq;
+import comatching.comatching3.matching.dto.response.MatchRes;
+import comatching.comatching3.matching.enums.AgeOption;
+import comatching.comatching3.matching.enums.ContactFrequencyOption;
+import comatching.comatching3.matching.service.MatchService;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.HobbyEnum;

@@ -1,4 +1,4 @@
-package comatching.comatching3.match.enums;
+package comatching.comatching3.matching.enums;
 
 public enum AgeOption {
 	YOUNGER,

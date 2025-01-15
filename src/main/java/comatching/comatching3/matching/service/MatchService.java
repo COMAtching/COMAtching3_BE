@@ -1,6 +1,6 @@
-package comatching.comatching3.match.service;
+package comatching.comatching3.matching.service;
 
-import java.util.ArrayList;
+import comatching.comatching3.util.Idempotent.Idempotent;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,22 +13,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.history.entity.MatchingHistory;
 import comatching.comatching3.history.repository.MatchingHistoryRepository;
-import comatching.comatching3.match.dto.cache.CodeCheckInfo;
-import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
-import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
-import comatching.comatching3.match.dto.request.AdminMatchReq;
-import comatching.comatching3.match.dto.request.DeleteCsvReq;
-import comatching.comatching3.match.dto.request.MatchReq;
-import comatching.comatching3.match.dto.request.RecoverReq;
-import comatching.comatching3.match.dto.response.MatchRes;
-import comatching.comatching3.match.enums.AgeOption;
-import comatching.comatching3.match.enums.ContactFrequencyOption;
-import comatching.comatching3.users.dto.UserFeatureReq;
-import comatching.comatching3.users.entity.Hobby;
-import comatching.comatching3.users.entity.UserAiFeature;
+import comatching.comatching3.matching.dto.cache.CodeCheckInfo;
+import comatching.comatching3.matching.dto.messageQueue.MatchRequestMsg;
+import comatching.comatching3.matching.dto.messageQueue.MatchResponseMsg;
+import comatching.comatching3.matching.dto.request.AdminMatchReq;
+import comatching.comatching3.matching.dto.request.MatchReq;
+import comatching.comatching3.matching.dto.response.MatchRes;
+import comatching.comatching3.matching.enums.AgeOption;
+import comatching.comatching3.matching.enums.ContactFrequencyOption;
 import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.enums.ContactFrequency;
-import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.HobbyRepository;
@@ -64,6 +57,7 @@ public class MatchService {
 	 * @return 요청 성공시 GEN-001
 	 *
 	 */
+	@Idempotent
 	@Transactional
 	public MatchRes requestMatch(MatchReq matchReq){
 		String requestId = UUID.randomUUID().toString();

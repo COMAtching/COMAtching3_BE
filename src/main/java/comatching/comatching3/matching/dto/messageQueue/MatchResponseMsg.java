@@ -1,4 +1,4 @@
-package comatching.comatching3.match.dto.messageQueue;
+package comatching.comatching3.matching.dto.messageQueue;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

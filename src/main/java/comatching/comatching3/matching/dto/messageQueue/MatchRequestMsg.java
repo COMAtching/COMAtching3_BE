@@ -1,12 +1,12 @@
-package comatching.comatching3.match.dto.messageQueue;
+package comatching.comatching3.matching.dto.messageQueue;
 
 import java.util.List;
 
 import comatching.comatching3.history.entity.MatchingHistory;
-import comatching.comatching3.match.dto.request.AdminMatchReq;
-import comatching.comatching3.match.dto.request.MatchReq;
-import comatching.comatching3.match.enums.AgeOption;
-import comatching.comatching3.match.enums.ContactFrequencyOption;
+import comatching.comatching3.matching.dto.request.AdminMatchReq;
+import comatching.comatching3.matching.dto.request.MatchReq;
+import comatching.comatching3.matching.enums.AgeOption;
+import comatching.comatching3.matching.enums.ContactFrequencyOption;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.util.UUIDUtil;

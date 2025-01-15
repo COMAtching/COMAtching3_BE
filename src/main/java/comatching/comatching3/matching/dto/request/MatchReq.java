@@ -1,9 +1,9 @@
-package comatching.comatching3.match.dto.request;
+package comatching.comatching3.matching.dto.request;
 
 import java.util.List;
 
-import comatching.comatching3.match.enums.AgeOption;
-import comatching.comatching3.match.enums.ContactFrequencyOption;
+import comatching.comatching3.matching.enums.AgeOption;
+import comatching.comatching3.matching.enums.ContactFrequencyOption;
 import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.util.validation.ValidEnum;
 import lombok.AllArgsConstructor;

@@ -1,15 +1,15 @@
-package comatching.comatching3.match.service;
+package comatching.comatching3.matching.service;
 
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import comatching.comatching3.exception.BusinessException;
-import comatching.comatching3.match.dto.cache.CodeCheckInfo;
-import comatching.comatching3.match.dto.request.CodeCheckReq;
-import comatching.comatching3.match.dto.response.CodeCheckRes;
-import comatching.comatching3.match.dto.response.RequestCodeRes;
-import comatching.comatching3.match.enums.CheckStatus;
+import comatching.comatching3.matching.dto.cache.CodeCheckInfo;
+import comatching.comatching3.matching.dto.request.CodeCheckReq;
+import comatching.comatching3.matching.dto.response.CodeCheckRes;
+import comatching.comatching3.matching.dto.response.RequestCodeRes;
+import comatching.comatching3.matching.enums.CheckStatus;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.RedisUtil;

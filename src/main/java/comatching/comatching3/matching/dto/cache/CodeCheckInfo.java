@@ -1,6 +1,6 @@
-package comatching.comatching3.match.dto.cache;
+package comatching.comatching3.matching.dto.cache;
 
-import comatching.comatching3.match.enums.CheckStatus;
+import comatching.comatching3.matching.enums.CheckStatus;
 import lombok.Builder;
 import lombok.Getter;
 

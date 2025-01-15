@@ -1,4 +1,4 @@
-package comatching.comatching3.match.dto.response;
+package comatching.comatching3.matching.dto.response;
 
 import java.util.List;
 
@@ -6,7 +6,6 @@ import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
-import comatching.comatching3.users.enums.HobbyEnum;
 import lombok.Builder;
 import lombok.Data;
 
