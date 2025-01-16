@@ -1,7 +1,9 @@
 package comatching.comatching3.util.Idempotent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import comatching.comatching3.util.Idempotent.Exception.IdempotentException;
 import comatching.comatching3.util.RedisUtil;
+import comatching.comatching3.util.ResponseCode;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -79,11 +81,12 @@ public class IdempotentAspect {
         String originRequestValue = stringRedisTemplate.opsForValue().get(requestKey);
         log.info("[IdempotentAspect] ({}) 기존의 요청 데이터 :: {}", requestKey, originRequestValue);
 
+        //요청이 내용이 비어있지 않으면서 원래 요청이랑 같은 경우
         if (!requestValue.isBlank() && !requestValue.equals(originRequestValue))
-            log.info("exception");
-            //Todo: exception
+            throw new IdempotentException(ResponseCode.UNPROCESSABLE_ENTITY);
+
+        //요청이 같지 않은 경우
         else
-            log.info("exception");
-            //Todo: exception
+            throw new IdempotentException(ResponseCode.CONFLICT);
     }
 }
