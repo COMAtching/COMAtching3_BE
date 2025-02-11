@@ -83,7 +83,9 @@ public class Users extends BaseEntity {
 
 	private Long payedPoint = 0L;
 
-	private String schoolMail;
+	private String schoolEmail;
+
+	private boolean schoolAuth = false;
 
 	private String contactId;
 
@@ -154,6 +156,10 @@ public class Users extends BaseEntity {
 		this.contactId = contactId;
 	}
 
+	public void updateUsername(String username) {
+		this.username = username;
+	}
+
 	public void updateEvent1(Boolean event1) {
 		this.event1 = event1;
 	}
@@ -172,5 +178,13 @@ public class Users extends BaseEntity {
 
 	public void addWarningCount() {
 		this.warningCount += 1;
+	}
+
+	public void schoolAuthenticationSuccess() {
+		this.schoolAuth = true;
+	}
+
+	public void setSchoolEmail(String schoolMail) {
+		this.schoolEmail = schoolMail;
 	}
 }

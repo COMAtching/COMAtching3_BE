@@ -47,7 +47,6 @@ public class AdminService {
 	private final JwtUtil jwtUtil;
 	private final EmailUtil emailUtil;
 	private final PasswordEncoder passwordEncoder;
-	private final UniversityService universityService;
 	private final RefreshTokenService refreshTokenService;
 
 	/**
@@ -106,13 +105,6 @@ public class AdminService {
 		Admin admin = securityUtil.getAdminFromContext();
 
 		String email = admin.getSchoolEmail();
-		String universityName = admin.getUniversity().getUniversityName();
-
-		Boolean checkEmailDomain = universityService.checkEmailDomain(email, universityName);
-
-		if (!checkEmailDomain) {
-			throw new BusinessException(ResponseCode.ARGUMENT_NOT_VALID);
-		}
 
 		String verificationCode = String.valueOf(new Random().nextInt(900000) + 100000);
 		String token = UUID.randomUUID().toString();

@@ -5,11 +5,8 @@ import java.util.List;
 
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
-import comatching.comatching3.users.enums.HobbyEnum;
-import comatching.comatching3.util.HobbyListConverter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -76,8 +73,18 @@ public class UserAiFeature {
 		this.contactFrequency = contactFrequency;
 	}
 
-	public void updateHobby(List<Hobby> hobbies) {
-		hobbyList.addAll(hobbies);
+	public void addHobby(List<Hobby> hobbies) {
+		for (Hobby hobby : hobbies) {
+			this.hobbyList.add(hobby);
+			hobby.setUserAiFeature(this);
+		}
+	}
+
+	public void removeHobby(List<Hobby> hobbies) {
+		for (Hobby hobby : hobbies) {
+			this.hobbyList.remove(hobby);
+			hobby.setUserAiFeature(null);
+		}
 	}
 
 	public void updateAge(Integer age) {

@@ -17,6 +17,8 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 
 	Optional<Users> findBySocialId(String socialId);
 
+	// Optional<Users> findByAccountId(String accountId);
+
 	@Query("SELECT u FROM Users u JOIN u.userAiFeature uf WHERE uf.uuid = :uuid")
 	Optional<Users> findUsersByUuid(@Param("uuid") byte[] uuid);
 
@@ -34,4 +36,8 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 	Optional<Users> findByEmailAndUniversity(String Email, University university);
 
 	Page<Users> findALlByUniversityOrderByCreatedAtAsc(Pageable pageable, University university);
+
+	boolean existsByContactId(String contactId);
+
+	boolean existsBySchoolEmail(String schoolEmail);
 }
