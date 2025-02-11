@@ -6,4 +6,5 @@ import lombok.Getter;
 public class OrderReq {
 	private String productName;
 	private Long amount;
+	private Long point;
 }

@@ -28,6 +28,10 @@ public class PayHistoryService {
 	public List<PayHistoryRes> getPayHistory() {
 		Users user = securityUtil.getCurrentUsersEntity();
 
+		// 테스트용
+		// Users user = usersRepository.findBySocialId("3490175542")
+		// 	.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
 		return getPayHistoryResList(user);
 	}
 
@@ -51,6 +55,7 @@ public class PayHistoryService {
 				.requestAt(order.getTossPayment().getRequestedAt().toString())
 				.approvedAt(order.getTossPayment().getApprovedAt().toString())
 				.cancelReason(order.getTossPayment().getCancelReason())
+				.amount(order.getAmount())
 				.tossPaymentMethod(order.getTossPayment().getTossPaymentMethod())
 				.build())
 			.toList();

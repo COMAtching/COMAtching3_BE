@@ -36,6 +36,7 @@ import comatching.comatching3.pay.enums.OrderStatus;
 import comatching.comatching3.pay.repository.OrderRepository;
 import comatching.comatching3.pay.repository.TossPaymentRepository;
 import comatching.comatching3.users.entity.Users;
+import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -66,8 +67,9 @@ public class PayService {
 
 		String product = orderReq.getProductName();
 		Long amount = orderReq.getAmount();
+		Long point = orderReq.getPoint();
 
-		Orders order = makeOrderEntity(user, product, amount);
+		Orders order = makeOrderEntity(user, product, amount, point);
 
 		TossPayment tossPayment = TossPayment.builder()
 			.order(order)
@@ -83,13 +85,14 @@ public class PayService {
 			.build();
 	}
 
-	private Orders makeOrderEntity(Users user, String product, Long amount) {
+	private Orders makeOrderEntity(Users user, String product, Long amount, Long point) {
 		Orders order = Orders.builder()
 			.users(user)
 			.orderStatus(OrderStatus.ORDER_REQUEST)
 			.orderUuid(UUID.randomUUID().toString())
 			.product(product)
 			.amount(amount)
+			.point(point)
 			.build();
 
 		return orderRepository.save(order);
@@ -124,12 +127,12 @@ public class PayService {
 
 				// 포인트 증가 로직
 				Users user = order.getUsers();
-				user.addPayedPoint(amount);
-				user.addPoint(amount);
+				user.addPayedPoint(order.getPoint());
+				user.addPoint(order.getPoint());
 				user.addNewOrder(order);
 
 				// 포인트 증가 내역 저장
-				pointHistoryService.makePointHistory(user, PointHistoryType.CHARGE, amount);
+				pointHistoryService.makePointHistory(user, PointHistoryType.CHARGE, order.getPoint());
 
 				return true;
 			} catch (Exception e) {
