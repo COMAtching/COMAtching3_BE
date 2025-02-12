@@ -69,6 +69,9 @@ public class Users extends BaseEntity {
 
 	private String username;
 
+	private String accountId;
+	private String password;
+
 	private String email;
 
 	private String role;

@@ -36,7 +36,8 @@ public class JwtFilter extends OncePerRequestFilter {
 		"/api/match",
 		"/charge-monitor",
 		"/admin",
-		"/auth/refresh"
+		"/auth/refresh",
+		"/user/login"
 	);
 	private final JwtUtil jwtUtil;
 

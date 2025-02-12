@@ -1,4 +1,4 @@
-package comatching.comatching3.admin.auth.filter;
+package comatching.comatching3.users.auth.filter;
 
 import java.io.IOException;
 
@@ -10,8 +10,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import comatching.comatching3.admin.auth.CustomAdmin;
-import comatching.comatching3.auth.service.CustomDetailsService;
 import comatching.comatching3.auth.filter.AbstractAuthenticationFilter;
+import comatching.comatching3.auth.service.CustomDetailsService;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
 import comatching.comatching3.users.auth.oauth2.provider.CustomUser;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
@@ -27,15 +27,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
+public class UserAuthenticationFilter extends AbstractAuthenticationFilter {
 
-	private static final String LOGIN_URL = "/admin/login";
+	private static final String LOGIN_URL = "/user/login";
+
 	private final JwtUtil jwtUtil;
 	private final CookieUtil cookieUtil;
 	private final RefreshTokenService refreshTokenService;
 	private final BlackListService blackListService;
 
-	public AdminAuthenticationFilter(AuthenticationManager authenticationManager,
+	public UserAuthenticationFilter(AuthenticationManager authenticationManager,
 		CustomDetailsService customDetailsService,
 		JwtUtil jwtUtil,
 		CookieUtil cookieUtil,
@@ -59,20 +60,20 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 		ServletException {
 		// 인증 성공 시 JWT 토큰 생성 및 응답
 		Object principal = authResult.getPrincipal();
-		if (principal instanceof CustomUser) {
+		if (principal instanceof CustomAdmin) {
 			authenticationFailed(response);
 			return;
 		}
-		CustomAdmin customAdmin = (CustomAdmin)authResult.getPrincipal();
+		CustomUser customUser = (CustomUser)authResult.getPrincipal();
 
-		if (checkBlackListForAdmin(customAdmin, response)) {
+		if (checkBlackListForUser(customUser, response)) {
 			// 블랙리스트에 포함된 경우 차단 후 로직 종료
 			return;
 		}
 
-		String accessToken = jwtUtil.generateAccessToken(customAdmin.getUuid(), customAdmin.getRole());
-		String refreshToken = jwtUtil.generateRefreshToken(customAdmin.getUuid(), customAdmin.getRole());
-		refreshTokenService.saveRefreshTokenInRedis(customAdmin.getUuid(), refreshToken);
+		String accessToken = jwtUtil.generateAccessToken(customUser.getUuid(), customUser.getRole());
+		String refreshToken = jwtUtil.generateRefreshToken(customUser.getUuid(), customUser.getRole());
+		refreshTokenService.saveRefreshTokenInRedis(customUser.getUuid(), refreshToken);
 
 		ResponseCookie accessCookie = cookieUtil.setAccessResponseCookie(accessToken);
 		ResponseCookie refreshCookie = cookieUtil.setRefreshResponseCookie(refreshToken);
@@ -102,9 +103,9 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 		response.getWriter().flush();
 	}
 
-	private boolean checkBlackListForAdmin(CustomAdmin admin, HttpServletResponse response) throws IOException {
-		if (isInBlackListed(admin.getUuid())) {
-			log.info("블랙된 관리자");
+	private boolean checkBlackListForUser(CustomUser user, HttpServletResponse response) throws IOException {
+		if (isInBlackListed(user.getUuid())) {
+			log.info("블랙된 유저");
 			blockAccess(response);
 			return true;
 		}

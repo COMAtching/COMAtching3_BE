@@ -23,7 +23,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import comatching.comatching3.admin.auth.filter.AdminAuthenticationFilter;
-import comatching.comatching3.admin.auth.service.AdminUserDetailsService;
+import comatching.comatching3.auth.service.CustomDetailsService;
+import comatching.comatching3.users.auth.filter.UserAuthenticationFilter;
 import comatching.comatching3.users.auth.jwt.JwtExceptionFilter;
 import comatching.comatching3.users.auth.jwt.JwtFilter;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
@@ -31,6 +32,7 @@ import comatching.comatching3.users.auth.oauth2.handler.OAuth2FailureHandler;
 import comatching.comatching3.users.auth.oauth2.handler.OAuth2SuccessHandler;
 import comatching.comatching3.users.auth.oauth2.service.CustomOAuth2UserService;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
+import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.users.service.BlackListService;
 import comatching.comatching3.util.CookieUtil;
 import lombok.RequiredArgsConstructor;
@@ -45,11 +47,11 @@ public class SecurityConfig {
 	);
 	private static final List<String> WHITELIST = List.of(
 		"/login", "/admin/**", "/charge-monitor/**", "/app/**",
-		"/api/participations", "/auth/refresh", "/pay-success", "/"
+		"/api/participations", "/auth/refresh", "/pay-success", "/", "/user/login"
 	);
 	private final JwtUtil jwtUtil;
 	private final RefreshTokenService refreshTokenService;
-	private final AdminUserDetailsService adminUserDetailsService;
+	private final CustomDetailsService customDetailsService;
 	private final CustomOAuth2UserService customOAuth2UserService;
 	private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	private final OAuth2FailureHandler oAuth2FailureHandler;
@@ -81,21 +83,24 @@ public class SecurityConfig {
 
 		// 관리자 인증 필터 설정
 		AdminAuthenticationFilter adminAuthFilter = new AdminAuthenticationFilter(authenticationManager,
-			adminUserDetailsService, jwtUtil,
-			cookieUtil, refreshTokenService, blackListService);
-		adminAuthFilter.setFilterProcessesUrl("/admin/login"); // 관리자 로그인 URL 설정
+			customDetailsService, jwtUtil, cookieUtil, refreshTokenService, blackListService);
+		adminAuthFilter.setFilterProcessesUrl("/admin/login");
+
+		UserAuthenticationFilter userAuthFilter = new UserAuthenticationFilter(authenticationManager,
+			customDetailsService, jwtUtil, cookieUtil, refreshTokenService, blackListService);
+		userAuthFilter.setFilterProcessesUrl("/user/login");
 
 		http
 			.cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()));
 
 		http
 			.csrf(AbstractHttpConfigurer::disable)
-			//todo: 로그인 페이지 등록 필요
 			.formLogin(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable);
 
 		http
 			.addFilterBefore(adminAuthFilter, UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(userAuthFilter, UsernamePasswordAuthenticationFilter.class)
 			.addFilterAfter(new JwtFilter(jwtUtil),
 				OAuth2LoginAuthenticationFilter.class)
 			.addFilterBefore(new JwtExceptionFilter(), JwtFilter.class);
