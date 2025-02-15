@@ -2,24 +2,31 @@ package comatching.comatching3.users.controller;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import comatching.comatching3.admin.dto.request.EmailVerifyReq;
+import comatching.comatching3.admin.dto.response.EmailTokenRes;
 import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.users.auth.oauth2.provider.OAuth2Provider;
 import comatching.comatching3.users.auth.oauth2.service.LogoutService;
 import comatching.comatching3.users.auth.oauth2.service.LogoutServiceFactory;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
-import comatching.comatching3.users.dto.BuyPickMeReq;
-import comatching.comatching3.users.dto.CurrentPointRes;
-import comatching.comatching3.users.dto.UserFeatureReq;
-import comatching.comatching3.users.dto.UserInfoRes;
+import comatching.comatching3.users.dto.request.BuyPickMeReq;
+import comatching.comatching3.users.dto.request.UserRegisterReq;
+import comatching.comatching3.users.dto.request.UserUpdateInfoReq;
+import comatching.comatching3.users.dto.response.CurrentPointRes;
+import comatching.comatching3.users.dto.request.UserFeatureReq;
+import comatching.comatching3.users.dto.response.UserInfoRes;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.service.UserService;
 import comatching.comatching3.util.CookieUtil;
@@ -27,6 +34,7 @@ import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,10 +50,22 @@ public class UserController {
 	private final SecurityUtil securityUtil;
 	private final RefreshTokenService refreshTokenService;
 
+	@Value("${redirect-url.frontend}")
+	private String REDIRECT_URL;
+
 	@GetMapping("/api/participations")
 	public Response<Long> getParticipations() {
 		Long result = userService.getParticipations();
 		return Response.ok(result);
+	}
+
+	/**
+	 * 유저 회원가입
+	 */
+	@PostMapping("/user/register")
+	public Response<Void> userRegister(@RequestBody @Validated UserRegisterReq form) {
+		userService.userRegister(form);
+		return Response.ok();
 	}
 
 	/**
@@ -64,10 +84,23 @@ public class UserController {
 		return Response.ok();
 	}
 
+	@PatchMapping("/auth/user/api/user/info")
+	public Response<Void> updateUserInfo(@RequestBody UserUpdateInfoReq form) {
+		userService.updateUserInfo(form);
+
+		return Response.ok();
+	}
+
+	/**
+	 * contactId 중복확인
+	 */
+	@GetMapping("/auth/social/api/check/{contactId}")
+	public Response<Boolean> isContactIdDuplicated(@PathVariable String contactId) {
+		return Response.ok(userService.isContactIdDuplicated(contactId));
+	}
+
 	/**
 	 * contactId 변경
-	 * @param contactId 소셜 ID
-	 * @return 200
 	 */
 	@PatchMapping("/auth/user/api/user/info/{contactId}")
 	public Response<Void> updateContactId(@PathVariable String contactId) {
@@ -76,7 +109,36 @@ public class UserController {
 	}
 
 	/**
+	 * 유저 학교 인증
+	 */
+	@PostMapping("/auth/user/api/auth/school")
+	@RateLimiter(name = "send-email")
+	public Response<EmailTokenRes> userSchoolAuth(@RequestParam String schoolEmail) {
+		String token = userService.userSchoolAuth(schoolEmail);
+
+		return Response.ok(new EmailTokenRes(token));
+	}
+
+	/**
+	 * 입력한 코드가 맞는지 확인하는 메소드
+	 * 3분동안 최대 10번 시도 가능, 그 이후에는 만료
+	 * @param request 토큰 값과 입력한 코드 번호를 이용해서 redis에 저장된 값과 비교
+	 * @return 인증 성공 시 ok, 실패 시 VAL-001
+	 */
+	@PostMapping("/auth/user/api/auth/school/code")
+	@RateLimiter(name = "verify-email")
+	public Response<Void> verifyCode(@Validated @RequestBody EmailVerifyReq request) {
+		boolean result = userService.verifyCode(request);
+		if (result) {
+			return Response.ok();
+		} else {
+			return Response.errorResponse(ResponseCode.ARGUMENT_NOT_VALID);
+		}
+	}
+
+	/**
 	 * 메인 페이지 유저 정보 조회
+	 * 학교 인증 여부 및 학교 이메일도 추가
 	 * @return 유저 정보
 	 */
 	@GetMapping("/auth/user/api/info")
@@ -100,7 +162,7 @@ public class UserController {
 	 * 전략 패턴 적용
 	 * @return ok
 	 */
-	@GetMapping("/auth/user/api/logout")
+	@GetMapping("/auth/allUser/api/logout")
 	public Response<Void> userLogout(HttpServletResponse response) throws IOException {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -132,7 +194,7 @@ public class UserController {
 		// SecurityContext 비우기
 		SecurityContextHolder.clearContext();
 
-		response.sendRedirect("/main-page");
+		response.sendRedirect(REDIRECT_URL);
 
 		return Response.ok();
 	}
@@ -162,7 +224,7 @@ public class UserController {
 	}
 
 	/**
-	 * 더이상 안뽑히기 (사실상 탈퇴)
+	 * 더이상 안뽑히기
 	 * @return 200
 	 */
 	@GetMapping("/auth/user/api/stop-pickMe")
@@ -179,6 +241,15 @@ public class UserController {
 	@GetMapping("/auth/user/api/restart-pickMe")
 	public Response<Void> restartAccount() {
 		userService.restartPickMe();
+		return Response.ok();
+	}
+
+	/**
+	 * 회원 soft-delete 요청
+	 */
+	@PatchMapping("/auth/user/api/remove")
+	public Response<Void> removeUser() {
+		userService.removeUser();
 		return Response.ok();
 	}
 }

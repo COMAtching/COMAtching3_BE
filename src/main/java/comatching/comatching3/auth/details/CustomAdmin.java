@@ -1,4 +1,4 @@
-package comatching.comatching3.admin.auth;
+package comatching.comatching3.auth.details;
 
 import java.util.Collection;
 import java.util.List;
@@ -7,12 +7,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import comatching.comatching3.auth.dto.LoginDto;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class CustomAdmin implements UserDetails {
 
-	private final AdminDto adminDto;
+	private final LoginDto adminDto;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

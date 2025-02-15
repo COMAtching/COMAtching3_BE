@@ -1,11 +1,22 @@
 package comatching.comatching3.admin.dto.request;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class ResetPasswordReq {
-    private String token;
-    private String password;
-    private String confirmPassword;
+	@NotNull
+	@NotBlank
+	private String token;
+
+	@NotNull
+	@NotBlank
+	private String password;
+
+	@NotNull
+	@NotBlank
+	private String confirmPassword;
 }

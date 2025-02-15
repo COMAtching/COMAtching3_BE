@@ -33,4 +33,8 @@ public class Hobby {
 		this.hobbyName = hobbyName;
 		this.userAiFeature = userAiFeature;
 	}
+
+	public void setUserAiFeature(UserAiFeature userAiFeature) {
+		this.userAiFeature = userAiFeature;
+	}
 }

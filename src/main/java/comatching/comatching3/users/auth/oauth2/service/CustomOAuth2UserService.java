@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import comatching.comatching3.exception.BusinessException;
-import comatching.comatching3.users.auth.oauth2.dto.UserDto;
-import comatching.comatching3.users.auth.oauth2.provider.CustomUser;
+import comatching.comatching3.auth.dto.LoginDto;
+import comatching.comatching3.auth.details.CustomUser;
 import comatching.comatching3.users.auth.oauth2.provider.OAuth2ProviderFactory;
 import comatching.comatching3.users.auth.oauth2.provider.OAuth2ProviderUser;
 import comatching.comatching3.users.entity.UserAiFeature;
@@ -53,12 +53,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			throw new BusinessException(ResponseCode.INTERNAL_SERVER_ERROR);
 		}
 
-		UserDto userDto = UserDto.builder()
+		LoginDto loginDto = LoginDto.builder()
 			.uuid(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()))
 			.role(user.getRole())
 			.build();
 
-		return new CustomUser(userDto);
+		return new CustomUser(loginDto);
 	}
 
 	private Users register(OAuth2ProviderUser userInfo) {

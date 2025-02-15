@@ -36,4 +36,9 @@ public class UUIDUtil {
         }
         return new String(hexChars).toLowerCase();
     }
+
+    public static String generateSocialId() {
+        UUID uuid = UUID.randomUUID();
+        return uuid.toString().substring(0, 8);
+    }
 }

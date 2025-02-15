@@ -48,17 +48,14 @@ public class Admin extends BaseEntity {
 
 	private Boolean universityAuth = false;
 
-	private String contactEmail = null;
-
-	private Boolean accountIdChanged = false;
-
 	private Boolean access = false;
 
 	@Builder
-	public Admin(byte[] uuid,String nickname, AdminRole adminRole, String accountId, String password, University university) {
+	public Admin(String schoolEmail, byte[] uuid,String nickname, AdminRole adminRole, String accountId, String password, University university) {
 		this.uuid = uuid;
 		this.nickname = nickname;
 		this.adminRole = adminRole;
+		this.schoolEmail = schoolEmail;
 		this.accountId = accountId;
 		this.password = password;
 		this.university = university;
@@ -66,14 +63,6 @@ public class Admin extends BaseEntity {
 
 	public void changeAdminRole(AdminRole adminRole) {
 		this.adminRole = adminRole;
-	}
-
-	public void setSchoolEmail(String schoolEmail) {
-		this.schoolEmail = schoolEmail;
-	}
-
-	public Optional<String> getContactEmail() {
-		return Optional.ofNullable(contactEmail);
 	}
 
 	public void updateAccountId(String accountId) {
@@ -84,19 +73,13 @@ public class Admin extends BaseEntity {
 		this.password = password;
 	}
 
-	public void accountIdChange() {
-		this.accountIdChanged = true;
-	}
-
 	public void updateNickname(String nickname) {
 		this.nickname = nickname;
-	}
-
-	public void updateContactEmail(String contactEmail) {
-		this.contactEmail = contactEmail;
 	}
 
 	public void accessOk() {
 		this.access = true;
 	}
+
+	public void universityAuthOk() {this.universityAuth = true;}
 }

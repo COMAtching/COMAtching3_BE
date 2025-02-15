@@ -1,10 +1,10 @@
 package comatching.comatching3.util.security;
 
-import comatching.comatching3.admin.auth.CustomAdmin;
+import comatching.comatching3.auth.details.CustomAdmin;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.repository.AdminRepository;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
-import comatching.comatching3.users.auth.oauth2.provider.CustomUser;
+import comatching.comatching3.auth.details.CustomUser;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.Authentication;

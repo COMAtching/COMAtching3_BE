@@ -1,4 +1,4 @@
-package comatching.comatching3.users.auth.oauth2.dto;
+package comatching.comatching3.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDto {
+public class LoginDto {
+
+    private String accountId;
+    private String password;
     private String uuid;
     private String role;
 }

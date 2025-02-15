@@ -1,4 +1,4 @@
-package comatching.comatching3.users.auth.oauth2.provider;
+package comatching.comatching3.auth.details;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,27 +9,27 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import comatching.comatching3.users.auth.oauth2.dto.UserDto;
+import comatching.comatching3.auth.dto.LoginDto;
 
 public class CustomUser implements UserDetails, OAuth2User {
 
-	private final UserDto userDto;
+	private final LoginDto loginDto;
 
-	public CustomUser(UserDto userDto) {
-		this.userDto = userDto;
+	public CustomUser(LoginDto loginDto) {
+		this.loginDto = loginDto;
 	}
 
 	public String getUuid() {
-		return userDto.getUuid();
+		return loginDto.getUuid();
 	}
 
 	public String getRole() {
-		return userDto.getRole();
+		return loginDto.getRole();
 	}
 
 	@Override
 	public String getName() {
-		return userDto.getUuid();
+		return loginDto.getUuid();
 	}
 
 	@Override
@@ -39,16 +39,16 @@ public class CustomUser implements UserDetails, OAuth2User {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority(userDto.getRole()));
+		return List.of(new SimpleGrantedAuthority(loginDto.getRole()));
 	}
 
 	@Override
 	public String getPassword() {
-		return null;
+		return loginDto.getPassword();
 	}
 
 	@Override
 	public String getUsername() {
-		return userDto.getUuid();
+		return loginDto.getUuid();
 	}
 }

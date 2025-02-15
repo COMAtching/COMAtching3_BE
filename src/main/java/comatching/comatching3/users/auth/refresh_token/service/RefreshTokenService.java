@@ -45,6 +45,7 @@ public class RefreshTokenService {
         return (String) redisTemplate.opsForValue().get(key);
     }
 
+    @Transactional
     public void deleteRefreshToken(String uuid) {
         String key = REFRESH_TOKEN_PREFIX + uuid;
         redisTemplate.delete(key);

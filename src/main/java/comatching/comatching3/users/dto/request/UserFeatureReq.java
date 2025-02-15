@@ -1,4 +1,4 @@
-package comatching.comatching3.users.dto;
+package comatching.comatching3.users.dto.request;
 
 import java.util.List;
 
@@ -14,6 +14,7 @@ public class UserFeatureReq {
     private String major;
     private String contactId;
     private String gender;
+    private String username;
 
     @Min(20) @Max(30)
     private Integer age;

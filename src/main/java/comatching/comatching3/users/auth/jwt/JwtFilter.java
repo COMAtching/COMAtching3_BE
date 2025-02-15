@@ -9,13 +9,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import comatching.comatching3.admin.auth.AdminDto;
-import comatching.comatching3.admin.auth.CustomAdmin;
 import comatching.comatching3.admin.enums.AdminRole;
-import comatching.comatching3.users.auth.oauth2.dto.UserDto;
-import comatching.comatching3.users.auth.oauth2.provider.CustomUser;
-import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
-import comatching.comatching3.util.CookieUtil;
+import comatching.comatching3.auth.details.CustomAdmin;
+import comatching.comatching3.auth.details.CustomUser;
+import comatching.comatching3.auth.dto.LoginDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -36,11 +33,11 @@ public class JwtFilter extends OncePerRequestFilter {
 		"/api/match",
 		"/charge-monitor",
 		"/admin",
-		"/auth/refresh"
+		"/auth/refresh",
+		"/user/login",
+		"/user/register"
 	);
 	private final JwtUtil jwtUtil;
-	private final RefreshTokenService refreshTokenService;
-	private final CookieUtil cookieUtil;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request,
@@ -85,20 +82,20 @@ public class JwtFilter extends OncePerRequestFilter {
 	private void setAuthentication(String accessToken) {
 		String uuid = jwtUtil.getUUID(accessToken);
 		String role = jwtUtil.getRole(accessToken);
-		log.info("role = " + role);
 
 		if (AdminRole.isValidRole(role)) {
-			AdminDto adminDto = AdminDto.builder()
+			LoginDto adminDto = LoginDto.builder()
 				.uuid(uuid)
 				.role(role)
 				.build();
 
 			CustomAdmin adminUser = new CustomAdmin(adminDto);
-			Authentication authToken = new UsernamePasswordAuthenticationToken(adminUser, null, adminUser.getAuthorities());
+			Authentication authToken = new UsernamePasswordAuthenticationToken(adminUser, null,
+				adminUser.getAuthorities());
 			SecurityContextHolder.getContext().setAuthentication(authToken);
 
 		} else {
-			UserDto userDto = UserDto.builder()
+			LoginDto userDto = LoginDto.builder()
 				.uuid(uuid)
 				.role(role)
 				.build();

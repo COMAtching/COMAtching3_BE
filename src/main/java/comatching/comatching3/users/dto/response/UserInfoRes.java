@@ -1,7 +1,8 @@
-package comatching.comatching3.users.dto;
+package comatching.comatching3.users.dto.response;
 
 import java.util.List;
 
+import comatching.comatching3.users.dto.response.HobbyRes;
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
 import lombok.AllArgsConstructor;
@@ -20,12 +21,13 @@ public class UserInfoRes {
 	private String contactId;
 	private Long point;
 	private Integer pickMe;
-	// private Boolean canRequestCharge;
 	private Long participations;
 	private List<HobbyRes> hobbies;
 	private ContactFrequency contactFrequency;
 	private Gender gender;
 	private String comment;
 	private Integer admissionYear;
+	private boolean schoolAuth;
+	private String schoolEmail;
 	private Boolean event1;
 }

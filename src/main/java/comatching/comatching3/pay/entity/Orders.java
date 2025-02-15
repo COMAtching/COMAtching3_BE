@@ -42,16 +42,19 @@ public class Orders {
 
 	private Long amount;
 
+	private Long point;
+
 	private String orderUuid;
 
 	@Builder
-	public Orders(TossPayment tossPayment, Users users, OrderStatus orderStatus, String product, Long amount,
+	public Orders(TossPayment tossPayment, Users users, OrderStatus orderStatus, String product, Long amount, Long point,
 		String orderUuid) {
 		this.tossPayment = tossPayment;
 		this.users = users;
 		this.orderStatus = orderStatus;
 		this.product = product;
 		this.amount = amount;
+		this.point = point;
 		this.orderUuid = orderUuid;
 	}
 

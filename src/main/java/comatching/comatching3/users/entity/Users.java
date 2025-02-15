@@ -69,6 +69,8 @@ public class Users extends BaseEntity {
 
 	private String username;
 
+	private String password;
+
 	private String email;
 
 	private String role;
@@ -83,21 +85,26 @@ public class Users extends BaseEntity {
 
 	private Long payedPoint = 0L;
 
-	private String schoolMail;
+	private String schoolEmail;
+
+	private boolean schoolAuth = false;
 
 	private String contactId;
 
 	private Boolean isDeactivated = false;
 
+	private int warningCount = 0;
+
 	private Boolean event1 = false;
 
 	@Builder
-	public Users(String provider, String socialId, String email, String role, String username) {
+	public Users(String provider, String socialId, String email, String role, String username, String password) {
 		this.provider = provider;
 		this.socialId = socialId;
 		this.email = email;
 		this.role = role;
 		this.username = username;
+		this.password = password;
 	}
 
 	public void addNewOrder(Orders order) {
@@ -152,6 +159,10 @@ public class Users extends BaseEntity {
 		this.contactId = contactId;
 	}
 
+	public void updateUsername(String username) {
+		this.username = username;
+	}
+
 	public void updateEvent1(Boolean event1) {
 		this.event1 = event1;
 	}
@@ -166,5 +177,17 @@ public class Users extends BaseEntity {
 
 	public void subtractPayedPoint(Long payedPoint) {
 		this.payedPoint -= payedPoint;
+	}
+
+	public void addWarningCount() {
+		this.warningCount += 1;
+	}
+
+	public void schoolAuthenticationSuccess() {
+		this.schoolAuth = true;
+	}
+
+	public void setSchoolEmail(String schoolMail) {
+		this.schoolEmail = schoolMail;
 	}
 }
