@@ -6,17 +6,15 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vane.badwordfiltering.BadWordFiltering;
 
 import comatching.comatching3.admin.dto.request.EmailVerifyReq;
-import comatching.comatching3.admin.dto.response.AfterVerifyEmailRes;
 import comatching.comatching3.admin.dto.response.TokenRes;
-import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.entity.University;
-import comatching.comatching3.admin.enums.AdminRole;
 import comatching.comatching3.admin.repository.UniversityRepository;
 import comatching.comatching3.admin.service.UniversityService;
 import comatching.comatching3.exception.BusinessException;
@@ -24,9 +22,11 @@ import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.history.enums.PointHistoryType;
 import comatching.comatching3.history.repository.PointHistoryRepository;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
+import comatching.comatching3.users.auth.oauth2.provider.OAuth2ProviderUser;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.users.dto.request.BuyPickMeReq;
 import comatching.comatching3.users.dto.request.UserFeatureReq;
+import comatching.comatching3.users.dto.request.UserRegisterReq;
 import comatching.comatching3.users.dto.request.UserUpdateInfoReq;
 import comatching.comatching3.users.dto.response.CurrentPointRes;
 import comatching.comatching3.users.dto.response.HobbyRes;
@@ -67,9 +67,44 @@ public class UserService {
 	private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
 	private final RefreshTokenService refreshTokenService;
 	private final UniversityService universityService;
+	private final PasswordEncoder passwordEncoder;
 
 	public Long getParticipations() {
 		return usersRepository.count();
+	}
+
+
+	public void userRegister(UserRegisterReq form) {
+		if (usersRepository.existsByEmail(form.getAccountId())) {
+			throw new BusinessException(ResponseCode.ACCOUNT_ID_DUPLICATED);
+		}
+		Users user = register(form);
+		usersRepository.save(user);
+	}
+
+	private Users register(UserRegisterReq userInfo) {
+		String encryptedPassword = passwordEncoder.encode(userInfo.getPassword());
+
+		Users newUser = Users.builder()
+			.socialId(UUIDUtil.generateSocialId())
+			.provider("COMATCHING")
+			.email(userInfo.getAccountId())
+			.password(encryptedPassword)
+			.role(Role.SOCIAL.getRoleName())
+			.build();
+
+		byte[] uuid = UUIDUtil.createUUID();
+		UserAiFeature userAiFeature = UserAiFeature.builder()
+			.users(newUser)
+			.uuid(uuid)
+			.build();
+
+		newUser.updateUserAiFeature(userAiFeature);
+
+		usersRepository.save(newUser);
+		userAiFeatureRepository.save(userAiFeature);
+
+		return newUser;
 	}
 
 	/**
@@ -172,6 +207,7 @@ public class UserService {
 		user.updateUniversity(university);
 		user.updateContactId(form.getContactId());
 		user.updateUserAiFeature(userAiFeature);
+		user.updateUsername(form.getUsername());
 
 		usersRepository.save(user);
 	}

@@ -1,19 +1,22 @@
-package comatching.comatching3.admin.auth.filter;
+package comatching.comatching3.auth.filter;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import comatching.comatching3.admin.auth.CustomAdmin;
+import comatching.comatching3.auth.details.CustomAdmin;
 import comatching.comatching3.auth.service.CustomDetailsService;
 import comatching.comatching3.auth.filter.AbstractAuthenticationFilter;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
-import comatching.comatching3.users.auth.oauth2.provider.CustomUser;
+import comatching.comatching3.auth.details.CustomUser;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.users.service.BlackListService;
 import comatching.comatching3.util.CookieUtil;
@@ -49,6 +52,24 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 	}
 
 	@Override
+	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+		throws AuthenticationException {
+		try {
+			Map<String, String> creds = parseRequest(request);
+			String accountId = getUsernameKey(creds);
+			String password = getPasswordKey(creds);
+			String username = "ADMIN:" + accountId;
+
+			UsernamePasswordAuthenticationToken authToken =
+				new UsernamePasswordAuthenticationToken(username, password);
+
+			return authenticationManager.authenticate(authToken);
+		} catch (IOException e) {
+			throw new AuthenticationServiceException("로그인 정보를 읽을 수 없습니다.", e);
+		}
+	}
+
+	@Override
 	protected String getLoginUrl() {
 		return LOGIN_URL;
 	}
@@ -57,12 +78,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 		Authentication authResult) throws IOException,
 		ServletException {
-		// 인증 성공 시 JWT 토큰 생성 및 응답
-		Object principal = authResult.getPrincipal();
-		if (principal instanceof CustomUser) {
-			authenticationFailed(response);
-			return;
-		}
+
 		CustomAdmin customAdmin = (CustomAdmin)authResult.getPrincipal();
 
 		if (checkBlackListForAdmin(customAdmin, response)) {

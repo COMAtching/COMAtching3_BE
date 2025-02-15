@@ -1,18 +1,15 @@
 package comatching.comatching3.auth.service;
 
-import java.util.Optional;
-
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import comatching.comatching3.admin.auth.AdminDto;
-import comatching.comatching3.admin.auth.CustomAdmin;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.repository.AdminRepository;
-import comatching.comatching3.users.auth.oauth2.dto.UserDto;
-import comatching.comatching3.users.auth.oauth2.provider.CustomUser;
+import comatching.comatching3.auth.details.CustomAdmin;
+import comatching.comatching3.auth.details.CustomUser;
+import comatching.comatching3.auth.dto.LoginDto;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.UUIDUtil;
@@ -21,19 +18,19 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CustomDetailsService implements UserDetailsService {
+
 	private final AdminRepository adminRepository;
 	private final UsersRepository usersRepository;
 
 	@Override
 	public UserDetails loadUserByUsername(String accountId) throws UsernameNotFoundException {
 
-		Optional<Users> userOpt = usersRepository.findByAccountId(accountId);
+		if (accountId.startsWith("ADMIN:")) {
+			String realId = accountId.substring("ADMIN:".length());
+			Admin admin = adminRepository.findByAccountId(realId)
+				.orElseThrow(() -> new UsernameNotFoundException("관리자를 찾을 수 없습니다."));
 
-		if (userOpt.isEmpty()) {
-			Admin admin = adminRepository.findByAccountId(accountId)
-				.orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 유저입니다."));
-
-			AdminDto adminDto = AdminDto.builder()
+			LoginDto adminDto = LoginDto.builder()
 				.accountId(admin.getAccountId())
 				.password(admin.getPassword())
 				.role(admin.getAdminRole().getRoleName())
@@ -41,18 +38,22 @@ public class CustomDetailsService implements UserDetailsService {
 				.build();
 
 			return new CustomAdmin(adminDto);
+		} else if (accountId.startsWith("USER:")) {
+			String realId = accountId.substring("USER:".length());
+			Users user = usersRepository.findByEmail(realId)
+				.orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
 
-		} else {
-			Users user = userOpt.get();
-
-			UserDto userDto = UserDto.builder()
-				.uuid(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()))
+			LoginDto userDto = LoginDto.builder()
+				.accountId(user.getAccountId())
+				.password(user.getPassword())
 				.role(user.getRole())
+				.uuid(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()))
 				.build();
 
 			return new CustomUser(userDto);
+		} else {
+			throw new UsernameNotFoundException("유효하지 않은 로그인 요청입니다.");
 		}
-
 
 	}
 }

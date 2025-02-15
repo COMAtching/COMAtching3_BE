@@ -3,12 +3,9 @@ package comatching.comatching3.users.controller;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import comatching.comatching3.admin.dto.request.EmailVerifyReq;
-import comatching.comatching3.admin.dto.response.AfterVerifyEmailRes;
 import comatching.comatching3.admin.dto.response.EmailTokenRes;
 import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.users.auth.oauth2.provider.OAuth2Provider;
@@ -26,6 +22,7 @@ import comatching.comatching3.users.auth.oauth2.service.LogoutService;
 import comatching.comatching3.users.auth.oauth2.service.LogoutServiceFactory;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.users.dto.request.BuyPickMeReq;
+import comatching.comatching3.users.dto.request.UserRegisterReq;
 import comatching.comatching3.users.dto.request.UserUpdateInfoReq;
 import comatching.comatching3.users.dto.response.CurrentPointRes;
 import comatching.comatching3.users.dto.request.UserFeatureReq;
@@ -60,6 +57,15 @@ public class UserController {
 	public Response<Long> getParticipations() {
 		Long result = userService.getParticipations();
 		return Response.ok(result);
+	}
+
+	/**
+	 * 유저 회원가입
+	 */
+	@PostMapping("/user/register")
+	public Response<Void> userRegister(@RequestBody @Validated UserRegisterReq form) {
+		userService.userRegister(form);
+		return Response.ok();
 	}
 
 	/**

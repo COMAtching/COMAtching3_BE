@@ -69,7 +69,6 @@ public class Users extends BaseEntity {
 
 	private String username;
 
-	private String accountId;
 	private String password;
 
 	private String email;
@@ -99,12 +98,13 @@ public class Users extends BaseEntity {
 	private Boolean event1 = false;
 
 	@Builder
-	public Users(String provider, String socialId, String email, String role, String username) {
+	public Users(String provider, String socialId, String email, String role, String username, String password) {
 		this.provider = provider;
 		this.socialId = socialId;
 		this.email = email;
 		this.role = role;
 		this.username = username;
+		this.password = password;
 	}
 
 	public void addNewOrder(Orders order) {

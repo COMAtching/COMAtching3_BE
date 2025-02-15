@@ -22,9 +22,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import comatching.comatching3.admin.auth.filter.AdminAuthenticationFilter;
+import comatching.comatching3.auth.filter.AdminAuthenticationFilter;
 import comatching.comatching3.auth.service.CustomDetailsService;
-import comatching.comatching3.users.auth.filter.UserAuthenticationFilter;
+import comatching.comatching3.auth.filter.UserAuthenticationFilter;
 import comatching.comatching3.users.auth.jwt.JwtExceptionFilter;
 import comatching.comatching3.users.auth.jwt.JwtFilter;
 import comatching.comatching3.users.auth.jwt.JwtUtil;
@@ -32,7 +32,6 @@ import comatching.comatching3.users.auth.oauth2.handler.OAuth2FailureHandler;
 import comatching.comatching3.users.auth.oauth2.handler.OAuth2SuccessHandler;
 import comatching.comatching3.users.auth.oauth2.service.CustomOAuth2UserService;
 import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
-import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.users.service.BlackListService;
 import comatching.comatching3.util.CookieUtil;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +46,8 @@ public class SecurityConfig {
 	);
 	private static final List<String> WHITELIST = List.of(
 		"/login", "/admin/**", "/charge-monitor/**", "/app/**",
-		"/api/participations", "/auth/refresh", "/pay-success", "/", "/user/login"
+		"/api/participations", "/auth/refresh", "/pay-success", "/",
+		"/user/login", "/user/register"
 	);
 	private final JwtUtil jwtUtil;
 	private final RefreshTokenService refreshTokenService;
@@ -69,6 +69,14 @@ public class SecurityConfig {
 		AuthenticationConfiguration authenticationConfiguration) throws Exception {
 		AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
 
+		AdminAuthenticationFilter adminAuthFilter = new AdminAuthenticationFilter(authenticationManager,
+			customDetailsService, jwtUtil, cookieUtil, refreshTokenService, blackListService);
+		adminAuthFilter.setFilterProcessesUrl("/admin/login");
+
+		UserAuthenticationFilter userAuthFilter = new UserAuthenticationFilter(authenticationManager,
+			customDetailsService, jwtUtil, cookieUtil, refreshTokenService, blackListService);
+		userAuthFilter.setFilterProcessesUrl("/user/login");
+
 		http
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(WHITELIST.toArray(new String[0])).permitAll()
@@ -80,15 +88,6 @@ public class SecurityConfig {
 				.requestMatchers("/auth/allUser/**").hasAnyRole("SOCIAL", "USER")
 				.anyRequest().authenticated()
 			);
-
-		// 관리자 인증 필터 설정
-		AdminAuthenticationFilter adminAuthFilter = new AdminAuthenticationFilter(authenticationManager,
-			customDetailsService, jwtUtil, cookieUtil, refreshTokenService, blackListService);
-		adminAuthFilter.setFilterProcessesUrl("/admin/login");
-
-		UserAuthenticationFilter userAuthFilter = new UserAuthenticationFilter(authenticationManager,
-			customDetailsService, jwtUtil, cookieUtil, refreshTokenService, blackListService);
-		userAuthFilter.setFilterProcessesUrl("/user/login");
 
 		http
 			.cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()));

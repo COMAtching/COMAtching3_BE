@@ -35,25 +35,6 @@ public abstract class AbstractAuthenticationFilter extends UsernamePasswordAuthe
 
 	protected abstract String getLoginUrl();
 
-	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response)
-		throws AuthenticationException {
-		try {
-			Map<String, String> creds = parseRequest(request);
-			String username = getUsernameKey(creds);
-			String password = getPasswordKey(creds);
-
-			log.info("username={}, password={}", username, password);
-
-			UsernamePasswordAuthenticationToken authToken =
-				new UsernamePasswordAuthenticationToken(username, password);
-
-			return authenticationManager.authenticate(authToken);
-		} catch (IOException e) {
-			throw new AuthenticationServiceException("로그인 정보를 읽을 수 없습니다.", e);
-		}
-	}
-
 	protected String getUsernameKey(Map<String, String> creds) {
 		return creds.get("accountId");
 
