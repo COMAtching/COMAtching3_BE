@@ -14,7 +14,9 @@ import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.UUIDUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomDetailsService implements UserDetailsService {
@@ -43,8 +45,9 @@ public class CustomDetailsService implements UserDetailsService {
 			Users user = usersRepository.findByEmail(realId)
 				.orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
 
+			log.info("username={}", user.getUsername());
 			LoginDto userDto = LoginDto.builder()
-				.accountId(user.getAccountId())
+				.accountId(user.getEmail())
 				.password(user.getPassword())
 				.role(user.getRole())
 				.uuid(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()))

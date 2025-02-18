@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+	private static final ObjectMapper mapper = new ObjectMapper();
 	protected final AuthenticationManager authenticationManager;
 	protected final CustomDetailsService customDetailsService;
 
@@ -29,7 +30,6 @@ public abstract class AbstractAuthenticationFilter extends UsernamePasswordAuthe
 	}
 
 	protected Map<String, String> parseRequest(HttpServletRequest request) throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
 		return mapper.readValue(request.getInputStream(), Map.class);
 	}
 
