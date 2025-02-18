@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,7 +16,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -23,17 +23,12 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import comatching.comatching3.auth.filter.AdminAuthenticationFilter;
-import comatching.comatching3.auth.service.CustomDetailsService;
 import comatching.comatching3.auth.filter.UserAuthenticationFilter;
-import comatching.comatching3.users.auth.jwt.JwtExceptionFilter;
-import comatching.comatching3.users.auth.jwt.JwtFilter;
-import comatching.comatching3.users.auth.jwt.JwtUtil;
+import comatching.comatching3.auth.service.CustomDetailsService;
 import comatching.comatching3.users.auth.oauth2.handler.OAuth2FailureHandler;
 import comatching.comatching3.users.auth.oauth2.handler.OAuth2SuccessHandler;
 import comatching.comatching3.users.auth.oauth2.service.CustomOAuth2UserService;
-import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.users.service.BlackListService;
-import comatching.comatching3.util.CookieUtil;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -42,20 +37,19 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private static final List<String> CORS_WHITELIST = List.of(
-		"http://localhost:5173"
+		"http://localhost:5173",
+		"http://127.0.0.1:5500"
 	);
 	private static final List<String> WHITELIST = List.of(
 		"/login", "/admin/**", "/charge-monitor/**", "/app/**",
-		"/api/participations", "/auth/refresh", "/pay-success", "/",
+		"/api/participations", "/auth/refresh", "/pay-success",
 		"/user/login", "/user/register"
 	);
-	private final JwtUtil jwtUtil;
-	private final RefreshTokenService refreshTokenService;
+
 	private final CustomDetailsService customDetailsService;
 	private final CustomOAuth2UserService customOAuth2UserService;
 	private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	private final OAuth2FailureHandler oAuth2FailureHandler;
-	private final CookieUtil cookieUtil;
 	private final BlackListService blackListService;
 
 	@Bean
@@ -65,17 +59,37 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http,
-		AuthenticationConfiguration authenticationConfiguration) throws Exception {
-		AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
+	public DaoAuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+		provider.setUserDetailsService(customDetailsService);
+		provider.setPasswordEncoder(passwordEncoder());
+		return provider;
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws
+		Exception {
+		return authenticationConfiguration.getAuthenticationManager();
+	}
+
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws
+		Exception {
 
 		AdminAuthenticationFilter adminAuthFilter = new AdminAuthenticationFilter(authenticationManager,
-			customDetailsService, jwtUtil, cookieUtil, refreshTokenService, blackListService);
+			customDetailsService, blackListService);
 		adminAuthFilter.setFilterProcessesUrl("/admin/login");
 
 		UserAuthenticationFilter userAuthFilter = new UserAuthenticationFilter(authenticationManager,
-			customDetailsService, jwtUtil, cookieUtil, refreshTokenService, blackListService);
+			customDetailsService, blackListService);
 		userAuthFilter.setFilterProcessesUrl("/user/login");
+
+		http
+			.sessionManagement((session) -> session
+				.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+
+		http
+			.authenticationProvider(authenticationProvider());
 
 		http
 			.authorizeHttpRequests(auth -> auth
@@ -99,11 +113,7 @@ public class SecurityConfig {
 
 		http
 			.addFilterBefore(adminAuthFilter, UsernamePasswordAuthenticationFilter.class)
-			.addFilterBefore(userAuthFilter, UsernamePasswordAuthenticationFilter.class)
-			.addFilterAfter(new JwtFilter(jwtUtil),
-				OAuth2LoginAuthenticationFilter.class)
-			.addFilterBefore(new JwtExceptionFilter(), JwtFilter.class);
-
+			.addFilterBefore(userAuthFilter, UsernamePasswordAuthenticationFilter.class);
 		http
 			.oauth2Login(oauth2 -> oauth2
 				.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
@@ -112,9 +122,6 @@ public class SecurityConfig {
 				.failureHandler(oAuth2FailureHandler)
 			);
 
-		http
-			.sessionManagement((session) -> session
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		return http.build();
 	}
 
@@ -137,9 +144,4 @@ public class SecurityConfig {
 		return new BCryptPasswordEncoder();
 	}
 
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws
-		Exception {
-		return authenticationConfiguration.getAuthenticationManager();
-	}
 }

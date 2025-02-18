@@ -29,9 +29,6 @@ import java.io.IOException;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final BlackListService blackListService;
-    private final RefreshTokenService refreshTokenService;
-    private final TokenService tokenService;
-    private final CookieUtil cookieUtil;
 
     @Value("${redirect-url.frontend}")
      private String REDIRECT_URL;
@@ -51,15 +48,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             return;
         }
 
-        TokenRes tokenRes = tokenService.makeTokenRes(customUser.getUuid(), customUser.getRole());
-        response.addHeader("Set-Cookie", cookieUtil.setAccessResponseCookie(tokenRes.getAccessToken()).toString());
-        response.addHeader("Set-Cookie", cookieUtil.setRefreshResponseCookie(tokenRes.getRefreshToken()).toString());
-        refreshTokenService.saveRefreshTokenInRedis(customUser.getUuid(), tokenRes.getRefreshToken());
-
         response.sendRedirect(REDIRECT_URL);
     }
 
     private CustomUser getOAuth2UserPrincipal(Authentication authentication) {
+        log.info("Authentication_OAuth2={}", authentication);
         Object principal = authentication.getPrincipal();
 
         if (principal instanceof CustomUser) {
