@@ -16,18 +16,24 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 @Order(Integer.MIN_VALUE)
 public class CachingRequestFilter implements Filter {
 
+    /**
+     *
+     * POST 요청시에만 ContentCachingRequestWrapper에 request 저장
+     *
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 
-        // GET 요청이 아닌 경우에만 ContentCachingRequestWrapper 적용
         if (!"GET".equalsIgnoreCase(httpServletRequest.getMethod())) {
-            // ContentCachingRequestWrapper로 요청 래핑
+
             ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(httpServletRequest);
 
             filterChain.doFilter(wrappedRequest, response);
         }
-        // GET 요청인 경우 ContentCachingRequestWrapper 적용하지 않음
+
         else {
             filterChain.doFilter(request, response);
         }
