@@ -5,6 +5,8 @@ import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -39,10 +41,13 @@ public class PointHistory extends BaseEntity {
 //	@JoinColumn(name = "admin_id")
 //	private Admin approver;
 
+	@Enumerated(EnumType.STRING)
 	private PointHistoryType pointHistoryType;
 
 	// 사용/소비한 포인트 양
 	private Long changeAmount;
+
+	private String reason;
 
 	// 결과 픽미 횟수
 	private Integer pickMe;
@@ -51,10 +56,11 @@ public class PointHistory extends BaseEntity {
 	private Long totalPoint;
 
 	@Builder
-	public PointHistory(Users users, PointHistoryType pointHistoryType, Long changeAmount, Integer pickMe, Long totalPoint) {
+	public PointHistory(Users users, PointHistoryType pointHistoryType, Long changeAmount, String reason, Integer pickMe, Long totalPoint) {
 		this.users = users;
 		this.pointHistoryType = pointHistoryType;
 		this.changeAmount = changeAmount;
+		this.reason = reason;
 		this.pickMe = pickMe;
 		this.totalPoint = totalPoint;
 	}

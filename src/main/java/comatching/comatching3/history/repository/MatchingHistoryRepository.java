@@ -6,10 +6,12 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import comatching.comatching3.history.entity.MatchingHistory;
 import comatching.comatching3.users.entity.Users;
 
+@Repository
 public interface MatchingHistoryRepository extends JpaRepository<MatchingHistory, Long> {
 
     @Query("SELECT mh FROM MatchingHistory mh WHERE mh.applier.id = :applierId")

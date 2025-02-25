@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PayHistoryRes {
 	private String productName;
+	private Long amount;
 	private OrderStatus orderStatus;
 	private String requestAt;
 	private String approvedAt;

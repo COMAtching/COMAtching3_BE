@@ -1,25 +1,36 @@
 package comatching.comatching3.users.service;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import comatching.comatching3.admin.dto.response.TokenRes;
+import com.vane.badwordfiltering.BadWordFiltering;
+
+import comatching.comatching3.admin.dto.request.EmailVerifyReq;
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.admin.repository.UniversityRepository;
+import comatching.comatching3.admin.service.UniversityService;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.history.enums.PointHistoryType;
 import comatching.comatching3.history.repository.PointHistoryRepository;
-import comatching.comatching3.users.auth.jwt.JwtUtil;
-import comatching.comatching3.users.auth.oauth2.provider.kakao.KakaoLogoutService;
-import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
-import comatching.comatching3.users.dto.BuyPickMeReq;
-import comatching.comatching3.users.dto.CurrentPointRes;
-import comatching.comatching3.users.dto.HobbyRes;
-import comatching.comatching3.users.dto.UserFeatureReq;
-import comatching.comatching3.users.dto.UserInfoRes;
+import comatching.comatching3.users.dto.AnonymousUser;
+import comatching.comatching3.users.dto.request.BuyPickMeReq;
+import comatching.comatching3.users.dto.request.UserFeatureReq;
+import comatching.comatching3.users.dto.request.UserRegisterReq;
+import comatching.comatching3.users.dto.request.UserUpdateInfoReq;
+import comatching.comatching3.users.dto.response.CurrentPointRes;
+import comatching.comatching3.users.dto.response.HobbyRes;
+import comatching.comatching3.users.dto.response.UserInfoRes;
 import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
@@ -30,246 +41,477 @@ import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.HobbyRepository;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
+import comatching.comatching3.util.EmailUtil;
 import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
+import comatching.comatching3.util.validation.AdditionalBadWords;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UsersRepository usersRepository;
-    private final UserAiFeatureRepository userAiFeatureRepository;
-    private final HobbyRepository hobbyRepository;
-    private final UniversityRepository universityRepository;
-    private final SecurityUtil securityUtil;
-    private final JwtUtil jwtUtil;
-    private final RefreshTokenService refreshTokenService;
-    private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
-    private final PointHistoryRepository pointHistoryRepository;
-    private final KakaoLogoutService logoutService;
+	private final RedisTemplate<String, Object> redisTemplate;
+	private final UsersRepository usersRepository;
+	private final UserAiFeatureRepository userAiFeatureRepository;
+	private final HobbyRepository hobbyRepository;
+	private final UniversityRepository universityRepository;
+	private final PointHistoryRepository pointHistoryRepository;
+	private final SecurityUtil securityUtil;
+	private final EmailUtil emailUtil;
+	private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
+	private final UniversityService universityService;
+	private final PasswordEncoder passwordEncoder;
+	private final SessionRepository<?> sessionRepository;
 
-    public Long getParticipations() {
-        return usersRepository.count();
-    }
+	public Long getParticipations() {
+		return usersRepository.count();
+	}
 
+	public void userRegister(UserRegisterReq form) {
+		if (usersRepository.existsByEmail(form.getAccountId())) {
+			throw new BusinessException(ResponseCode.ACCOUNT_ID_DUPLICATED);
+		}
+		Users user = register(form);
+		usersRepository.save(user);
+	}
 
-    /**
-     * 소셜 유저 피처 정보 입력 후 유저로 역할 변경까지
-     * @param form social 유저의 Feature
-     */
-    @Transactional
-    public TokenRes inputUserInfo(UserFeatureReq form) {
-        Users user = securityUtil.getCurrentUsersEntity();
+	private Users register(UserRegisterReq userInfo) {
+		String encryptedPassword = passwordEncoder.encode(userInfo.getPassword());
 
-        University university = universityRepository.findByUniversityName(form.getUniversity())
-                .orElseThrow(() -> new BusinessException(ResponseCode.SCHOOL_NOT_EXIST));
+		Users newUser = Users.builder()
+			.socialId(UUIDUtil.generateSocialId())
+			.provider("COMATCHING")
+			.email(userInfo.getAccountId())
+			.password(encryptedPassword)
+			.role(Role.SOCIAL.getRoleName())
+			.build();
 
-        UserAiFeature userAiFeature = user.getUserAiFeature();
+		byte[] uuid = UUIDUtil.createUUID();
+		UserAiFeature userAiFeature = UserAiFeature.builder()
+			.users(newUser)
+			.uuid(uuid)
+			.build();
 
-        List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
-        List<Hobby> newHobbyList = form.getHobby().stream()
-            .map(hobby -> Hobby.builder()
-                .hobbyName(hobby)
-                .userAiFeature(userAiFeature)
-                .build())
-            .toList();
+		newUser.updateUserAiFeature(userAiFeature);
 
-        hobbyRepository.deleteAll(existingHobbies);
-        hobbyRepository.saveAll(newHobbyList);
+		usersRepository.save(newUser);
+		userAiFeatureRepository.save(userAiFeature);
 
-        userAiFeature.updateMajor(form.getMajor());
-        userAiFeature.updateGender(Gender.fromAiValue(form.getGender()));
-        userAiFeature.updateAge(form.getAge());
-        userAiFeature.updateMbti(form.getMbti());
-        userAiFeature.updateHobby(newHobbyList);
-        userAiFeature.updateContactFrequency(ContactFrequency.fromAiValue(form.getContactFrequency()));
-        userAiFeature.updateAdmissionYear(form.getAdmissionYear());
+		return newUser;
+	}
 
-        userAiFeatureRepository.save(userAiFeature);
+	/**
+	 * 소셜 유저 피처 정보 입력 후 유저로 역할 변경까지
+	 * @param form social 유저의 Feature
+	 */
+	@Transactional
+	public void inputUserInfo(UserFeatureReq form, HttpServletRequest request) {
+		// 1) 사용자 정보 조회
+		Users user = securityUtil.getCurrentUsersEntity();
+		UserAiFeature userAiFeature = user.getUserAiFeature();
 
-        user.updateSong(form.getSong());
-        user.updateComment(form.getComment());
-        user.updateRole(Role.USER.getRoleName());
-        user.updateUniversity(university);
-        user.updateContactId(form.getContactId());
-        user.updateUserAiFeature(userAiFeature);
+		// 2) 대학 정보 조회
+		University university = getUniversityByName(form.getUniversity());
 
-        usersRepository.save(user);
+		// 3) 닉네임 필터 체크
+		checkNicknameFilter(form.getUsername());
 
-        //역할 업데이트된 jwt 토큰 발행 및 토큰 교체
-        String uuid = UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid());
-        String accessToken = jwtUtil.generateAccessToken(uuid, Role.USER.getRoleName());
-        String refreshToken = refreshTokenService.getRefreshToken(uuid);
+		// 4) 취미 부분 처리
+		handleUserHobbies(userAiFeature, form.getHobby());
 
+		// 5) UserAiFeature 업데이트
+		updateUserAiFeature(userAiFeature, form);
 
-        // todo: rabbitMQ 연결 후 해제
-        // Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
-        // if(!isSuccess){
-        //     throw new BusinessException(ResponseCode.INPUT_FEATURE_FAIL);
-        // }
+		// 6) Users 엔티티 업데이트
+		updateUsersEntity(user, form, university, userAiFeature, request);
 
-        return TokenRes.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
+		// todo: rabbitMQ 연결 후 주석 해제
+		// Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+		// if(!isSuccess){
+		//     throw new BusinessException(ResponseCode.INPUT_FEATURE_FAIL);
+		// }
 
-    /**
-     * 메인 페이지 유저 정보 조회
-     * @return 유저 정보 조회
-     */
-    @Transactional
-    public UserInfoRes getUserInfo() {
+	}
 
-        Users user = securityUtil.getCurrentUsersEntity();
-//        log.info(user.getUsername());
+	/**
+	 * 2) 대학 정보 조회
+	 */
+	private University getUniversityByName(String universityName) {
+		return universityRepository.findByUniversityName(universityName)
+			.orElseThrow(() -> new BusinessException(ResponseCode.SCHOOL_NOT_EXIST));
+	}
 
-        // Boolean canRequest = !chargeRequestRepository.existsByUsers(user);
+	/**
+	 * 3) 닉네임 필터 체크
+	 */
+	private void checkNicknameFilter(String nickname) {
+		BadWordFiltering badWordFiltering = new BadWordFiltering();
+		badWordFiltering.addAll(List.of(AdditionalBadWords.koreaWord2));
 
-        if(user.getPickMe() <= 0){
-            if(user.getPickMe() < 0) {
-                user.updatePickMe(0);
-                userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.DELETE);
-            }
-        }
+		if (badWordFiltering.check(nickname)) {
+			throw new BusinessException(ResponseCode.INVALID_USERNAME);
+		}
+	}
 
-        List<HobbyRes> hobbyResList = hobbyRepository.findAllByUserAiFeature(user.getUserAiFeature()).stream().map(
-            hobby -> HobbyRes.builder()
-                .hobbyName(hobby.getHobbyName())
-                .build()
-        ).toList();
+	/**
+	 * 4) Hobby 관련 로직 (삭제 후 새로 추가)
+	 */
+	private void handleUserHobbies(UserAiFeature userAiFeature, List<String> hobbyNames) {
+		List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 
-        return UserInfoRes.builder()
-                .username(user.getUsername())
-                .major(user.getUserAiFeature().getMajor())
-                .age(user.getUserAiFeature().getAge())
-                .song(user.getSong())
-                .mbti(user.getUserAiFeature().getMbti())
-                .contactId(user.getContactId())
-                .point(user.getPoint())
-                .pickMe(user.getPickMe())
-                // .canRequestCharge(canRequest)
-                .participations(getParticipations())
-                .admissionYear(user.getUserAiFeature().getAdmissionYear())
-                .comment(user.getComment())
-                .contactFrequency(user.getUserAiFeature().getContactFrequency())
-                .hobbies(hobbyResList)
-                .gender(user.getUserAiFeature().getGender())
-                .event1(user.getEvent1())
-                .build();
-    }
+		hobbyRepository.deleteAll(existingHobbies);
 
-    @Transactional
-    public void updateContactId(String contactId) {
-        Users user = securityUtil.getCurrentUsersEntity();
-        user.updateContactId(contactId);
-    }
+		List<Hobby> newHobbyList = hobbyNames.stream()
+			.map(hobbyName -> Hobby.builder()
+				.hobbyName(hobbyName)
+				.userAiFeature(userAiFeature)
+				.build())
+			.toList();
+		hobbyRepository.saveAll(newHobbyList);
 
+		userAiFeature.addHobby(newHobbyList);
+	}
 
-    /**
-     * 유저 포인트 조회
-     * @return 유저 포인트
-     */
-    public Long getPoints() {
-        Users user = securityUtil.getCurrentUsersEntity();
-        return user.getPoint();
-    }
+	/**
+	 * 5) UserAiFeature 업데이트
+	 */
+	private void updateUserAiFeature(UserAiFeature userAiFeature, UserFeatureReq form) {
+		log.info("gender={}, mbti={}, contactFrequency={}", form.getGender(), form.getMbti(), form.getContactFrequency());
+		int age = LocalDate.now().getYear() - Integer.parseInt(form.getYear()) + 1;
+		userAiFeature.updateMajor(form.getMajor());
+		userAiFeature.updateGender(Gender.fromAiValue(form.getGender()));
+		userAiFeature.updateAge(age);
+		userAiFeature.updateMbti(form.getMbti());
+		userAiFeature.updateContactFrequency(ContactFrequency.fromAiValue(form.getContactFrequency()));
 
-    /**
-     * 뽑힐 기회 구매
-     * @param req
-     */
-    @Transactional
-    public void buyPickMe(BuyPickMeReq req) {
+		userAiFeatureRepository.save(userAiFeature);
+	}
 
-        if (req == null || req.getAmount() == null) {
-            throw new BusinessException(ResponseCode.BAD_REQUEST_PICKME);
-        }
+	/**
+	 * 6) Users 엔티티 업데이트
+	 */
+	private void updateUsersEntity(Users user, UserFeatureReq form, University university,
+		UserAiFeature userAiFeature, HttpServletRequest request) {
+		user.updateSong(form.getSong());
+		user.updateComment(form.getComment());
+		user.updateRole(Role.USER.getRoleName());
+		user.updateUniversity(university);
+		user.updateContactId(form.getContactId());
+		user.updateUserAiFeature(userAiFeature);
+		user.updateUsername(form.getUsername());
+		user.updateBirthday(form.getYear() + "-" + form.getMonth() + "-" + form.getDay());
 
-        Users user = securityUtil.getCurrentUsersEntity();
-        Long price = 500L;
-        Long userPoint = user.getPoint();
-        Long reqPoint = (req.getAmount() / 3) * (price * 2) + (req.getAmount() % 3) * price;
+		usersRepository.save(user);
 
-        if (reqPoint > userPoint) {
-            throw new BusinessException(ResponseCode.NOT_ENOUGH_POINT);
-        }
+		securityUtil.setNewUserSecurityContext(user, request);
+	}
 
-        if (user.getPickMe() == 0){
-            Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+	/**
+	 * 7) 토큰 발행 로직
+	 */
+/*	private TokenRes generateTokens(Users user) {
+		String uuid = UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid());
+		String accessToken = jwtUtil.generateAccessToken(uuid, Role.USER.getRoleName());
+		String refreshToken = refreshTokenService.getRefreshToken(uuid);
 
-            if(isSuccess){
-                throw new BusinessException(ResponseCode.ADD_PICKME_FAIL);
-            }
-        }
+		return TokenRes.builder()
+			.accessToken(accessToken)
+			.refreshToken(refreshToken)
+			.build();
+	}*/
 
-        PointHistory pointHistory = PointHistory.builder()
-                .users(user)
-                .pointHistoryType(PointHistoryType.BUY_PICK_ME)
-                .changeAmount(reqPoint)
-                .build();
+	/**
+	 * 연락처 중복확인(카톡, 인스타 id)
+	 */
+	public boolean isContactIdDuplicated(String contactId) {
+		return usersRepository.existsByContactId(contactId);
+	}
 
-        user.subtractPoint(reqPoint);
-        user.addPickMe(req.getAmount());
+	/**
+	 * 연락처 업데이트
+	 */
+	@Transactional
+	public void updateContactId(String contactId) {
+		Users user = securityUtil.getCurrentUsersEntity();
+		user.updateContactId(contactId);
+	}
 
-        pointHistory.setTotalPoint(user.getPoint());
-        pointHistory.setPickMe(user.getPickMe());
+	/**
+	 * 유저 정보 업데이트
+	 * todo: Hobby 삭제 후 추가
+	 */
+	@Transactional
+	public void updateUserInfo(UserUpdateInfoReq form) {
+		Users user = securityUtil.getCurrentUsersEntity();
+		UserAiFeature userAiFeature = user.getUserAiFeature();
 
-        user.getPointHistoryList().add(pointHistory);
+		University university = universityRepository.findByUniversityName(form.getSchool())
+			.orElseThrow(() -> new BusinessException(ResponseCode.SCHOOL_NOT_EXIST));
 
-        pointHistoryRepository.save(pointHistory);
-    }
+		user.updateUsername(form.getNickname());
+		user.updateSong(form.getFavoriteSong());
+		user.updateComment(form.getIntroduction());
+		user.updateContactId(form.getContact());
+		user.updateUniversity(university);
+		userAiFeature.updateAge(form.getAge());
+		userAiFeature.updateMajor(form.getDepartment());
+		userAiFeature.updateMbti(form.getSelectMBTIEdit());
+	}
 
-    public CurrentPointRes inquiryCurrentPoint(){
-        Users users = securityUtil.getCurrentUsersEntity();
-        return new CurrentPointRes(users.getPoint());
-    }
+	/**
+	 * 유저 학교 인증
+	 */
+	@Transactional
+	public String userSchoolAuth(String schoolEmail) {
 
+		boolean isDuplicated = usersRepository.existsBySchoolEmail(schoolEmail);
+		if (isDuplicated) {
+			throw new BusinessException(ResponseCode.ARGUMENT_NOT_VALID);
+		}
 
-    @Transactional
-    public void requestEventPickMe(){
-        Users users = securityUtil.getCurrentUsersEntity();
-        if (users.getEvent1()) {
-            throw new BusinessException(ResponseCode.ALREADY_PARTICIPATED);
-        }
+		Users user = securityUtil.getCurrentUsersEntity();
 
-        if(users.getPickMe() <= 0){
-            userCrudRabbitMQUtil.sendUserChange(users.getUserAiFeature(), UserCrudType.CREATE);
-            users.updatePickMe(0);
-        }
-        else{
-            users.updatePickMe(users.getPickMe() + 3);
-        }
-        users.updateEvent1(true);
+		boolean checkEmailDomain = universityService.checkEmailDomain(schoolEmail,
+			user.getUniversity().getUniversityName());
+		if (!checkEmailDomain) {
+			throw new BusinessException(ResponseCode.ARGUMENT_NOT_VALID);
+		}
+		user.updateSchoolEmail(schoolEmail);
+		return sendVerifyEmail(schoolEmail);
+	}
 
-    }
+	/**
+	 * 인증용 이메일 전송
+	 */
+	private String sendVerifyEmail(String email) {
+		String verificationCode = String.valueOf(new Random().nextInt(900000) + 100000);
+		String token = UUID.randomUUID().toString();
+		String redisKey = "email-verification:" + token;
 
-    @Transactional
-    public void notRequestEventPickMe(){
-        Users users = securityUtil.getCurrentUsersEntity();
-        users.updateEvent1(true);
-    }
+		redisTemplate.opsForValue().set(redisKey, verificationCode, 3, TimeUnit.MINUTES);
+		emailUtil.sendEmail(email, "COMAtching 사용자 학교 인증 메일", "Your verification code is " + verificationCode);
+		return token;
+	}
 
-    @Transactional
-    public void stopPickMe() {
-        Users user = securityUtil.getCurrentUsersEntity();
-        user.updateDeactivated(true);
-        userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.DELETE);
-    }
+	/**
+	 * 이메일 인증번호 검사
+	 */
+	@Transactional
+	public boolean verifyCode(EmailVerifyReq request) {
+		String redisKey = "email-verification:" + request.getToken();
+		String storedCode = (String)redisTemplate.opsForValue().get(redisKey);
 
-    @Transactional
-    public void restartPickMe() {
-        Users user = securityUtil.getCurrentUsersEntity();
-        user.updateDeactivated(false);
+		if (storedCode != null && storedCode.equals(request.getCode())) {
+			Users user = securityUtil.getCurrentUsersEntity();
+			user.schoolAuthenticationSuccess();
 
-        if (user.getPickMe() > 0) {
-            userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
-        }
-    }
+			redisTemplate.delete(redisKey);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 메인 페이지 유저 정보 조회
+	 */
+	@Transactional
+	public UserInfoRes getUserInfo() {
+
+		Users user = securityUtil.getCurrentUsersEntity();
+		//        log.info(user.getUsername());
+
+		// Boolean canRequest = !chargeRequestRepository.existsByUsers(user);
+
+		if (user.getPickMe() <= 0) {
+			if (user.getPickMe() < 0) {
+				user.updatePickMe(0);
+				userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.DELETE);
+			}
+		}
+
+		List<HobbyRes> hobbyResList = hobbyRepository.findAllByUserAiFeature(user.getUserAiFeature()).stream().map(
+			hobby -> HobbyRes.builder()
+				.hobbyName(hobby.getHobbyName())
+				.build()
+		).toList();
+
+		return UserInfoRes.builder()
+			.username(user.getUsername())
+			.major(user.getUserAiFeature().getMajor())
+			.age(user.getUserAiFeature().getAge())
+			.song(user.getSong())
+			.mbti(user.getUserAiFeature().getMbti())
+			.contactId(user.getContactId())
+			.point(user.getPoint())
+			.pickMe(user.getPickMe())
+			.participations(getParticipations())
+			.admissionYear(user.getUserAiFeature().getAdmissionYear())
+			.comment(user.getComment())
+			.contactFrequency(user.getUserAiFeature().getContactFrequency())
+			.hobbies(hobbyResList)
+			.gender(user.getUserAiFeature().getGender())
+			.event1(user.getEvent1())
+			.schoolAuth(user.isSchoolAuth())
+			.schoolEmail(user.getSchoolEmail())
+			.build();
+	}
+
+	/**
+	 * 유저 포인트 조회
+	 *
+	 * @return 유저 포인트
+	 */
+	public Long getPoints() {
+		Users user = securityUtil.getCurrentUsersEntity();
+		System.out.println(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()));
+		return user.getPoint();
+	}
+
+	/**
+	 * todo: remove pickMe
+	 * 뽑힐 기회 구매
+	 *
+	 * @param req
+	 */
+	@Transactional
+	public void buyPickMe(BuyPickMeReq req) {
+
+		if (req == null || req.getAmount() == null) {
+			throw new BusinessException(ResponseCode.BAD_REQUEST_PICKME);
+		}
+
+		Users user = securityUtil.getCurrentUsersEntity();
+		Long price = 500L;
+		Long userPoint = user.getPoint();
+		Long reqPoint = (req.getAmount() / 3) * (price * 2) + (req.getAmount() % 3) * price;
+
+		if (reqPoint > userPoint) {
+			throw new BusinessException(ResponseCode.NOT_ENOUGH_POINT);
+		}
+
+		if (user.getPickMe() == 0) {
+			Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+
+			if (isSuccess) {
+				throw new BusinessException(ResponseCode.ADD_PICKME_FAIL);
+			}
+		}
+
+		PointHistory pointHistory = PointHistory.builder()
+			.users(user)
+			.pointHistoryType(PointHistoryType.BUY_PICK_ME)
+			.changeAmount(reqPoint)
+			.build();
+
+		user.subtractPoint(reqPoint);
+		user.addPickMe(req.getAmount());
+
+		pointHistory.setTotalPoint(user.getPoint());
+		pointHistory.setPickMe(user.getPickMe());
+
+		user.getPointHistoryList().add(pointHistory);
+
+		pointHistoryRepository.save(pointHistory);
+	}
+
+	public CurrentPointRes inquiryCurrentPoint() {
+		Users users = securityUtil.getCurrentUsersEntity();
+		return new CurrentPointRes(users.getPoint());
+	}
+
+	//todo: remove pickMe
+	@Transactional
+	public void requestEventPickMe() {
+		Users users = securityUtil.getCurrentUsersEntity();
+		if (users.getEvent1()) {
+			throw new BusinessException(ResponseCode.ALREADY_PARTICIPATED);
+		}
+
+		if (users.getPickMe() <= 0) {
+			userCrudRabbitMQUtil.sendUserChange(users.getUserAiFeature(), UserCrudType.CREATE);
+			users.updatePickMe(0);
+		} else {
+			users.updatePickMe(users.getPickMe() + 3);
+		}
+		users.updateEvent1(true);
+
+	}
+
+	//todo: remove pickMe
+	@Transactional
+	public void notRequestEventPickMe() {
+		Users users = securityUtil.getCurrentUsersEntity();
+		users.updateEvent1(true);
+	}
+
+	//todo: remove pickMe
+	// 그만 뽑히기 기능은 유지해도 좋을 듯? pickMe 횟수 없이 csv에서 지우면 되지 않을까
+	@Transactional
+	public void stopPickMe() {
+		Users user = securityUtil.getCurrentUsersEntity();
+		userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.DELETE);
+	}
+
+	//todo: remove pickMe
+	@Transactional
+	public void restartPickMe() {
+		Users user = securityUtil.getCurrentUsersEntity();
+
+		if (user.getPickMe() > 0) {
+			userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+		}
+	}
+
+	/**
+	 * 회원 탈퇴 요청
+	 * 익명 사용자로 정보 변경
+	 */
+	@Transactional
+	public void removeUser(HttpServletRequest request, HttpServletResponse response) {
+		Users user = securityUtil.getCurrentUsersEntity();
+
+		AnonymousUser anonymousUser = new AnonymousUser();
+
+		user.updateUsername(anonymousUser.getUsername());
+		user.updatePassword(anonymousUser.getPassword());
+		user.updateEmail(anonymousUser.getEmail());
+		user.updateRole(anonymousUser.getRole());
+		user.updateSchoolEmail(anonymousUser.getSchoolEmail());
+		user.updateContactId(anonymousUser.getContactId());
+		user.subtractPoint(user.getPoint());
+		user.subtractPayedPoint(user.getPayedPoint());
+
+		HttpSession session = request.getSession(false);
+
+		if (session != null) {
+			String sessionId = session.getId();
+			sessionRepository.deleteById(sessionId);
+			session.invalidate();
+
+			Cookie cookie = new Cookie("SESSION", null);
+			cookie.setPath("/");
+			cookie.setHttpOnly(true);
+			cookie.setMaxAge(0);
+			response.addCookie(cookie);
+
+			try {
+				response.sendRedirect("http://localhost:5173/admin/login");
+			} catch (IOException e) {
+				throw new BusinessException(ResponseCode.INTERNAL_SERVER_ERROR);
+			}
+
+		} else {
+			throw new BusinessException(ResponseCode.BAD_REQUEST);
+		}
+	}
+
 }

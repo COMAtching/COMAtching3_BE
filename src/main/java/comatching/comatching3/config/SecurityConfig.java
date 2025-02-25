@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,24 +16,20 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import comatching.comatching3.admin.auth.filter.AdminAuthenticationFilter;
-import comatching.comatching3.admin.auth.service.AdminUserDetailsService;
-import comatching.comatching3.users.auth.jwt.JwtExceptionFilter;
-import comatching.comatching3.users.auth.jwt.JwtFilter;
-import comatching.comatching3.users.auth.jwt.JwtUtil;
-import comatching.comatching3.users.auth.oauth2.handler.OAuth2FailureHandler;
-import comatching.comatching3.users.auth.oauth2.handler.OAuth2SuccessHandler;
-import comatching.comatching3.users.auth.oauth2.service.CustomOAuth2UserService;
-import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
-import comatching.comatching3.util.CookieUtil;
-import jakarta.servlet.http.HttpServletResponse;
+import comatching.comatching3.auth.filter.AdminAuthenticationFilter;
+import comatching.comatching3.auth.filter.RequestLoggingFilter;
+import comatching.comatching3.auth.filter.UserAuthenticationFilter;
+import comatching.comatching3.auth.service.CustomDetailsService;
+import comatching.comatching3.auth.oauth2.handler.OAuth2FailureHandler;
+import comatching.comatching3.auth.oauth2.handler.OAuth2SuccessHandler;
+import comatching.comatching3.auth.oauth2.service.CustomOAuth2UserService;
+import comatching.comatching3.users.service.BlackListService;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -41,19 +38,20 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private static final List<String> CORS_WHITELIST = List.of(
-		"*"
+		"http://localhost:5173",
+		"http://127.0.0.1:5500"
 	);
 	private static final List<String> WHITELIST = List.of(
-		"/login", "/admin/**", "/charge-monitor/**", "/app/**", "/login-success",
-		"/api/participations", "/auth/refresh", "/main-page", "/pay-success"
+		"/login", "/admin/**", "/charge-monitor/**", "/app/**",
+		"/api/participations", "/auth/refresh", "/pay-success",
+		"/user/login", "/user/register", "/api/auth/oauth/**"
 	);
-	private final JwtUtil jwtUtil;
-	private final RefreshTokenService refreshTokenService;
-	private final AdminUserDetailsService adminUserDetailsService;
+
+	private final CustomDetailsService customDetailsService;
 	private final CustomOAuth2UserService customOAuth2UserService;
 	private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	private final OAuth2FailureHandler oAuth2FailureHandler;
-	private final CookieUtil cookieUtil;
+	private final BlackListService blackListService;
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
@@ -62,9 +60,38 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http,
-		AuthenticationConfiguration authenticationConfiguration) throws Exception {
-		AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
+	public DaoAuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+		provider.setUserDetailsService(customDetailsService);
+		provider.setPasswordEncoder(passwordEncoder());
+		return provider;
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws
+		Exception {
+		return authenticationConfiguration.getAuthenticationManager();
+	}
+
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws
+		Exception {
+
+		AdminAuthenticationFilter adminAuthFilter = new AdminAuthenticationFilter(authenticationManager,
+			customDetailsService, blackListService);
+		adminAuthFilter.setFilterProcessesUrl("/admin/login");
+
+		UserAuthenticationFilter userAuthFilter = new UserAuthenticationFilter(authenticationManager,
+			customDetailsService, blackListService);
+		userAuthFilter.setFilterProcessesUrl("/user/login");
+
+		http
+			.sessionManagement((session) -> session
+				.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+
+		http
+			.authenticationProvider(authenticationProvider());
+
 
 		http
 			.authorizeHttpRequests(auth -> auth
@@ -74,30 +101,22 @@ public class SecurityConfig {
 				.requestMatchers("/auth/semi/**").hasAnyRole("SEMI_OPERATOR", "SEMI_ADMIN")
 				.requestMatchers("/auth/social/**").hasRole("SOCIAL")
 				.requestMatchers("/auth/user/**", "/payments/**").hasRole("USER")
+				.requestMatchers("/auth/allUser/**").hasAnyRole("SOCIAL", "USER")
 				.anyRequest().authenticated()
 			);
-
-		// 관리자 인증 필터 설정
-		AdminAuthenticationFilter adminAuthFilter = new AdminAuthenticationFilter(authenticationManager,
-			adminUserDetailsService, jwtUtil,
-			cookieUtil, refreshTokenService);
-		adminAuthFilter.setFilterProcessesUrl("/admin/login"); // 관리자 로그인 URL 설정
 
 		http
 			.cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()));
 
 		http
 			.csrf(AbstractHttpConfigurer::disable)
-			//todo: 로그인 페이지 등록 필요
 			.formLogin(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable);
 
 		http
+			.addFilterBefore(new RequestLoggingFilter(), UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(adminAuthFilter, UsernamePasswordAuthenticationFilter.class)
-			.addFilterAfter(new JwtFilter(jwtUtil, refreshTokenService, cookieUtil),
-				OAuth2LoginAuthenticationFilter.class)
-			.addFilterBefore(new JwtExceptionFilter(), JwtFilter.class);
-
+			.addFilterBefore(userAuthFilter, UsernamePasswordAuthenticationFilter.class);
 		http
 			.oauth2Login(oauth2 -> oauth2
 				.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
@@ -107,14 +126,19 @@ public class SecurityConfig {
 			);
 
 		http
-			.sessionManagement((session) -> session
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+			.logout(logout -> logout
+				.logoutUrl("/logout")
+				.logoutSuccessUrl("/login") // 로그아웃 후 리다이렉트 URL 설정
+				.deleteCookies("SESSION")   // 쿠키 삭제 (쿠키 이름이 "SESSION"인 경우)
+				.invalidateHttpSession(true)
+			);
+
 		return http.build();
 	}
 
 	private CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(CORS_WHITELIST);
+		configuration.setAllowedOriginPatterns(CORS_WHITELIST);
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 		configuration.setAllowCredentials(true);
 		configuration.setAllowedHeaders(Collections.singletonList("*"));
@@ -131,9 +155,4 @@ public class SecurityConfig {
 		return new BCryptPasswordEncoder();
 	}
 
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws
-		Exception {
-		return authenticationConfiguration.getAuthenticationManager();
-	}
 }

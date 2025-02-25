@@ -37,17 +37,10 @@ public class University extends BaseEntity {
 
 	private String s3Key;
 
-	private String appName;
-
 	@Builder
-	public University(String universityName, String mailDomain, String s3Key, String appName) {
+	public University(String universityName, String mailDomain, String s3Key) {
 		this.universityName = universityName;
 		this.mailDomain = mailDomain;
 		this.s3Key = s3Key;
-		this.appName = appName;
-	}
-
-	public void updateAppName(String appName) {
-		this.appName = appName;
 	}
 }

@@ -123,7 +123,7 @@ public class MatchTest {
 		Users enemy = em.find(Users.class, this.enemy.getId());
 		Users applier = em.find(Users.class, this.applier.getId());
 
-		Integer originalPoint = applier.getPoint();
+		Long originalPoint = applier.getPoint();
 		Integer originalPickMe = applier.getPickMe();
 
 		//when(matchRabbitMQUtil.match(any(MatchReq.class), anyString())).thenReturn(matchResponseMsg);
