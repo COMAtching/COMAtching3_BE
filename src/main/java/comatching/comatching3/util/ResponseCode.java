@@ -55,7 +55,10 @@ public enum ResponseCode {
 
 	//Idempotent exception response
 	UNPROCESSABLE_ENTITY(422, "IDP-001", HttpStatus.UNPROCESSABLE_ENTITY, "Unprocessable Entity"),
-	CONFLICT(409, "IDP-002", HttpStatus.CONFLICT, "Conflict");
+	CONFLICT(409, "IDP-002", HttpStatus.CONFLICT, "Conflict"),
+
+	//Event
+	EVENT_PERIOD_DUPLICATE(400, "EVT-001", HttpStatus.BAD_REQUEST, "Event period is duplicated!");
 
 
 	private final Integer status;
