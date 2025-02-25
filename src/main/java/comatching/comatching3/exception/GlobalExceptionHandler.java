@@ -1,9 +1,12 @@
 package comatching.comatching3.exception;
 
+import comatching.comatching3.util.Idempotent.Exception.IdempotentException;
 import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,5 +49,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TossPaymentException.class)
     public Response<TossPaymentExceptionDto> handleTossPaymentException(TossPaymentException ex) {
         return new Response<>(ex.getTossPaymentExceptionDto());
+    }
+
+    @ExceptionHandler({IdempotentException.class})
+    public Response<ResponseCode> handelIdempotentException(IdempotentException ex){
+        return new Response<>(ex.getResponseCode());
     }
 }

@@ -2,11 +2,11 @@ package comatching.comatching3.history.entity;
 
 import java.util.List;
 
-import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
+import comatching.comatching3.matching.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.HobbyEnum;
-import comatching.comatching3.match.enums.AgeOption;
-import comatching.comatching3.match.enums.ContactFrequencyOption;
+import comatching.comatching3.matching.enums.AgeOption;
+import comatching.comatching3.matching.enums.ContactFrequencyOption;
 import comatching.comatching3.util.BaseEntity;
 import comatching.comatching3.util.HobbyListConverter;
 import jakarta.persistence.Column;
