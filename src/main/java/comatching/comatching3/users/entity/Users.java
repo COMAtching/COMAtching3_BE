@@ -73,6 +73,8 @@ public class Users extends BaseEntity {
 
 	private String email;
 
+	private String birthday;
+
 	private String role;
 
 	private Integer pickMe = 1;
@@ -90,8 +92,6 @@ public class Users extends BaseEntity {
 	private boolean schoolAuth = false;
 
 	private String contactId;
-
-	private Boolean isDeactivated = false;
 
 	private int warningCount = 0;
 
@@ -117,10 +117,6 @@ public class Users extends BaseEntity {
 
 	public void updateUniversity(University university) {
 		this.university = university;
-	}
-
-	public void updateEmail(String email) {
-		this.email = email;
 	}
 
 	public void updateRole(String role) {
@@ -167,10 +163,6 @@ public class Users extends BaseEntity {
 		this.event1 = event1;
 	}
 
-	public void updateDeactivated(Boolean deactivated) {
-		isDeactivated = deactivated;
-	}
-
 	public void addPayedPoint(Long payedPoint) {
 		this.payedPoint += payedPoint;
 	}
@@ -187,7 +179,19 @@ public class Users extends BaseEntity {
 		this.schoolAuth = true;
 	}
 
-	public void setSchoolEmail(String schoolMail) {
+	public void updateSchoolEmail(String schoolMail) {
 		this.schoolEmail = schoolMail;
+	}
+
+	public void updateEmail(String email) {
+		this.email = email;
+	}
+
+	public void updatePassword(String password) {
+		this.password = password;
+	}
+
+	public void updateBirthday(String birthday) {
+		this.birthday = birthday;
 	}
 }

@@ -1,4 +1,4 @@
-package comatching.comatching3.users.auth.oauth2.service;
+package comatching.comatching3.auth.oauth2.service;
 
 import comatching.comatching3.users.entity.Users;
 

@@ -1,5 +1,7 @@
 package comatching.comatching3.users.service;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -7,13 +9,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vane.badwordfiltering.BadWordFiltering;
 
 import comatching.comatching3.admin.dto.request.EmailVerifyReq;
-import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.admin.repository.UniversityRepository;
 import comatching.comatching3.admin.service.UniversityService;
@@ -21,9 +23,7 @@ import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.history.enums.PointHistoryType;
 import comatching.comatching3.history.repository.PointHistoryRepository;
-import comatching.comatching3.users.auth.jwt.JwtUtil;
-import comatching.comatching3.users.auth.oauth2.provider.OAuth2ProviderUser;
-import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
+import comatching.comatching3.users.dto.AnonymousUser;
 import comatching.comatching3.users.dto.request.BuyPickMeReq;
 import comatching.comatching3.users.dto.request.UserFeatureReq;
 import comatching.comatching3.users.dto.request.UserRegisterReq;
@@ -47,6 +47,10 @@ import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
 import comatching.comatching3.util.validation.AdditionalBadWords;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,17 +66,15 @@ public class UserService {
 	private final UniversityRepository universityRepository;
 	private final PointHistoryRepository pointHistoryRepository;
 	private final SecurityUtil securityUtil;
-	private final JwtUtil jwtUtil;
 	private final EmailUtil emailUtil;
 	private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
-	private final RefreshTokenService refreshTokenService;
 	private final UniversityService universityService;
 	private final PasswordEncoder passwordEncoder;
+	private final SessionRepository<?> sessionRepository;
 
 	public Long getParticipations() {
 		return usersRepository.count();
 	}
-
 
 	public void userRegister(UserRegisterReq form) {
 		if (usersRepository.existsByEmail(form.getAccountId())) {
@@ -112,7 +114,7 @@ public class UserService {
 	 * @param form social 유저의 Feature
 	 */
 	@Transactional
-	public TokenRes inputUserInfo(UserFeatureReq form) {
+	public void inputUserInfo(UserFeatureReq form, HttpServletRequest request) {
 		// 1) 사용자 정보 조회
 		Users user = securityUtil.getCurrentUsersEntity();
 		UserAiFeature userAiFeature = user.getUserAiFeature();
@@ -130,16 +132,13 @@ public class UserService {
 		updateUserAiFeature(userAiFeature, form);
 
 		// 6) Users 엔티티 업데이트
-		updateUsersEntity(user, form, university, userAiFeature);
+		updateUsersEntity(user, form, university, userAiFeature, request);
 
 		// todo: rabbitMQ 연결 후 주석 해제
 		// Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
 		// if(!isSuccess){
 		//     throw new BusinessException(ResponseCode.INPUT_FEATURE_FAIL);
 		// }
-
-		// 7) 토큰 발행 및 반환
-		return generateTokens(user);
 
 	}
 
@@ -186,12 +185,13 @@ public class UserService {
 	 * 5) UserAiFeature 업데이트
 	 */
 	private void updateUserAiFeature(UserAiFeature userAiFeature, UserFeatureReq form) {
+		log.info("gender={}, mbti={}, contactFrequency={}", form.getGender(), form.getMbti(), form.getContactFrequency());
+		int age = LocalDate.now().getYear() - Integer.parseInt(form.getYear()) + 1;
 		userAiFeature.updateMajor(form.getMajor());
 		userAiFeature.updateGender(Gender.fromAiValue(form.getGender()));
-		userAiFeature.updateAge(form.getAge());
+		userAiFeature.updateAge(age);
 		userAiFeature.updateMbti(form.getMbti());
 		userAiFeature.updateContactFrequency(ContactFrequency.fromAiValue(form.getContactFrequency()));
-		userAiFeature.updateAdmissionYear(form.getAdmissionYear());
 
 		userAiFeatureRepository.save(userAiFeature);
 	}
@@ -200,7 +200,7 @@ public class UserService {
 	 * 6) Users 엔티티 업데이트
 	 */
 	private void updateUsersEntity(Users user, UserFeatureReq form, University university,
-		UserAiFeature userAiFeature) {
+		UserAiFeature userAiFeature, HttpServletRequest request) {
 		user.updateSong(form.getSong());
 		user.updateComment(form.getComment());
 		user.updateRole(Role.USER.getRoleName());
@@ -208,14 +208,17 @@ public class UserService {
 		user.updateContactId(form.getContactId());
 		user.updateUserAiFeature(userAiFeature);
 		user.updateUsername(form.getUsername());
+		user.updateBirthday(form.getYear() + "-" + form.getMonth() + "-" + form.getDay());
 
 		usersRepository.save(user);
+
+		securityUtil.setNewUserSecurityContext(user, request);
 	}
 
 	/**
 	 * 7) 토큰 발행 로직
 	 */
-	private TokenRes generateTokens(Users user) {
+/*	private TokenRes generateTokens(Users user) {
 		String uuid = UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid());
 		String accessToken = jwtUtil.generateAccessToken(uuid, Role.USER.getRoleName());
 		String refreshToken = refreshTokenService.getRefreshToken(uuid);
@@ -224,7 +227,7 @@ public class UserService {
 			.accessToken(accessToken)
 			.refreshToken(refreshToken)
 			.build();
-	}
+	}*/
 
 	/**
 	 * 연락처 중복확인(카톡, 인스타 id)
@@ -277,11 +280,12 @@ public class UserService {
 
 		Users user = securityUtil.getCurrentUsersEntity();
 
-		boolean checkEmailDomain = universityService.checkEmailDomain(schoolEmail, user.getUniversity().getUniversityName());
+		boolean checkEmailDomain = universityService.checkEmailDomain(schoolEmail,
+			user.getUniversity().getUniversityName());
 		if (!checkEmailDomain) {
 			throw new BusinessException(ResponseCode.ARGUMENT_NOT_VALID);
 		}
-		user.setSchoolEmail(schoolEmail);
+		user.updateSchoolEmail(schoolEmail);
 		return sendVerifyEmail(schoolEmail);
 	}
 
@@ -363,6 +367,7 @@ public class UserService {
 
 	/**
 	 * 유저 포인트 조회
+	 *
 	 * @return 유저 포인트
 	 */
 	public Long getPoints() {
@@ -374,6 +379,7 @@ public class UserService {
 	/**
 	 * todo: remove pickMe
 	 * 뽑힐 기회 구매
+	 *
 	 * @param req
 	 */
 	@Transactional
@@ -452,7 +458,6 @@ public class UserService {
 	@Transactional
 	public void stopPickMe() {
 		Users user = securityUtil.getCurrentUsersEntity();
-		user.updateDeactivated(true);
 		userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.DELETE);
 	}
 
@@ -460,7 +465,6 @@ public class UserService {
 	@Transactional
 	public void restartPickMe() {
 		Users user = securityUtil.getCurrentUsersEntity();
-		user.updateDeactivated(false);
 
 		if (user.getPickMe() > 0) {
 			userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
@@ -469,10 +473,45 @@ public class UserService {
 
 	/**
 	 * 회원 탈퇴 요청
+	 * 익명 사용자로 정보 변경
 	 */
 	@Transactional
-	public void removeUser() {
+	public void removeUser(HttpServletRequest request, HttpServletResponse response) {
 		Users user = securityUtil.getCurrentUsersEntity();
-		user.updateDeactivated(true);
+
+		AnonymousUser anonymousUser = new AnonymousUser();
+
+		user.updateUsername(anonymousUser.getUsername());
+		user.updatePassword(anonymousUser.getPassword());
+		user.updateEmail(anonymousUser.getEmail());
+		user.updateRole(anonymousUser.getRole());
+		user.updateSchoolEmail(anonymousUser.getSchoolEmail());
+		user.updateContactId(anonymousUser.getContactId());
+		user.subtractPoint(user.getPoint());
+		user.subtractPayedPoint(user.getPayedPoint());
+
+		HttpSession session = request.getSession(false);
+
+		if (session != null) {
+			String sessionId = session.getId();
+			sessionRepository.deleteById(sessionId);
+			session.invalidate();
+
+			Cookie cookie = new Cookie("SESSION", null);
+			cookie.setPath("/");
+			cookie.setHttpOnly(true);
+			cookie.setMaxAge(0);
+			response.addCookie(cookie);
+
+			try {
+				response.sendRedirect("http://localhost:5173/admin/login");
+			} catch (IOException e) {
+				throw new BusinessException(ResponseCode.INTERNAL_SERVER_ERROR);
+			}
+
+		} else {
+			throw new BusinessException(ResponseCode.BAD_REQUEST);
+		}
 	}
+
 }

@@ -45,7 +45,6 @@ public class CustomDetailsService implements UserDetailsService {
 			Users user = usersRepository.findByEmail(realId)
 				.orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
 
-			log.info("username={}", user.getUsername());
 			LoginDto userDto = LoginDto.builder()
 				.accountId(user.getEmail())
 				.password(user.getPassword())

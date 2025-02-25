@@ -1,11 +1,11 @@
-package comatching.comatching3.users.auth.oauth2.provider.naver;
+package comatching.comatching3.auth.oauth2.provider.naver;
 
 import java.util.Map;
 
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import comatching.comatching3.users.auth.oauth2.provider.OAuth2ProviderUser;
+import comatching.comatching3.auth.oauth2.provider.OAuth2ProviderUser;
 
 public class NaverUser extends OAuth2ProviderUser {
 

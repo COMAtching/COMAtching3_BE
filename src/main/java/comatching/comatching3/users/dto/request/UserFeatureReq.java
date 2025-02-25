@@ -15,13 +15,12 @@ public class UserFeatureReq {
     private String contactId;
     private String gender;
     private String username;
-
-    @Min(20) @Max(30)
-    private Integer age;
+    private String year;
+    private String month;
+    private String day;
     private String mbti;
     private List<String> hobby;
     private String contactFrequency;
     private String song;
     private String comment;
-    private Integer admissionYear;
 }

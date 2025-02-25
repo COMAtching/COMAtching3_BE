@@ -1,4 +1,4 @@
-package comatching.comatching3.users.auth.oauth2.handler;
+package comatching.comatching3.auth.oauth2.handler;
 
 import java.io.IOException;
 

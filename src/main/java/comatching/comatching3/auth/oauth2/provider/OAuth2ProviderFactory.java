@@ -1,12 +1,12 @@
-package comatching.comatching3.users.auth.oauth2.provider;
+package comatching.comatching3.auth.oauth2.provider;
 
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import comatching.comatching3.auth.oauth2.provider.google.GoogleUser;
 import comatching.comatching3.exception.BusinessException;
-import comatching.comatching3.users.auth.oauth2.provider.google.GoogleUser;
-import comatching.comatching3.users.auth.oauth2.provider.kakao.KakaoUser;
-import comatching.comatching3.users.auth.oauth2.provider.naver.NaverUser;
+import comatching.comatching3.auth.oauth2.provider.kakao.KakaoUser;
+import comatching.comatching3.auth.oauth2.provider.naver.NaverUser;
 import comatching.comatching3.util.ResponseCode;
 
 public class OAuth2ProviderFactory {

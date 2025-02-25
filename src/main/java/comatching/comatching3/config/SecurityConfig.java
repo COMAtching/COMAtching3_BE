@@ -23,11 +23,12 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import comatching.comatching3.auth.filter.AdminAuthenticationFilter;
+import comatching.comatching3.auth.filter.RequestLoggingFilter;
 import comatching.comatching3.auth.filter.UserAuthenticationFilter;
 import comatching.comatching3.auth.service.CustomDetailsService;
-import comatching.comatching3.users.auth.oauth2.handler.OAuth2FailureHandler;
-import comatching.comatching3.users.auth.oauth2.handler.OAuth2SuccessHandler;
-import comatching.comatching3.users.auth.oauth2.service.CustomOAuth2UserService;
+import comatching.comatching3.auth.oauth2.handler.OAuth2FailureHandler;
+import comatching.comatching3.auth.oauth2.handler.OAuth2SuccessHandler;
+import comatching.comatching3.auth.oauth2.service.CustomOAuth2UserService;
 import comatching.comatching3.users.service.BlackListService;
 import lombok.RequiredArgsConstructor;
 
@@ -43,7 +44,7 @@ public class SecurityConfig {
 	private static final List<String> WHITELIST = List.of(
 		"/login", "/admin/**", "/charge-monitor/**", "/app/**",
 		"/api/participations", "/auth/refresh", "/pay-success",
-		"/user/login", "/user/register"
+		"/user/login", "/user/register", "/api/auth/oauth/**"
 	);
 
 	private final CustomDetailsService customDetailsService;
@@ -91,6 +92,7 @@ public class SecurityConfig {
 		http
 			.authenticationProvider(authenticationProvider());
 
+
 		http
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(WHITELIST.toArray(new String[0])).permitAll()
@@ -112,6 +114,7 @@ public class SecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable);
 
 		http
+			.addFilterBefore(new RequestLoggingFilter(), UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(adminAuthFilter, UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(userAuthFilter, UsernamePasswordAuthenticationFilter.class);
 		http
@@ -120,6 +123,14 @@ public class SecurityConfig {
 					.userService(customOAuth2UserService))
 				.successHandler(oAuth2SuccessHandler)
 				.failureHandler(oAuth2FailureHandler)
+			);
+
+		http
+			.logout(logout -> logout
+				.logoutUrl("/logout")
+				.logoutSuccessUrl("/login") // 로그아웃 후 리다이렉트 URL 설정
+				.deleteCookies("SESSION")   // 쿠키 삭제 (쿠키 이름이 "SESSION"인 경우)
+				.invalidateHttpSession(true)
 			);
 
 		return http.build();

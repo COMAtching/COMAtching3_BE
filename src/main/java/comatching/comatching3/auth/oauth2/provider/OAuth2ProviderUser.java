@@ -1,4 +1,4 @@
-package comatching.comatching3.users.auth.oauth2.provider;
+package comatching.comatching3.auth.oauth2.provider;
 
 import java.util.List;
 import java.util.Map;

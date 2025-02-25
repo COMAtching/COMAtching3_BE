@@ -35,13 +35,6 @@ public class UserAuthenticationFilter extends AbstractAuthenticationFilter {
 		this.blackListService = blackListService;
 	}
 
-	private static void authenticationFailed(HttpServletResponse response) throws IOException {
-		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		response.setContentType("application/json");
-		response.getWriter().write(Response.errorResponse(ResponseCode.INVALID_LOGIN).convertToJson());
-		response.getWriter().flush();
-	}
-
 	@Override
 	protected String getLoginUrl() {
 		return LOGIN_URL;
@@ -87,10 +80,9 @@ public class UserAuthenticationFilter extends AbstractAuthenticationFilter {
 	}
 
 	@Override
-	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-		AuthenticationException failed) throws IOException, ServletException {
-		// 인증 실패 시 처리 로직
-		authenticationFailed(response);
+	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
+		throws IOException, ServletException {
+		sendAuthenticationFailed(response);
 	}
 
 	private boolean checkBlackListForUser(CustomUser user, HttpServletResponse response) throws IOException {
@@ -104,7 +96,7 @@ public class UserAuthenticationFilter extends AbstractAuthenticationFilter {
 
 	private void blockAccess(HttpServletResponse response) throws IOException {
 		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-		response.sendRedirect("/");
+		response.sendRedirect("/login");
 		response.getWriter().write(Response.errorResponse(ResponseCode.BLACK_USER).convertToJson());
 		response.getWriter().flush();
 	}

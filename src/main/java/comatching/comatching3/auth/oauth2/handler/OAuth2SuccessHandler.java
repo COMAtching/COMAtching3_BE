@@ -1,12 +1,8 @@
-package comatching.comatching3.users.auth.oauth2.handler;
+package comatching.comatching3.auth.oauth2.handler;
 
-import comatching.comatching3.admin.dto.response.TokenRes;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.auth.details.CustomUser;
-import comatching.comatching3.users.auth.oauth2.service.TokenService;
-import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.users.service.BlackListService;
-import comatching.comatching3.util.CookieUtil;
 import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
@@ -52,7 +48,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     }
 
     private CustomUser getOAuth2UserPrincipal(Authentication authentication) {
-        log.info("Authentication_OAuth2={}", authentication);
         Object principal = authentication.getPrincipal();
 
         if (principal instanceof CustomUser) {

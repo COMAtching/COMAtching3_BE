@@ -30,6 +30,7 @@ import comatching.comatching3.util.CookieUtil;
 import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -92,24 +93,15 @@ public class AdminController {
 	/**
 	 * 입력한 코드가 맞는지 확인하는 메소드
 	 * 3분동안 최대 10번 시도 가능, 그 이후에는 만료
-	 * @param request 토큰 값과 입력한 코드 번호를 이용해서 redis에 저장된 값과 비교
+	 * @param emailVerifyReq 토큰 값과 입력한 코드 번호를 이용해서 redis에 저장된 값과 비교
 	 * @return 인증 성공 시 ok, 실패 시 VAL-001
 	 */
 	@PostMapping("/auth/semi/email/verify/code")
 	@RateLimiter(name = "verify-email")
-	public Response<Void> verifyCode(@Validated @RequestBody EmailVerifyReq request, HttpServletResponse response) {
-		AfterVerifyEmailRes result = adminService.verifyCode(request);
+	public Response<Void> verifyCode(@Validated @RequestBody EmailVerifyReq emailVerifyReq, HttpServletRequest request) {
+		adminService.verifyCode(emailVerifyReq, request);
 
-		if (result.getSuccess()) {
-			ResponseCookie accessCookie = cookieUtil.setAccessResponseCookie(result.getAccessToken());
-			ResponseCookie refreshCookie = cookieUtil.setRefreshResponseCookie(result.getRefreshToken());
-
-			response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-			response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-			return Response.ok();
-		} else {
-			return Response.errorResponse(ResponseCode.ARGUMENT_NOT_VALID);
-		}
+		return Response.ok();
 	}
 
 	/**
@@ -167,6 +159,19 @@ public class AdminController {
 	@PatchMapping("/auth/operator/info")
 	public Response<Void> updateAdminInfo(@RequestBody AdminInfoUpdateReq request) {
 		adminService.updateAdminInfo(request);
+
+		return Response.ok();
+	}
+
+	/**
+	 * 관리자 로그아웃
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@GetMapping("/admin/logout")
+	public Response<Void> adminLogout(HttpServletRequest request, HttpServletResponse response) {
+		adminService.adminLogout(request, response);
 
 		return Response.ok();
 	}
