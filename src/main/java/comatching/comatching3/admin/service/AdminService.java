@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +18,6 @@ import comatching.comatching3.admin.dto.request.AdminInfoUpdateReq;
 import comatching.comatching3.admin.dto.request.AdminRegisterReq;
 import comatching.comatching3.admin.dto.request.EmailVerifyReq;
 import comatching.comatching3.admin.dto.response.AdminInfoRes;
-import comatching.comatching3.admin.dto.response.AfterVerifyEmailRes;
 import comatching.comatching3.admin.dto.response.OperatorRes;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.entity.University;
@@ -25,13 +25,15 @@ import comatching.comatching3.admin.enums.AdminRole;
 import comatching.comatching3.admin.repository.AdminRepository;
 import comatching.comatching3.admin.repository.UniversityRepository;
 import comatching.comatching3.exception.BusinessException;
-import comatching.comatching3.users.auth.jwt.JwtUtil;
-import comatching.comatching3.users.auth.refresh_token.service.RefreshTokenService;
 import comatching.comatching3.util.EmailUtil;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
 import comatching.comatching3.util.validation.AdditionalBadWords;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,13 +46,13 @@ public class AdminService {
 	private final AdminRepository adminRepository;
 	private final UniversityRepository universityRepository;
 	private final SecurityUtil securityUtil;
-	private final JwtUtil jwtUtil;
 	private final EmailUtil emailUtil;
 	private final PasswordEncoder passwordEncoder;
-	private final RefreshTokenService refreshTokenService;
+	private final SessionRepository<?> sessionRepository;
 
 	/**
 	 * 관리자 회원가입
+	 *
 	 * @param form 관리자 회원 가입에 필요한 DTO
 	 */
 	@Transactional
@@ -120,36 +122,26 @@ public class AdminService {
 	 * 이메일 인증번호 검사
 	 */
 	@Transactional
-	public AfterVerifyEmailRes verifyCode(EmailVerifyReq request) {
-		String redisKey = "email-verification:" + request.getToken();
+	public void verifyCode(EmailVerifyReq emailVerifyReq, HttpServletRequest request) {
+		String redisKey = "email-verification:" + emailVerifyReq.getToken();
 		String storedCode = (String)redisTemplate.opsForValue().get(redisKey);
 
-		AfterVerifyEmailRes response = new AfterVerifyEmailRes();
-		if (storedCode != null && storedCode.equals(request.getCode())) {
+		if (storedCode != null && storedCode.equals(emailVerifyReq.getCode())) {
 			Admin admin = securityUtil.getAdminFromContext();
 			admin.changeAdminRole(AdminRole.ROLE_ADMIN);
 			admin.universityAuthOk();
 			adminRepository.save(admin);
 
-			String uuid = UUIDUtil.bytesToHex(admin.getUuid());
-			String accessToken = jwtUtil.generateAccessToken(uuid, String.valueOf(admin.getAdminRole()));
-			String refreshToken = refreshTokenService.getRefreshToken(uuid);
-			redisTemplate.delete(redisKey);
-			refreshTokenService.saveRefreshTokenInRedis(uuid, refreshToken);
-
-			response.setAccessToken(accessToken);
-			response.setRefreshToken(refreshToken);
-			response.setSuccess(true);
-			return response;
+			securityUtil.setNewUserSecurityContext(admin, request);
+		} else {
+			throw new BusinessException(ResponseCode.ARGUMENT_NOT_VALID);
 		}
-		response.setAccessToken(null);
-		response.setRefreshToken(null);
-		response.setSuccess(false);
-		return response;
+
 	}
 
 	/**
 	 * 승인 대기중인 오퍼레이터 목록 조회
+	 *
 	 * @return 승인 대기중인 오퍼레이터 목록 (uuid, accountId, 닉네임, 요청 시각)
 	 */
 	public List<OperatorRes> getPendingOperators() {
@@ -168,6 +160,7 @@ public class AdminService {
 
 	/**
 	 * 오퍼레이터 승인 메소드
+	 *
 	 * @param uuid 승인할 오퍼레이터의 uuid
 	 */
 	@Transactional
@@ -191,6 +184,7 @@ public class AdminService {
 
 	/**
 	 * 오퍼레이터 가입 거절 (오퍼레이터 계정은 삭제됨)
+	 *
 	 * @param uuid 오퍼레이터 id
 	 */
 	@Transactional
@@ -214,6 +208,7 @@ public class AdminService {
 
 	/**
 	 * 관리자 정보 조회
+	 *
 	 * @return 관리자 정보
 	 */
 	public AdminInfoRes getAdminInfo() {
@@ -233,6 +228,7 @@ public class AdminService {
 	/**
 	 * 관리자 정보 변경 메소드
 	 * todo: 닉네임 검열
+	 *
 	 * @param request 닉네임만 바꿀 수 있음
 	 */
 	@Transactional
@@ -250,6 +246,28 @@ public class AdminService {
 
 		if (badWordFiltering.check(nickname)) {
 			throw new BusinessException(ResponseCode.INVALID_USERNAME);
+		}
+	}
+
+	/**
+	 * 관리자 로그아웃
+	 */
+	public void adminLogout(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession(false);
+
+		if (session != null) {
+			String sessionId = session.getId();
+			sessionRepository.deleteById(sessionId);
+			session.invalidate();
+
+			Cookie cookie = new Cookie("SESSION", null);
+			cookie.setPath("/");
+			cookie.setHttpOnly(true);
+			cookie.setMaxAge(0);
+			response.addCookie(cookie);
+
+		} else {
+			throw new BusinessException(ResponseCode.BAD_REQUEST);
 		}
 	}
 }

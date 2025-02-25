@@ -1,11 +1,10 @@
-package comatching.comatching3.users.auth.oauth2.service;
+package comatching.comatching3.auth.oauth2.service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component
 public class LogoutServiceFactory {

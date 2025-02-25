@@ -1,4 +1,4 @@
-package comatching.comatching3.users.auth.oauth2.service;
+package comatching.comatching3.auth.oauth2.service;
 
 import java.util.Optional;
 
@@ -10,11 +10,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import comatching.comatching3.auth.oauth2.provider.OAuth2ProviderFactory;
+import comatching.comatching3.auth.oauth2.provider.OAuth2ProviderUser;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.auth.dto.LoginDto;
 import comatching.comatching3.auth.details.CustomUser;
-import comatching.comatching3.users.auth.oauth2.provider.OAuth2ProviderFactory;
-import comatching.comatching3.users.auth.oauth2.provider.OAuth2ProviderUser;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.Role;

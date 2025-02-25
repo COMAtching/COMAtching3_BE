@@ -20,6 +20,8 @@ import comatching.comatching3.util.ResponseCode;
 import io.jsonwebtoken.Jwts;
 import static comatching.comatching3.users.auth.jwt.JwtExpirationConst.*;
 
+
+@Deprecated
 @Component
 public class JwtUtil {
 

@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import comatching.comatching3.admin.enums.AdminRole;
 import comatching.comatching3.auth.details.CustomAdmin;
 import comatching.comatching3.auth.service.CustomDetailsService;
 import comatching.comatching3.users.service.BlackListService;
@@ -33,13 +34,6 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 		BlackListService blackListService) {
 		super(authenticationManager, customDetailsService);
 		this.blackListService = blackListService;
-	}
-
-	private static void authenticationFailed(HttpServletResponse response) throws IOException {
-		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		response.setContentType("application/json");
-		response.getWriter().write(Response.errorResponse(ResponseCode.INVALID_LOGIN).convertToJson());
-		response.getWriter().flush();
 	}
 
 	@Override
@@ -81,14 +75,13 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 		SecurityContextHolder.getContext().setAuthentication(authResult);
 
 		request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-		response.sendRedirect("/admin/login-success");
+		response.sendRedirect("/login-success");
 	}
 
 	@Override
-	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-		AuthenticationException failed) throws IOException, ServletException {
-		// 인증 실패 시 처리 로직
-		authenticationFailed(response);
+	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
+		throws IOException, ServletException {
+		sendAuthenticationFailed(response);
 	}
 
 	private boolean checkBlackListForAdmin(CustomAdmin admin, HttpServletResponse response) throws IOException {

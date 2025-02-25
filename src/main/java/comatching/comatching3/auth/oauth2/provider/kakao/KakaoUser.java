@@ -1,7 +1,6 @@
-package comatching.comatching3.users.auth.oauth2.provider.kakao;
+package comatching.comatching3.auth.oauth2.provider.kakao;
 
-import comatching.comatching3.users.auth.oauth2.provider.OAuth2ProviderUser;
-import lombok.Data;
+import comatching.comatching3.auth.oauth2.provider.OAuth2ProviderUser;
 
 import java.util.Map;
 

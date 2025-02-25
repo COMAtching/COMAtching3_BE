@@ -1,4 +1,4 @@
-package comatching.comatching3.users.auth.oauth2.provider.kakao;
+package comatching.comatching3.auth.oauth2.provider.kakao;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import comatching.comatching3.users.auth.oauth2.service.LogoutService;
+import comatching.comatching3.auth.oauth2.service.LogoutService;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
