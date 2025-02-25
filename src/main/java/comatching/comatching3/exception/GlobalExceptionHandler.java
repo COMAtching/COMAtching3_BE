@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import comatching.comatching3.util.Idempotent.Exception.IdempotentException;
 import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
@@ -53,5 +54,10 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(RequestNotPermitted.class)
 	public Response<?> handleRateLimitException(RequestNotPermitted ex) {
 		return Response.errorResponse(ResponseCode.OVER_REQUEST_LIMIT);
+	}
+
+	@ExceptionHandler({IdempotentException.class})
+	public Response<ResponseCode> handelIdempotentException(IdempotentException ex) {
+		return new Response<>(ex.getResponseCode());
 	}
 }

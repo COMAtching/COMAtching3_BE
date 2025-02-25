@@ -8,8 +8,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 import comatching.comatching3.exception.BusinessException;
-import comatching.comatching3.match.dto.messageQueue.MatchRequestMsg;
-import comatching.comatching3.match.dto.messageQueue.MatchResponseMsg;
+import comatching.comatching3.matching.dto.messageQueue.MatchRequestMsg;
+import comatching.comatching3.matching.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.util.ResponseCode;
 import lombok.extern.slf4j.Slf4j;
 

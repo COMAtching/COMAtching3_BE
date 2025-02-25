@@ -70,6 +70,15 @@ dependencies {
 
     //Swagger - API Documentation
     //implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+
+    //Test Container dependency
+    testImplementation "org.testcontainers:testcontainers:1.20.4"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.8.1"
+    testImplementation "org.testcontainers:junit-jupiter:1.20.4"
+
+    testImplementation "org.testcontainers:mysql:1.20.4"
+
+
 }
 
 tasks.named('test') {

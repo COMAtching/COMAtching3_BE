@@ -58,7 +58,10 @@ public enum ResponseCode {
 
 	//Payment exception response
 	PAYMENT_FAIL(400, "PAY-001", HttpStatus.BAD_REQUEST, "Payment failed"),
-	;
+
+	//Idempotent exception response
+	UNPROCESSABLE_ENTITY(422, "IDP-001", HttpStatus.UNPROCESSABLE_ENTITY, "Unprocessable Entity"),
+	CONFLICT(409, "IDP-002", HttpStatus.CONFLICT, "Conflict");
 
 
 	private final Integer status;
