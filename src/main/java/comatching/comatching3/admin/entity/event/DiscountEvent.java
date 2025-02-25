@@ -10,6 +10,7 @@ import lombok.Setter;
 @Entity
 @DiscriminatorValue("DISCOUNT")
 @Getter
+@Setter
 public class DiscountEvent extends Event{
     private Integer discountRate;
 }
