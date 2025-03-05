@@ -3,6 +3,7 @@ package comatching.comatching3.admin.repository;
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.admin.entity.event.Event;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,4 +15,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     boolean existsOverlappingEvent(@Param("university") University university,
                                    @Param("startTime") LocalDateTime start,
                                    @Param("endTime") LocalDateTime end);
+
+    @Query("SELECT e FROM Event e WHERE e.university = :university")
+    List<Event> findEventsByUniversity(@Param("university") University university);
 }
