@@ -29,7 +29,6 @@ public class UserCrudMsg {
 	public void updateFromUserAIFeatureAndType(UserCrudType type, UserAiFeature userAiFeature){
 		this.type = type;
 		this.uuid = UUIDUtil.bytesToHex(userAiFeature.getUuid());
-		//this.uuid = "11ef6b568b0cdc2985f9c1ab3fa5c8fc";
 		this.mbti = userAiFeature.getMbti();
 		this.contactFrequency = userAiFeature.getContactFrequency().getAiValue();
 		this.hobby = toHobbyString(userAiFeature.getHobbyList());
@@ -47,21 +46,4 @@ public class UserCrudMsg {
 		return hobbyString.toString();
 	}
 
-	/*public List<HobbyEnum> getHobbyAsList(){
-		String hobbyString = this.hobby;
-		if (hobbyString.endsWith(",")) {
-			hobbyString = hobbyString.substring(0, hobbyString.length() - 1);
-		}
-
-		List<HobbyEnum> hobbyEnumList = new ArrayList<>();
-		List<String> hobbies = Arrays.asList(hobbyString.split(","));
-
-		for (String hobby : hobbies) {
-			HobbyEnum h = HobbyEnum.from(hobby);
-			if (h != null) {
-				hobbyEnumList.add(h);
-			}
-		}
-		return hobbyEnumList;
-	}*/
 }
