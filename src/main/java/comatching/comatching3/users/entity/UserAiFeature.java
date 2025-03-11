@@ -56,8 +56,6 @@ public class UserAiFeature {
 
 	private String  major;
 
-	private Integer admissionYear;
-
 
 	@Builder
 	public UserAiFeature(byte[] uuid, Users users) {
@@ -97,10 +95,6 @@ public class UserAiFeature {
 
 	public void updateMajor(String major) {
 		this.major = major;
-	}
-
-	public void updateAdmissionYear(Integer admissionYear) {
-		this.admissionYear = admissionYear;
 	}
 
 	public void updateUuid(byte[] uuid){

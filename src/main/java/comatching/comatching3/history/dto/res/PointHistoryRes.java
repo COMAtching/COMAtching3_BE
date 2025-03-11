@@ -15,6 +15,7 @@ public class PointHistoryRes {
     private PointHistoryType pointHistoryType;
     private Long changeAmount;
     private Long totalPoint;
+    private Long price;
     private Integer pickMe;
     private LocalDateTime timeStamp;
 }
