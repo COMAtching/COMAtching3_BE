@@ -18,6 +18,8 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 		AuthenticationException exception) throws IOException, ServletException {
-		log.info("LoginFailureHandler");
+		exception.printStackTrace();
+		// 기존 처리 로직
+		super.onAuthenticationFailure(request, response, exception);
 	}
 }

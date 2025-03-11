@@ -125,6 +125,48 @@ public class FlutterController {
 		return Response.ok(loginRes);
 	}
 
+	@PostMapping("/api/auth/oauth/google")
+	public Response<FlutterLoginRes> googleLogin(@RequestBody Map<String, String> payload, HttpServletRequest request) {
+		if (payload == null) {
+			throw new BusinessException(ResponseCode.INVALID_LOGIN);
+		}
+
+		String socialId = payload.get("id");
+		String email = payload.get("email");
+		String username = payload.get("displayName");
+		String provider = "google";
+
+		Optional<Users> userOpt = usersRepository.findBySocialId(socialId);
+		Users user;
+		if (userOpt.isPresent()) {
+			user = userOpt.get();
+		} else {
+			user = registerUser(username, socialId, provider, email);
+		}
+
+		LoginDto loginDto = LoginDto.builder()
+			.uuid(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()))
+			.role(user.getRole())
+			.build();
+
+		CustomUser customUser = new CustomUser(loginDto);
+
+		UsernamePasswordAuthenticationToken authToken =
+			new UsernamePasswordAuthenticationToken(customUser, null, customUser.getAuthorities());
+
+		SecurityContextHolder.getContext().setAuthentication(authToken);
+
+		HttpSession session = request.getSession(true);
+		session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+
+		FlutterLoginRes loginRes = FlutterLoginRes.builder()
+			.socialId(user.getSocialId())
+			.role(user.getRole())
+			.build();
+
+		return Response.ok(loginRes);
+	}
+
 	private Users registerUser(String username, String socialId, String provider, String email) {
 		Users newUser = Users.builder()
 			.username(username)

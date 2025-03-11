@@ -1,6 +1,8 @@
 package comatching.comatching3.history.entity;
 
 import comatching.comatching3.history.enums.PointHistoryType;
+import comatching.comatching3.pay.entity.Orders;
+import comatching.comatching3.pay.entity.TossPayment;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.Column;
@@ -13,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -33,9 +36,15 @@ public class PointHistory extends BaseEntity {
 	@JoinColumn(name = "users_id")
 	private Users users;
 
-//	@OneToOne(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "match_history_id")
-//	private MatchingHistory matchingHistory;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "match_history_id")
+	private MatchingHistory matchingHistory;
+
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "order_id")
+	private Orders orders;
 
 //	@ManyToOne(fetch = FetchType.LAZY)
 //	@JoinColumn(name = "admin_id")
@@ -44,7 +53,7 @@ public class PointHistory extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private PointHistoryType pointHistoryType;
 
-	// 사용/소비한 포인트 양
+	// 증가/감소한 포인트 양
 	private Long changeAmount;
 
 	private String reason;
@@ -56,13 +65,15 @@ public class PointHistory extends BaseEntity {
 	private Long totalPoint;
 
 	@Builder
-	public PointHistory(Users users, PointHistoryType pointHistoryType, Long changeAmount, String reason, Integer pickMe, Long totalPoint) {
+	public PointHistory(Orders orders, MatchingHistory matchingHistory, Users users, PointHistoryType pointHistoryType, Long changeAmount, String reason, Integer pickMe, Long totalPoint) {
 		this.users = users;
 		this.pointHistoryType = pointHistoryType;
 		this.changeAmount = changeAmount;
 		this.reason = reason;
 		this.pickMe = pickMe;
 		this.totalPoint = totalPoint;
+		this.orders = orders;
+		this.matchingHistory = matchingHistory;
 	}
 
 	public void setTotalPoint(Long totalPoint) {
@@ -71,5 +82,13 @@ public class PointHistory extends BaseEntity {
 
 	public void setPickMe(Integer pickMe) {
 		this.pickMe = pickMe;
+	}
+
+	public void setMatchingHistory(MatchingHistory matchingHistory) {
+		this.matchingHistory = matchingHistory;
+	}
+
+	public void setOrders(Orders orders) {
+		this.orders = orders;
 	}
 }

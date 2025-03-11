@@ -19,7 +19,6 @@ public class MatchHistoryRes {
 	private Integer age;
 	private Gender gender;
 	private String  major;
-	private Integer admissionYear;
 	private String comment;
 	private String song;
 	private String contactId;
@@ -32,7 +31,6 @@ public class MatchHistoryRes {
 		this.age = userAiFeature.getAge();
 		this.gender = userAiFeature.getGender();
 		this.major = userAiFeature.getMajor();
-		this.admissionYear = userAiFeature.getAdmissionYear();
 		this.comment = users.getComment();
 		this.song = users.getSong();
 		this.contactId = users.getContactId();

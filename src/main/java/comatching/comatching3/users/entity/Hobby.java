@@ -22,6 +22,8 @@ public class Hobby {
 	@Column(name = "hobby_id")
 	private Long id;
 
+	private String category;
+
 	private String hobbyName;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -29,8 +31,9 @@ public class Hobby {
 	private UserAiFeature userAiFeature;
 
 	@Builder
-	public Hobby(String hobbyName, UserAiFeature userAiFeature) {
+	public Hobby(String hobbyName, UserAiFeature userAiFeature, String category) {
 		this.hobbyName = hobbyName;
+		this.category = category;
 		this.userAiFeature = userAiFeature;
 	}
 

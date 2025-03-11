@@ -1,6 +1,7 @@
 package comatching.comatching3.history.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.history.repository.MatchingHistoryRepository;
 import comatching.comatching3.history.repository.PointHistoryRepository;
 import comatching.comatching3.pay.dto.res.PayHistoryRes;
+import comatching.comatching3.pay.entity.Orders;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
@@ -49,6 +51,7 @@ public class HistoryService {
 
 	public List<PointHistoryRes> getAllPointHistory(byte[] uuid) {
 		List<PointHistory> pointHistories = pointHistoryRepository.findAllByUuid(uuid);
+		Collections.reverse(pointHistories);
 		return convertToPointHistoryRes(pointHistories);
 	}
 
@@ -59,6 +62,7 @@ public class HistoryService {
 						.pointHistoryType(pointHistory.getPointHistoryType())
 						.changeAmount(pointHistory.getChangeAmount())
 						.totalPoint(pointHistory.getTotalPoint())
+						.price(pointHistory.getOrders().getAmount())
 						.pickMe(pointHistory.getPickMe())
 						.timeStamp(pointHistory.getCreatedAt())
 						.build())

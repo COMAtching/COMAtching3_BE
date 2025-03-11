@@ -29,8 +29,8 @@ import comatching.comatching3.users.dto.request.UserFeatureReq;
 import comatching.comatching3.users.dto.request.UserRegisterReq;
 import comatching.comatching3.users.dto.request.UserUpdateInfoReq;
 import comatching.comatching3.users.dto.response.CurrentPointRes;
-import comatching.comatching3.users.dto.response.HobbyRes;
 import comatching.comatching3.users.dto.response.UserInfoRes;
+import comatching.comatching3.users.dto.response.UsernamePointRes;
 import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
@@ -111,6 +111,7 @@ public class UserService {
 
 	/**
 	 * 소셜 유저 피처 정보 입력 후 유저로 역할 변경까지
+	 *
 	 * @param form social 유저의 Feature
 	 */
 	@Transactional
@@ -167,7 +168,7 @@ public class UserService {
 	 */
 	private void handleUserHobbies(UserAiFeature userAiFeature, List<String> hobbyNames) {
 		List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
-
+		userAiFeature.removeHobby(existingHobbies);
 		hobbyRepository.deleteAll(existingHobbies);
 
 		List<Hobby> newHobbyList = hobbyNames.stream()
@@ -185,7 +186,8 @@ public class UserService {
 	 * 5) UserAiFeature 업데이트
 	 */
 	private void updateUserAiFeature(UserAiFeature userAiFeature, UserFeatureReq form) {
-		log.info("gender={}, mbti={}, contactFrequency={}", form.getGender(), form.getMbti(), form.getContactFrequency());
+		log.info("gender={}, mbti={}, contactFrequency={}", form.getGender(), form.getMbti(),
+			form.getContactFrequency());
 		int age = LocalDate.now().getYear() - Integer.parseInt(form.getYear()) + 1;
 		userAiFeature.updateMajor(form.getMajor());
 		userAiFeature.updateGender(Gender.fromAiValue(form.getGender()));
@@ -233,6 +235,10 @@ public class UserService {
 	 * 연락처 중복확인(카톡, 인스타 id)
 	 */
 	public boolean isContactIdDuplicated(String contactId) {
+		Users user = securityUtil.getCurrentUsersEntity();
+		if (user.getContactId() != null && user.getContactId().equals(contactId)) {
+			return false;
+		}
 		return usersRepository.existsByContactId(contactId);
 	}
 
@@ -247,24 +253,72 @@ public class UserService {
 
 	/**
 	 * 유저 정보 업데이트
-	 * todo: Hobby 삭제 후 추가
+	 * todo: Hobby 대분류 관련 로직 추가
 	 */
 	@Transactional
 	public void updateUserInfo(UserUpdateInfoReq form) {
 		Users user = securityUtil.getCurrentUsersEntity();
 		UserAiFeature userAiFeature = user.getUserAiFeature();
 
-		University university = universityRepository.findByUniversityName(form.getSchool())
+		if (form.getUniversity() != user.getUniversity().getUniversityName()) {
+			University university = universityRepository.findByUniversityName(form.getUniversity())
+				.orElseThrow(() -> new BusinessException(ResponseCode.SCHOOL_NOT_EXIST));
+
+			user.updateUniversity(university);
+		}
+
+
+		if (form.getHobbies() != null) {
+			List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
+			userAiFeature.removeHobby(existingHobbies);
+			hobbyRepository.deleteAll(existingHobbies);
+
+			List<Hobby> newHobbyList = form.getHobbies().stream()
+				.map(hobbyName -> Hobby.builder()
+					.hobbyName(hobbyName)
+					.userAiFeature(userAiFeature)
+					.build())
+				.toList();
+
+			hobbyRepository.saveAll(newHobbyList);
+			userAiFeature.addHobby(newHobbyList);
+		}
+
+		if (form.getUsername() != null) {
+			user.updateUsername(form.getUsername());
+		}
+
+		if (form.getMajor() != null) {
+			userAiFeature.updateMajor(form.getMajor());
+		}
+
+		if (form.getContactId() != null) {
+			user.updateContactId(form.getContactId());
+		}
+
+		if (form.getMbti() != null) {
+			userAiFeature.updateMbti(form.getMbti());
+		}
+
+		if (form.getContactFrequency() != null) {
+			userAiFeature.updateContactFrequency(ContactFrequency.valueToAiValue(form.getContactFrequency()));
+		}
+
+		if (form.getSong() != null) {
+			user.updateSong(form.getSong());
+		}
+
+		if (form.getComments() != null) {
+			user.updateComment(form.getComments());
+		}
+
+	}
+
+	public String getSchoolDomain(String universityName) {
+		University university = universityRepository.findByUniversityName(universityName)
 			.orElseThrow(() -> new BusinessException(ResponseCode.SCHOOL_NOT_EXIST));
 
-		user.updateUsername(form.getNickname());
-		user.updateSong(form.getFavoriteSong());
-		user.updateComment(form.getIntroduction());
-		user.updateContactId(form.getContact());
-		user.updateUniversity(university);
-		userAiFeature.updateAge(form.getAge());
-		userAiFeature.updateMajor(form.getDepartment());
-		userAiFeature.updateMbti(form.getSelectMBTIEdit());
+		return university.getMailDomain();
 	}
 
 	/**
@@ -273,10 +327,10 @@ public class UserService {
 	@Transactional
 	public String userSchoolAuth(String schoolEmail) {
 
-		boolean isDuplicated = usersRepository.existsBySchoolEmail(schoolEmail);
-		if (isDuplicated) {
-			throw new BusinessException(ResponseCode.ARGUMENT_NOT_VALID);
-		}
+		// boolean isDuplicated = usersRepository.existsBySchoolEmail(schoolEmail);
+		// if (isDuplicated) {
+		// 	throw new BusinessException(ResponseCode.ARGUMENT_NOT_VALID);
+		// }
 
 		Users user = securityUtil.getCurrentUsersEntity();
 
@@ -297,7 +351,7 @@ public class UserService {
 		String token = UUID.randomUUID().toString();
 		String redisKey = "email-verification:" + token;
 
-		redisTemplate.opsForValue().set(redisKey, verificationCode, 3, TimeUnit.MINUTES);
+		redisTemplate.opsForValue().set(redisKey, verificationCode, 5, TimeUnit.MINUTES);
 		emailUtil.sendEmail(email, "COMAtching 사용자 학교 인증 메일", "Your verification code is " + verificationCode);
 		return token;
 	}
@@ -321,47 +375,48 @@ public class UserService {
 	}
 
 	/**
-	 * 메인 페이지 유저 정보 조회
+	 * 유저 정보 조회
 	 */
 	@Transactional
 	public UserInfoRes getUserInfo() {
 
 		Users user = securityUtil.getCurrentUsersEntity();
-		//        log.info(user.getUsername());
 
-		// Boolean canRequest = !chargeRequestRepository.existsByUsers(user);
+		// if (user.getPickMe() <= 0) {
+		// 	if (user.getPickMe() < 0) {
+		// 		user.updatePickMe(0);
+		// 		userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.DELETE);
+		// 	}
+		// }
 
-		if (user.getPickMe() <= 0) {
-			if (user.getPickMe() < 0) {
-				user.updatePickMe(0);
-				userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.DELETE);
-			}
-		}
-
-		List<HobbyRes> hobbyResList = hobbyRepository.findAllByUserAiFeature(user.getUserAiFeature()).stream().map(
-			hobby -> HobbyRes.builder()
-				.hobbyName(hobby.getHobbyName())
-				.build()
-		).toList();
-
+		List<String> hobbyResList = hobbyRepository.findAllByUserAiFeature(user.getUserAiFeature()).stream()
+			.map(Hobby::getHobbyName)
+			.toList();
 		return UserInfoRes.builder()
 			.username(user.getUsername())
-			.major(user.getUserAiFeature().getMajor())
 			.age(user.getUserAiFeature().getAge())
-			.song(user.getSong())
-			.mbti(user.getUserAiFeature().getMbti())
+			.university(user.getUniversity().getUniversityName())
+			.major(user.getUserAiFeature().getMajor())
 			.contactId(user.getContactId())
-			.point(user.getPoint())
-			.pickMe(user.getPickMe())
-			.participations(getParticipations())
-			.admissionYear(user.getUserAiFeature().getAdmissionYear())
-			.comment(user.getComment())
-			.contactFrequency(user.getUserAiFeature().getContactFrequency())
 			.hobbies(hobbyResList)
+			.mbti(user.getUserAiFeature().getMbti())
+			.contactFrequency(user.getUserAiFeature().getContactFrequency())
+			.song(user.getSong())
+			.comment(user.getComment())
 			.gender(user.getUserAiFeature().getGender())
-			.event1(user.getEvent1())
 			.schoolAuth(user.isSchoolAuth())
 			.schoolEmail(user.getSchoolEmail())
+			.build();
+	}
+
+	public UsernamePointRes getProfile() {
+
+		Users user = securityUtil.getCurrentUsersEntity();
+
+		return UsernamePointRes.builder()
+			.socialId(user.getSocialId())
+			.username(user.getUsername())
+			.point(user.getPoint())
 			.build();
 	}
 
@@ -372,7 +427,6 @@ public class UserService {
 	 */
 	public Long getPoints() {
 		Users user = securityUtil.getCurrentUsersEntity();
-		System.out.println(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()));
 		return user.getPoint();
 	}
 

@@ -34,9 +34,9 @@ public abstract class Event {
     @JoinColumn(name = "university_id")
     private University university;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, insertable = false, updatable = false)
-    private EventType eventType;
+    // @Enumerated(EnumType.STRING)
+    // @Column(nullable = false, insertable = false, updatable = false)
+    // private EventType eventType;
 
     private LocalDateTime start;
 
