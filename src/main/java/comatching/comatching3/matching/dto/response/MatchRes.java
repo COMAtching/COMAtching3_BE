@@ -21,7 +21,6 @@ public class MatchRes {
 	private Gender gender;
 	private String major;
 	private Long currentPoint;
-	private Integer admissionYear;
 	private String contactId;
 
 	public static MatchRes fromUsers(Users users){
@@ -34,7 +33,6 @@ public class MatchRes {
 			.age(users.getUserAiFeature().getAge())
 			.major(users.getUserAiFeature().getMajor())
 			.contactId(users.getContactId())
-			.admissionYear(users.getUserAiFeature().getAdmissionYear())
 			.gender(users.getUserAiFeature().getGender())
 			.build();
 	}

@@ -1,5 +1,6 @@
 package comatching.comatching3.pay.entity;
 
+import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.pay.enums.OrderStatus;
 import comatching.comatching3.users.entity.Users;
 import jakarta.persistence.Column;
@@ -46,9 +47,12 @@ public class Orders {
 
 	private String orderUuid;
 
+	@OneToOne(mappedBy = "orders")
+	private PointHistory pointHistory;
+
 	@Builder
 	public Orders(TossPayment tossPayment, Users users, OrderStatus orderStatus, String product, Long amount, Long point,
-		String orderUuid) {
+		String orderUuid, PointHistory pointHistory) {
 		this.tossPayment = tossPayment;
 		this.users = users;
 		this.orderStatus = orderStatus;
@@ -56,6 +60,7 @@ public class Orders {
 		this.amount = amount;
 		this.point = point;
 		this.orderUuid = orderUuid;
+		this.pointHistory = pointHistory;
 	}
 
 	public void setTossPayment(TossPayment tossPayment) {

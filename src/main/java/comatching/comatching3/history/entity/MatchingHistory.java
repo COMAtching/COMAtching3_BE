@@ -3,10 +3,10 @@ package comatching.comatching3.history.entity;
 import java.util.List;
 
 import comatching.comatching3.matching.dto.messageQueue.MatchRequestMsg;
-import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.matching.enums.AgeOption;
 import comatching.comatching3.matching.enums.ContactFrequencyOption;
+import comatching.comatching3.users.entity.Users;
+import comatching.comatching3.users.enums.HobbyEnum;
 import comatching.comatching3.util.BaseEntity;
 import comatching.comatching3.util.HobbyListConverter;
 import jakarta.persistence.Column;
@@ -20,6 +20,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -56,6 +57,10 @@ public class MatchingHistory extends BaseEntity {
 
 	private Boolean noSameMajorOption;
 
+	@OneToOne(mappedBy = "matchingHistory")
+	@JoinColumn(name = "point_history_id")
+	private PointHistory pointHistory;
+
 	@Builder
 	public MatchingHistory(Users applier, Users enemy, String mbtiOption, AgeOption ageOption,
 		ContactFrequencyOption contactFrequencyOption, List<HobbyEnum> hobbyEnumOption, Boolean noSameMajorOption) {
@@ -90,6 +95,5 @@ public class MatchingHistory extends BaseEntity {
 			", noSameMajorOption=" + noSameMajorOption +
 			'}';
 	}
-
 
 }

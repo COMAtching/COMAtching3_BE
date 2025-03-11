@@ -36,7 +36,6 @@ import comatching.comatching3.pay.enums.OrderStatus;
 import comatching.comatching3.pay.repository.OrderRepository;
 import comatching.comatching3.pay.repository.TossPaymentRepository;
 import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -132,7 +131,7 @@ public class PayService {
 				user.addNewOrder(order);
 
 				// 포인트 증가 내역 저장
-				pointHistoryService.makePointHistory(user, PointHistoryType.CHARGE, order.getPoint());
+				pointHistoryService.makeChargePointHistory(user, PointHistoryType.CHARGE, order, order.getPoint());
 
 				return true;
 			} catch (Exception e) {

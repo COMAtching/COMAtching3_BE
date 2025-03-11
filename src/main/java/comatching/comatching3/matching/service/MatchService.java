@@ -118,6 +118,9 @@ public class MatchService {
 		MatchRes response = MatchRes.fromUsers(enemy);
 		response.updateCurrentPoint(applier.getPoint());
 		log.info("[MatchService] - Match Process Success!! applierUuid = {}, enemyUuid = {}", applierUuid, UUIDUtil.bytesToHex(enemyUuid));
+
+		//todo: pointHistory 생성 로직 추가 (소모인 경우 changeAmount 음수값으로)
+
 		return response;
 	}
 

@@ -20,7 +20,6 @@ public class PayHistoryController {
 
 	@GetMapping("/history")
 	public Response<List<PayHistoryRes>> getPayHistoryList() {
-
 		return Response.ok(payHistoryService.getPayHistory());
 	}
 }

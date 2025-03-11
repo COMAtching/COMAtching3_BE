@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.history.enums.PointHistoryType;
 import comatching.comatching3.history.repository.PointHistoryRepository;
+import comatching.comatching3.pay.entity.Orders;
 import comatching.comatching3.users.entity.Users;
 import lombok.RequiredArgsConstructor;
 
@@ -14,14 +15,16 @@ public class PointHistoryService {
 
 	private final PointHistoryRepository pointHistoryRepository;
 
-	public void makePointHistory(Users user, PointHistoryType pointHistoryType, Long amount) {
+	public void makeChargePointHistory(Users user, PointHistoryType pointHistoryType, Orders order, Long amount) {
 		PointHistory pointHistory = PointHistory.builder()
 			.users(user)
 			.pointHistoryType(pointHistoryType)
 			.changeAmount(amount)
 			.pickMe(user.getPickMe())
 			.totalPoint(user.getPoint())
+			.orders(order)
 			.build();
+
 
 		pointHistoryRepository.save(pointHistory);
 	}
