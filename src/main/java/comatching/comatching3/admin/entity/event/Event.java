@@ -16,7 +16,10 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -32,13 +35,9 @@ public abstract class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id")
-    private University university;
+    protected University university;
 
-    // @Enumerated(EnumType.STRING)
-    // @Column(nullable = false, insertable = false, updatable = false)
-    // private EventType eventType;
+    protected LocalDateTime start;
 
-    private LocalDateTime start;
-
-    private LocalDateTime end;
+    protected LocalDateTime end;
 }

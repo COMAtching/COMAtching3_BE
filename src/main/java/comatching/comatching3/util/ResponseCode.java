@@ -64,7 +64,8 @@ public enum ResponseCode {
 	CONFLICT(409, "IDP-002", HttpStatus.CONFLICT, "Conflict"),
 
 	//Event
-	EVENT_PERIOD_DUPLICATE(400, "EVT-001", HttpStatus.BAD_REQUEST, "Event period is duplicated!");
+	EVENT_PERIOD_DUPLICATE(400, "EVT-001", HttpStatus.BAD_REQUEST, "Event period is duplicated!"),
+	NO_EVENT(200, "EVT-002", HttpStatus.OK, "No event exist");
 
 
 	private final Integer status;
