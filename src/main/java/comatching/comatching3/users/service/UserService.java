@@ -551,14 +551,14 @@ public class UserService {
 			sessionRepository.deleteById(sessionId);
 			session.invalidate();
 
-			Cookie cookie = new Cookie("SESSION", null);
+			Cookie cookie = new Cookie("JSESSIONID", null);
 			cookie.setPath("/");
 			cookie.setHttpOnly(true);
 			cookie.setMaxAge(0);
 			response.addCookie(cookie);
 
 			try {
-				response.sendRedirect("http://localhost:5173/admin/login");
+				response.sendRedirect("http://localhost:5173/");
 			} catch (IOException e) {
 				throw new BusinessException(ResponseCode.INTERNAL_SERVER_ERROR);
 			}
