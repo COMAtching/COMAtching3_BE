@@ -1,18 +1,18 @@
 package comatching.comatching3.users.dto.request;
 
+import java.util.List;
+
 import lombok.Getter;
 
 @Getter
 public class UserUpdateInfoReq {
-	private String nickname;
-	private int age;
-	private String school;
-	private String department;
-	private String contact;
-	private String[] interests;
-	private String favoriteSong;
-	private String selectMBTIEdit;
+	private String username;
+	private String university;
+	private String major;
+	private String contactId;
+	private List<String> hobbies;
+	private String song;
+	private String mbti;
 	private String contactFrequency;
-	private String introduction;
-
+	private String comments;
 }

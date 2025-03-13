@@ -1,7 +1,6 @@
 package comatching.comatching3.users.controller;
 
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +17,7 @@ import comatching.comatching3.users.dto.request.UserRegisterReq;
 import comatching.comatching3.users.dto.request.UserUpdateInfoReq;
 import comatching.comatching3.users.dto.response.CurrentPointRes;
 import comatching.comatching3.users.dto.response.UserInfoRes;
+import comatching.comatching3.users.dto.response.UsernamePointRes;
 import comatching.comatching3.users.service.UserService;
 import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
@@ -62,6 +62,10 @@ public class UserController {
 		return Response.ok();
 	}
 
+	/**
+	 * 프로필 수정
+	 * @param form
+	 */
 	@PatchMapping("/auth/user/api/user/info")
 	public Response<Void> updateUserInfo(@RequestBody UserUpdateInfoReq form) {
 		userService.updateUserInfo(form);
@@ -72,7 +76,7 @@ public class UserController {
 	/**
 	 * contactId 중복확인
 	 */
-	@GetMapping("/auth/social/api/check/{contactId}")
+	@GetMapping("/auth/allUser/api/check/{contactId}")
 	public Response<Boolean> isContactIdDuplicated(@PathVariable String contactId) {
 		return Response.ok(userService.isContactIdDuplicated(contactId));
 	}
@@ -80,10 +84,16 @@ public class UserController {
 	/**
 	 * contactId 변경
 	 */
-	@PatchMapping("/auth/user/api/user/info/{contactId}")
+	@Deprecated
+	// @PatchMapping("/auth/user/api/user/info/{contactId}")
 	public Response<Void> updateContactId(@PathVariable String contactId) {
 		userService.updateContactId(contactId);
 		return Response.ok();
+	}
+
+	@GetMapping("/auth/user/school-domain/{universityName}")
+	public Response<String> getSchoolDomain(@PathVariable String universityName) {
+		return Response.ok(userService.getSchoolDomain(universityName));
 	}
 
 	/**
@@ -106,13 +116,9 @@ public class UserController {
 	 */
 	@PostMapping("/auth/user/api/auth/school/code")
 	@RateLimiter(name = "verify-email")
-	public Response<Void> verifyCode(@Validated @RequestBody EmailVerifyReq request) {
+	public Response<Boolean> verifyCode(@Validated @RequestBody EmailVerifyReq request) {
 		boolean result = userService.verifyCode(request);
-		if (result) {
-			return Response.ok();
-		} else {
-			return Response.errorResponse(ResponseCode.ARGUMENT_NOT_VALID);
-		}
+		return Response.ok(result);
 	}
 
 	/**
@@ -128,14 +134,23 @@ public class UserController {
 	}
 
 	/**
+	 * 유저 닉네임 + 포인트 조회
+	 * @return
+	 */
+	@GetMapping("/auth/user/profile")
+	public Response<UsernamePointRes> getProfile() {
+		return Response.ok(userService.getProfile());
+	}
+
+	/**
 	 * 유저 포인트 조회
 	 *
 	 * @return 유저 포인트
 	 */
 	@GetMapping("/auth/user/api/points")
-	public Response<String> getPoints() {
+	public Response<Long> getPoints() {
 		Long points = userService.getPoints();
-		return Response.ok("point : " + points);
+		return Response.ok(points);
 	}
 
 	/**
