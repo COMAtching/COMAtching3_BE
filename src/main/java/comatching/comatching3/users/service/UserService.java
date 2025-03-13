@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +26,7 @@ import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.history.enums.PointHistoryType;
 import comatching.comatching3.history.repository.PointHistoryRepository;
 import comatching.comatching3.users.dto.AnonymousUser;
+import comatching.comatching3.users.dto.messageQueue.CategoryReqMsg;
 import comatching.comatching3.users.dto.request.BuyPickMeReq;
 import comatching.comatching3.users.dto.request.UserFeatureReq;
 import comatching.comatching3.users.dto.request.UserRegisterReq;
@@ -42,6 +45,7 @@ import comatching.comatching3.users.repository.HobbyRepository;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.EmailUtil;
+import comatching.comatching3.util.RabbitMQ.CategoryRabbitMQUtil;
 import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
@@ -71,6 +75,7 @@ public class UserService {
 	private final UniversityService universityService;
 	private final PasswordEncoder passwordEncoder;
 	private final SessionRepository<?> sessionRepository;
+	private final CategoryRabbitMQUtil categoryRabbitMQUtil;
 
 	public Long getParticipations() {
 		return usersRepository.count();
@@ -164,19 +169,24 @@ public class UserService {
 	}
 
 	/**
-	 * 4) Hobby 관련 로직 (삭제 후 새로 추가)
+	 * 4) Hobby 관련 로직
 	 */
 	private void handleUserHobbies(UserAiFeature userAiFeature, List<String> hobbyNames) {
+
+		List<String> categories = categoryRabbitMQUtil.classifyCategory(
+			new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid())));
+
 		List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 		userAiFeature.removeHobby(existingHobbies);
 		hobbyRepository.deleteAll(existingHobbies);
 
-		List<Hobby> newHobbyList = hobbyNames.stream()
-			.map(hobbyName -> Hobby.builder()
-				.hobbyName(hobbyName)
+		List<Hobby> newHobbyList = IntStream.range(0, hobbyNames.size())
+			.mapToObj(i -> Hobby.builder()
+				.hobbyName(hobbyNames.get(i))
 				.userAiFeature(userAiFeature)
+				.category(categories.get(i))
 				.build())
-			.toList();
+			.collect(Collectors.toList());
 		hobbyRepository.saveAll(newHobbyList);
 
 		userAiFeature.addHobby(newHobbyList);
@@ -186,8 +196,6 @@ public class UserService {
 	 * 5) UserAiFeature 업데이트
 	 */
 	private void updateUserAiFeature(UserAiFeature userAiFeature, UserFeatureReq form) {
-		log.info("gender={}, mbti={}, contactFrequency={}", form.getGender(), form.getMbti(),
-			form.getContactFrequency());
 		int age = LocalDate.now().getYear() - Integer.parseInt(form.getYear()) + 1;
 		userAiFeature.updateMajor(form.getMajor());
 		userAiFeature.updateGender(Gender.fromAiValue(form.getGender()));
@@ -216,20 +224,6 @@ public class UserService {
 
 		securityUtil.setNewUserSecurityContext(user, request);
 	}
-
-	/**
-	 * 7) 토큰 발행 로직
-	 */
-/*	private TokenRes generateTokens(Users user) {
-		String uuid = UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid());
-		String accessToken = jwtUtil.generateAccessToken(uuid, Role.USER.getRoleName());
-		String refreshToken = refreshTokenService.getRefreshToken(uuid);
-
-		return TokenRes.builder()
-			.accessToken(accessToken)
-			.refreshToken(refreshToken)
-			.build();
-	}*/
 
 	/**
 	 * 연락처 중복확인(카톡, 인스타 id)
@@ -269,18 +263,22 @@ public class UserService {
 
 
 		if (form.getHobbies() != null) {
+			List<String> categories = categoryRabbitMQUtil.classifyCategory(
+				new CategoryReqMsg(form.getHobbies(), UUIDUtil.bytesToHex(userAiFeature.getUuid())));
+
 			List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 			userAiFeature.removeHobby(existingHobbies);
 			hobbyRepository.deleteAll(existingHobbies);
 
-			List<Hobby> newHobbyList = form.getHobbies().stream()
-				.map(hobbyName -> Hobby.builder()
-					.hobbyName(hobbyName)
+			List<Hobby> newHobbyList = IntStream.range(0, form.getHobbies().size())
+				.mapToObj(i -> Hobby.builder()
+					.hobbyName(form.getHobbies().get(i))
 					.userAiFeature(userAiFeature)
+					.category(categories.get(i))
 					.build())
-				.toList();
-
+				.collect(Collectors.toList());
 			hobbyRepository.saveAll(newHobbyList);
+
 			userAiFeature.addHobby(newHobbyList);
 		}
 
