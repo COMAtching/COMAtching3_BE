@@ -70,6 +70,7 @@ public class PayHistoryService {
 			.map(order -> PayHistoryRes.builder()
 				.productName(order.getProduct())
 				.orderStatus(order.getOrderStatus())
+				.orderId(order.getOrderUuid())
 				.requestAt(order.getTossPayment().getRequestedAt().toString())
 				.approvedAt(order.getTossPayment().getApprovedAt().toString())
 				.cancelReason(order.getTossPayment().getCancelReason().equals("Not Canceled") ? "정상 결제" : "취소되거나 만료된 주문입니다.")

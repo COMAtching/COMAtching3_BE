@@ -141,7 +141,7 @@ public class UserService {
 		updateUsersEntity(user, form, university, userAiFeature, request);
 
 		// todo: rabbitMQ 연결 후 주석 해제
-		// Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+		// Boolean isSuccess = us가erCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
 		// if(!isSuccess){
 		//     throw new BusinessException(ResponseCode.INPUT_FEATURE_FAIL);
 		// }
@@ -173,8 +173,8 @@ public class UserService {
 	 */
 	private void handleUserHobbies(UserAiFeature userAiFeature, List<String> hobbyNames) {
 
-		List<String> categories = categoryRabbitMQUtil.classifyCategory(
-			new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid())));
+		// List<String> categories = categoryRabbitMQUtil.classifyCategory(
+		// 	new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid())));
 
 		List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 		userAiFeature.removeHobby(existingHobbies);
@@ -184,7 +184,7 @@ public class UserService {
 			.mapToObj(i -> Hobby.builder()
 				.hobbyName(hobbyNames.get(i))
 				.userAiFeature(userAiFeature)
-				.category(categories.get(i))
+				// .category(categories.get(i))
 				.build())
 			.collect(Collectors.toList());
 		hobbyRepository.saveAll(newHobbyList);
