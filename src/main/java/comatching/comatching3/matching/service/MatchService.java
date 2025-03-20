@@ -1,7 +1,7 @@
 package comatching.comatching3.matching.service;
 
-import comatching.comatching3.admin.entity.event.DiscountEvent;
-import comatching.comatching3.admin.entity.event.Event;
+import comatching.comatching3.event.entity.DiscountEvent;
+import comatching.comatching3.event.entity.Event;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.history.entity.MatchingHistory;
 import comatching.comatching3.history.repository.MatchingHistoryRepository;
