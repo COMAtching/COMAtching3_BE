@@ -28,7 +28,7 @@ import java.util.List;
 
 @Configuration
 @EnableBatchProcessing
-public class BatchConfig {
+public class CreateEventBatchConfig {
 
     @Autowired
     private JobRepository jobRepository;
