@@ -12,6 +12,11 @@ import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +30,9 @@ public class AdminEventService {
 
     private final SecurityUtil securityUtil;
     private final EventRepository eventRepository;
+
+    private final JobLauncher jobLauncher;
+    private final Job createEventParticipationJob;
 
     /**
      * 할인 이벤트 등록 메서드
@@ -48,6 +56,19 @@ public class AdminEventService {
             throw new BusinessException(ResponseCode.USER_NOT_FOUND);
         }
         eventRepository.save(discountEvent);
+
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLong("eventId", discountEvent.getId())
+                .addLong("universityId", admin.getUniversity().getId())
+                .toJobParameters();
+
+        try {
+            jobLauncher.run(createEventParticipationJob, jobParameters);
+        } catch (JobExecutionException e) {
+            throw new BusinessException(ResponseCode.USER_NOT_FOUND);
+        }
+
+
     }
 
     /**

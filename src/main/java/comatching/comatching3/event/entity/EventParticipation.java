@@ -3,9 +3,11 @@ package comatching.comatching3.event.entity;
 import comatching.comatching3.users.entity.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 public class EventParticipation {
 
     @Id

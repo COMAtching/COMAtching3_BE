@@ -43,6 +43,6 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 
     boolean existsBySchoolEmail(String schoolEmail);
 
-    List<Users> findAllUserByUniversity(University university);
+    List<Users> findAllUserByUniversityId(Long universityId);
 
 }
