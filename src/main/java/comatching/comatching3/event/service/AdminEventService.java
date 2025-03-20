@@ -21,7 +21,7 @@ import java.util.List;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class EventAdminService {
+public class AdminEventService {
 
     private final SecurityUtil securityUtil;
     private final EventRepository eventRepository;

@@ -2,7 +2,7 @@ package comatching.comatching3.event.controller;
 
 import comatching.comatching3.event.dto.req.DiscountEventRegisterReq;
 import comatching.comatching3.event.dto.res.EventRes;
-import comatching.comatching3.event.service.EventAdminService;
+import comatching.comatching3.event.service.AdminEventService;
 import comatching.comatching3.util.Response;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +17,9 @@ import java.util.List;
 @Slf4j
 @RestController
 @AllArgsConstructor
-public class EventAdminController {
+public class AdminEventController {
 
-    private final EventAdminService eventAdminService;
+    private final AdminEventService adminEventService;
 
     /**
      * 이벤트 생성 요청
@@ -30,7 +30,7 @@ public class EventAdminController {
     @PostMapping("/admin/event/register/discount")
     public Response registerDiscountEvent(@Validated @RequestBody DiscountEventRegisterReq req) {
 
-        eventAdminService.registerDiscountEvent(req);
+        adminEventService.registerDiscountEvent(req);
         return Response.ok();
     }
 
@@ -41,7 +41,7 @@ public class EventAdminController {
      */
     @GetMapping("/admin/event/inquiry")
     public Response<List<EventRes>> inquiryEvent() {
-        return Response.ok(eventAdminService.inquiryEvent());
+        return Response.ok(adminEventService.inquiryEvent());
     }
 
 }
