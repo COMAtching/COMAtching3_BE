@@ -1,4 +1,4 @@
-package comatching.comatching3.admin.repository;
+package comatching.comatching3.event.repository;
 
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.event.entity.Event;

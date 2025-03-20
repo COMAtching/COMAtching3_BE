@@ -22,4 +22,8 @@ public class EventParticipation {
     private Event event;
 
     private Boolean participated;
+
+    public void participateEvent() {
+        this.participated = true;
+    }
 }

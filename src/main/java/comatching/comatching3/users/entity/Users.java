@@ -81,8 +81,6 @@ public class Users extends BaseEntity {
 
     private int warningCount = 0;
 
-    private Boolean event1 = false;
-
     @Builder
     public Users(String provider, String socialId, String email, String role, String username, String password) {
         this.provider = provider;
