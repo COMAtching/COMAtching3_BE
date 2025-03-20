@@ -13,7 +13,6 @@ import comatching.comatching3.util.security.SecurityUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -62,11 +61,11 @@ public class AdminEventService {
                 .addLong("universityId", admin.getUniversity().getId())
                 .toJobParameters();
 
-        try {
-            jobLauncher.run(createEventParticipationJob, jobParameters);
-        } catch (JobExecutionException e) {
-            throw new BusinessException(ResponseCode.USER_NOT_FOUND);
-        }
+//        try {
+//            jobLauncher.run(createEventParticipationJob, jobParameters);
+//        } catch (JobExecutionException e) {
+//            throw new BusinessException(ResponseCode.USER_NOT_FOUND);
+//        }
 
 
     }
