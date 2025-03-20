@@ -130,10 +130,7 @@ public class Users extends BaseEntity {
     public void updateUsername(String username) {
         this.username = username;
     }
-
-    public void updateEvent1(Boolean event1) {
-        this.event1 = event1;
-    }
+    
 
     public void addPayedPoint(Long payedPoint) {
         this.payedPoint += payedPoint;

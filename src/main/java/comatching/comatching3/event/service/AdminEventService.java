@@ -2,11 +2,11 @@ package comatching.comatching3.event.service;
 
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.enums.EventType;
-import comatching.comatching3.admin.repository.EventRepository;
 import comatching.comatching3.event.dto.req.DiscountEventRegisterReq;
 import comatching.comatching3.event.dto.res.EventRes;
 import comatching.comatching3.event.entity.DiscountEvent;
 import comatching.comatching3.event.entity.Event;
+import comatching.comatching3.event.repository.EventRepository;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;

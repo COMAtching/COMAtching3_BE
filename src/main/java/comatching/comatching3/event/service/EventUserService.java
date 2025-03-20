@@ -31,7 +31,7 @@ public class EventUserService {
         Users participant = securityUtil.getCurrentUsersEntity();
 
         EventParticipation eventParticipation = eventParticipationRepository.findEventParticipationByEventIdAndUserId(eventId, participant.getId())
-                .orElseThrow(() -> new BusinessException(ResponseCode.CANT_PARTICIPATE));
+                .orElseThrow(() -> new BusinessException(ResponseCode.EVENT_TIME_OVER));
 
         if (eventParticipation.getEvent().getEnd().isBefore(LocalDateTime.now())) {
             throw new BusinessException(ResponseCode.CANT_PARTICIPATE);
