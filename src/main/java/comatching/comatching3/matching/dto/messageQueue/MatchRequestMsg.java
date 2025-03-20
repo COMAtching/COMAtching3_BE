@@ -1,7 +1,6 @@
 package comatching.comatching3.matching.dto.messageQueue;
 
 import comatching.comatching3.history.entity.MatchingHistory;
-import comatching.comatching3.matching.dto.request.AdminMatchReq;
 import comatching.comatching3.matching.dto.request.MatchReq;
 import comatching.comatching3.matching.enums.AgeOption;
 import comatching.comatching3.matching.enums.ContactFrequencyOption;
@@ -19,7 +18,7 @@ public class MatchRequestMsg {
     private String matcherUuid;
     private ContactFrequencyOption contactFrequencyOption;
     private String myGender;
-    private String hobbyOption;
+    private ArrayList<HobbyEnum> hobbyOption = new ArrayList<HobbyEnum>();
     private Boolean sameMajorOption;
     private AgeOption ageOption;
     private String mbtiOption;
@@ -32,25 +31,13 @@ public class MatchRequestMsg {
         this.matcherUuid = UUIDUtil.bytesToHex(applierFeature.getUuid());
         this.contactFrequencyOption = matchReq.getContactFrequencyOption();
         this.myGender = applierFeature.getGender().getAiValue();
-        this.hobbyOption = HobbyEnum.convertHobbiesString(matchReq.getHobbyEnumOption());
+        this.hobbyOption = matchReq.getHobbyEnumOption();
         this.sameMajorOption = matchReq.getSameMajorOption();
         this.ageOption = matchReq.getAgeOption();
         this.mbtiOption = matchReq.getMbtiOption();
         this.myMajor = applierFeature.getMajor();
         this.myAge = applierFeature.getAge();
         this.university = university;
-    }
-
-    public void fromAdminMatchReqAndUserAiFeature(AdminMatchReq adminMatchReq, UserAiFeature applierFeature) {
-        this.matcherUuid = UUIDUtil.bytesToHex(applierFeature.getUuid());
-        this.contactFrequencyOption = adminMatchReq.getContactFrequencyOption();
-        this.myGender = applierFeature.getGender().getAiValue();
-        this.hobbyOption = HobbyEnum.convertHobbiesString(adminMatchReq.getHobbyEnumOption());
-        this.sameMajorOption = adminMatchReq.getSameMajorOption();
-        this.ageOption = adminMatchReq.getAgeOption();
-        this.mbtiOption = adminMatchReq.getMbtiOption();
-        this.myMajor = applierFeature.getMajor();
-        this.myAge = applierFeature.getAge();
     }
 
     public void updateDuplicationListFromHistory(List<MatchingHistory> matchingHistories) {

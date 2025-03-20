@@ -51,14 +51,11 @@ public enum HobbyEnum {
 		return value;
 	}
 
-	public static String convertHobbiesString(List<HobbyEnum> hobbies) {
-		StringBuilder hobbiesString = new StringBuilder();
+	public static ArrayList<String> convertHobbiesString(List<HobbyEnum> hobbies, ArrayList<String> hobbyOption) {
 
-		for (int i = 0; i < hobbies.size(); i++) {
-			hobbiesString.append(hobbies.get(i).getValue());
-			if (i < hobbies.size() - 1) {
-				hobbiesString.append(", ");
-			}
+		ArrayList<String>
+		for(HobbyEnum hobby : hobbies){
+
 		}
 
 		return hobbiesString.toString();
