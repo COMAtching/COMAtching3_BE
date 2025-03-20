@@ -12,13 +12,16 @@ import comatching.comatching3.matching.dto.request.MatchReq;
 import comatching.comatching3.matching.dto.response.MatchRes;
 import comatching.comatching3.matching.enums.AgeOption;
 import comatching.comatching3.matching.enums.ContactFrequencyOption;
+import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.HobbyEnum;
+import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.HobbyRepository;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.Idempotent.Idempotent;
 import comatching.comatching3.util.RabbitMQ.MatchRabbitMQUtil;
+import comatching.comatching3.util.RabbitMQ.RabbitMQUtil;
 import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
 import comatching.comatching3.util.RedisUtil;
 import comatching.comatching3.util.ResponseCode;
@@ -46,6 +49,13 @@ public class MatchService {
     private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
     private final UserAiFeatureRepository userAiFeatureRepository;
     private final RedisUtil redisUtil;
+    private final RabbitMQUtil rabbitMQUtil;
+
+
+    public void requestTestCrud() {
+        UserAiFeature feature = userAiFeatureRepository.findById(1L).get();
+        userCrudRabbitMQUtil.sendUserChange(feature, UserCrudType.CREATE);
+    }
 
     /**
      * 괸리자 매칭 서비스 리퀘스트 메서드 메세지 브로커에게 리퀘스트를 publish
