@@ -1,10 +1,11 @@
-package comatching.comatching3.admin.dto.request;
+package comatching.comatching3.event.dto.req;
 
 import comatching.comatching3.admin.enums.EventType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import java.time.LocalDateTime;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
 
 @Getter
 public class DiscountEventRegisterReq {
