@@ -25,6 +25,8 @@ public class EventUserService {
      * 현재 유저에가 이벤트에 참여하는 것을 업데이트
      *
      * @param eventId : 유저가 참여할 이벤트
+     *                이벤트 참여 시간 지날경우) EVT-004
+     *                이벤트 생성당시 가입이 안되었을 경우) EVT-003
      */
     @Transactional
     public void participateEvent(Long eventId) {
