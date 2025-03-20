@@ -1,4 +1,4 @@
-package comatching.comatching3.admin.dto.response;
+package comatching.comatching3.event.dto.res;
 
 import comatching.comatching3.admin.enums.EventType;
 import lombok.Getter;

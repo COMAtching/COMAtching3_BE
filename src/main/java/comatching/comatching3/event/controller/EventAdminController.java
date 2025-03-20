@@ -1,7 +1,8 @@
-package comatching.comatching3.event;
+package comatching.comatching3.event.controller;
 
-import comatching.comatching3.admin.dto.request.DiscountEventRegisterReq;
-import comatching.comatching3.admin.dto.response.EventRes;
+import comatching.comatching3.event.dto.req.DiscountEventRegisterReq;
+import comatching.comatching3.event.dto.res.EventRes;
+import comatching.comatching3.event.service.EventAdminService;
 import comatching.comatching3.util.Response;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,10 +1,10 @@
-package comatching.comatching3.event;
+package comatching.comatching3.event.service;
 
-import comatching.comatching3.admin.dto.request.DiscountEventRegisterReq;
-import comatching.comatching3.admin.dto.response.EventRes;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.enums.EventType;
 import comatching.comatching3.admin.repository.EventRepository;
+import comatching.comatching3.event.dto.req.DiscountEventRegisterReq;
+import comatching.comatching3.event.dto.res.EventRes;
 import comatching.comatching3.event.entity.DiscountEvent;
 import comatching.comatching3.event.entity.Event;
 import comatching.comatching3.exception.BusinessException;
@@ -82,6 +82,7 @@ public class EventAdminService {
             eventRes.setStart(event.getStart());
             eventRes.setEventId(eventRes.getEventId());
 
+            //할인 이벤트
             if (event instanceof DiscountEvent) {
                 eventRes.setEventType(EventType.DISCOUNT);
                 eventRes.setDiscountRate(((DiscountEvent) event).getDiscountRate());
