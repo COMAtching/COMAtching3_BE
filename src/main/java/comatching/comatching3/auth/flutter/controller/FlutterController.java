@@ -57,7 +57,7 @@ public class FlutterController {
 		if (userOpt.isPresent()) {
 			user = userOpt.get();
 		} else {
-			user = registerUser(kakaoUser.getUsername(), kakaoUser.getSocialId(), kakaoUser.getProvider(), kakaoUser.getEmail());
+			user = registerUser(kakaoUser.getSocialId(), kakaoUser.getProvider(), kakaoUser.getEmail());
 		}
 
 		LoginDto loginDto = LoginDto.builder()
@@ -91,7 +91,6 @@ public class FlutterController {
 
 		String socialId = payload.get("id");
 		String email = payload.get("email");
-		String username = payload.get("name");
 		String provider = "naver";
 
 		Optional<Users> userOpt = usersRepository.findBySocialId(socialId);
@@ -99,7 +98,7 @@ public class FlutterController {
 		if (userOpt.isPresent()) {
 			user = userOpt.get();
 		} else {
-			user = registerUser(username, socialId, provider, email);
+			user = registerUser(socialId, provider, email);
 		}
 
 		LoginDto loginDto = LoginDto.builder()
@@ -133,7 +132,6 @@ public class FlutterController {
 
 		String socialId = payload.get("id");
 		String email = payload.get("email");
-		String username = payload.get("displayName");
 		String provider = "google";
 
 		Optional<Users> userOpt = usersRepository.findBySocialId(socialId);
@@ -141,7 +139,7 @@ public class FlutterController {
 		if (userOpt.isPresent()) {
 			user = userOpt.get();
 		} else {
-			user = registerUser(username, socialId, provider, email);
+			user = registerUser(socialId, provider, email);
 		}
 
 		LoginDto loginDto = LoginDto.builder()
@@ -167,9 +165,8 @@ public class FlutterController {
 		return Response.ok(loginRes);
 	}
 
-	private Users registerUser(String username, String socialId, String provider, String email) {
+	private Users registerUser(String socialId, String provider, String email) {
 		Users newUser = Users.builder()
-			.username(username)
 			.socialId(socialId)
 			.provider(provider)
 			.email(email)
