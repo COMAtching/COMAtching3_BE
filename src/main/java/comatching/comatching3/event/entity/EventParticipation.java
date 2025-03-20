@@ -1,19 +1,13 @@
-package comatching.comatching3.admin.entity.event;
+package comatching.comatching3.event.entity;
 
 import comatching.comatching3.users.entity.Users;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 public class EventParticipation {
 
     @Id
@@ -30,4 +24,8 @@ public class EventParticipation {
     private Event event;
 
     private Boolean participated;
+
+    public void participateEvent() {
+        this.participated = true;
+    }
 }

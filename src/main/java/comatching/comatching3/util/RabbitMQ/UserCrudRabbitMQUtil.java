@@ -37,8 +37,7 @@ public class UserCrudRabbitMQUtil {
         ParameterizedTypeReference<CompensationMsg> responseType = new ParameterizedTypeReference<CompensationMsg>() {
         };
         UserCrudMsg userCrudMsg = new UserCrudMsg();
-        //userCrudMsg.updateFromUserAIFeatureAndType(type, feature);
-        userCrudMsg.updateTest();
+        userCrudMsg.updateFromUserAIFeatureAndType(type, feature);
         CompensationMsg response = rabbitTemplate.convertSendAndReceiveAsType(
                 userCrudQueue,
                 userCrudMsg,
