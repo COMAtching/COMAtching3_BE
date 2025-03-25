@@ -130,11 +130,13 @@ public class PayService {
 				user.addPoint(order.getPoint());
 				user.addNewOrder(order);
 
+
 				// 포인트 증가 내역 저장
 				pointHistoryService.makeChargePointHistory(user, PointHistoryType.CHARGE, order, order.getPoint());
 
 				return true;
 			} catch (Exception e) {
+				System.out.println(e.getMessage());
 				// DB 저장 or 포인트 증가 실패 시 자동 결제 취소 요청
 				String tempIdempotencyKey = UUID.randomUUID().toString();
 				requestTossPaymentCancel(paymentKey, tempIdempotencyKey, order, cancelReason);

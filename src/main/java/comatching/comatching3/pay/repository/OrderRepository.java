@@ -19,7 +19,7 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
 	@Query("select o from Orders o join fetch o.tossPayment tp where o.users = :user and o.orderStatus = 'ORDER_COMPLETE'")
 	List<Orders> findCompleteByUsers(@Param("user") Users user);
 
-	@Query("select o from Orders o join fetch o.tossPayment tp where o.users = :user")
+	@Query("select o from Orders o join fetch o.tossPayment tp where o.users = :user and tp.approvedAt is not null")
 	List<Orders> findAllByUsers(@Param("user") Users user);
 
 }

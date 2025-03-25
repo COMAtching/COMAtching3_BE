@@ -73,6 +73,24 @@ public class Users extends BaseEntity {
 
     private Long payedPoint = 0L;
 
+	// 사용자가 신고한 목록 (내가 신고한 내역)
+	@OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Report> reportsMade = new ArrayList<>();
+
+	// 사용자가 신고당한 목록 (내가 신고된 내역)
+	@OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Report> reportsReceived = new ArrayList<>();
+
+	@Builder
+	public Users(String provider, String socialId, String email, String role, String username, String password) {
+		this.provider = provider;
+		this.socialId = socialId;
+		this.email = email;
+		this.role = role;
+		this.username = username;
+		this.password = password;
+	}
+
     private String schoolEmail;
 
     private boolean schoolAuth = false;
