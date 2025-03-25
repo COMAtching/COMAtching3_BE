@@ -24,8 +24,4 @@ public class EmailUtil {
         message.setText(text);
         mailSender.send(message);
     }
-
-
-
-
 }

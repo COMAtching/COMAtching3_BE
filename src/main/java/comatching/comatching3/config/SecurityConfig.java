@@ -16,6 +16,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -25,6 +28,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import comatching.comatching3.auth.filter.AdminAuthenticationFilter;
 import comatching.comatching3.auth.filter.RequestLoggingFilter;
 import comatching.comatching3.auth.filter.UserAuthenticationFilter;
+import comatching.comatching3.auth.oauth2.provider.apple.CustomRequestEntityConverter;
 import comatching.comatching3.auth.service.CustomDetailsService;
 import comatching.comatching3.auth.oauth2.handler.OAuth2FailureHandler;
 import comatching.comatching3.auth.oauth2.handler.OAuth2SuccessHandler;
@@ -39,7 +43,9 @@ public class SecurityConfig {
 
 	private static final List<String> CORS_WHITELIST = List.of(
 		"http://localhost:5173",
-		"http://127.0.0.1:5500"
+		"http://127.0.0.1:5500",
+		// "https://localhost.com:8080",
+		"https://appleid.apple.com"
 	);
 	private static final List<String> WHITELIST = List.of(
 		"/login", "/admin/**", "/charge-monitor/**", "/app/**",
@@ -52,6 +58,14 @@ public class SecurityConfig {
 	private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	private final OAuth2FailureHandler oAuth2FailureHandler;
 	private final BlackListService blackListService;
+	private final CustomRequestEntityConverter customRequestEntityConverter;
+
+	@Bean
+	public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+		DefaultAuthorizationCodeTokenResponseClient tokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
+		tokenResponseClient.setRequestEntityConverter(customRequestEntityConverter);
+		return tokenResponseClient;
+	}
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
@@ -119,6 +133,8 @@ public class SecurityConfig {
 			.addFilterBefore(userAuthFilter, UsernamePasswordAuthenticationFilter.class);
 		http
 			.oauth2Login(oauth2 -> oauth2
+				.tokenEndpoint(tokenEndpoint -> tokenEndpoint
+					.accessTokenResponseClient(accessTokenResponseClient()))
 				.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
 					.userService(customOAuth2UserService))
 				.successHandler(oAuth2SuccessHandler)
@@ -129,7 +145,7 @@ public class SecurityConfig {
 			.logout(logout -> logout
 				.logoutUrl("/logout")
 				.logoutSuccessUrl("/login") // 로그아웃 후 리다이렉트 URL 설정
-				.deleteCookies("SESSION")   // 쿠키 삭제 (쿠키 이름이 "SESSION"인 경우)
+				.deleteCookies("JSESSIONID")   // 쿠키 삭제 (쿠키 이름이 "SESSION"인 경우)
 				.invalidateHttpSession(true)
 			);
 

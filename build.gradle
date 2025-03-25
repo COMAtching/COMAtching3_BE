@@ -59,6 +59,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
     implementation "com.fasterxml.uuid:java-uuid-generator:4.0.1"
     implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.0.2'
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.70'
+    implementation 'commons-io:commons-io:2.11.0'
     testImplementation 'org.springframework.security:spring-security-test'
 
     //aws S3
@@ -70,6 +72,11 @@ dependencies {
 
     //Swagger - API Documentation
     //implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+
+    //Batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+
 
     //Test Container dependency
     testImplementation "org.testcontainers:testcontainers:1.20.4"
