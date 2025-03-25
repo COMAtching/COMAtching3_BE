@@ -38,7 +38,6 @@ public class AdminEventService {
      *
      * @param req
      */
-    @Transactional
     public void registerDiscountEvent(DiscountEventRegisterReq req) {
         Admin admin = securityUtil.getAdminFromContext();
 
@@ -52,22 +51,27 @@ public class AdminEventService {
         log.info("start={} end={}", req.getStart(), req.getEnd());
 
         if (isEventDuplicate(discountEvent)) {
-            throw new BusinessException(ResponseCode.USER_NOT_FOUND);
+            throw new BusinessException(ResponseCode.EVENT_PERIOD_DUPLICATE);
         }
-        eventRepository.save(discountEvent);
+        eventRepository.saveAndFlush(discountEvent);
 
+        runEventCreateBatch(discountEvent.getId(), admin.getUniversity().getId());
+
+    }
+
+    @Transactional
+    public void runEventCreateBatch(Long eventId, Long universityId) {
         JobParameters jobParameters = new JobParametersBuilder()
-                .addLong("eventId", discountEvent.getId())
-                .addLong("universityId", admin.getUniversity().getId())
+                .addLong("eventId", eventId)
+                .addLong("universityId", universityId)
                 .toJobParameters();
 
-//        try {
-//            jobLauncher.run(createEventParticipationJob, jobParameters);
-//        } catch (JobExecutionException e) {
-//            throw new BusinessException(ResponseCode.USER_NOT_FOUND);
-//        }
-
-
+        try {
+            jobLauncher.run(createEventParticipationJob, jobParameters);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException(ResponseCode.USER_NOT_FOUND);
+        }
     }
 
     /**
