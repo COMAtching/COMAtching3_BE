@@ -180,11 +180,7 @@ public class UserController {
     //
     // 	return Response.ok();
     // }
-    @PostMapping("/auth/user/api/pickme")
-    public Response<Void> buyPickMe(@RequestBody BuyPickMeReq request) {
-        userService.buyPickMe(request);
-        return Response.ok();
-    }
+
 
     @GetMapping("/auth/user/api/currentPoint")
     public Response<CurrentPointRes> inquiryCurrentPoint() {

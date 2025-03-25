@@ -81,15 +81,6 @@ public class Users extends BaseEntity {
 	@OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Report> reportsReceived = new ArrayList<>();
 
-	@Builder
-	public Users(String provider, String socialId, String email, String role, String username, String password) {
-		this.provider = provider;
-		this.socialId = socialId;
-		this.email = email;
-		this.role = role;
-		this.username = username;
-		this.password = password;
-	}
 
     private String schoolEmail;
 
