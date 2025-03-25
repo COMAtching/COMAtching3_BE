@@ -22,12 +22,8 @@ import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.admin.repository.UniversityRepository;
 import comatching.comatching3.admin.service.UniversityService;
 import comatching.comatching3.exception.BusinessException;
-import comatching.comatching3.history.entity.PointHistory;
-import comatching.comatching3.history.enums.PointHistoryType;
-import comatching.comatching3.history.repository.PointHistoryRepository;
 import comatching.comatching3.users.dto.AnonymousUser;
 import comatching.comatching3.users.dto.messageQueue.CategoryReqMsg;
-import comatching.comatching3.users.dto.request.BuyPickMeReq;
 import comatching.comatching3.users.dto.request.UserFeatureReq;
 import comatching.comatching3.users.dto.request.UserRegisterReq;
 import comatching.comatching3.users.dto.request.UserUpdateInfoReq;
@@ -40,13 +36,11 @@ import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.Role;
-import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.HobbyRepository;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.EmailUtil;
 import comatching.comatching3.util.RabbitMQ.CategoryRabbitMQUtil;
-import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
@@ -68,10 +62,8 @@ public class UserService {
 	private final UserAiFeatureRepository userAiFeatureRepository;
 	private final HobbyRepository hobbyRepository;
 	private final UniversityRepository universityRepository;
-	private final PointHistoryRepository pointHistoryRepository;
 	private final SecurityUtil securityUtil;
 	private final EmailUtil emailUtil;
-	private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
 	private final UniversityService universityService;
 	private final PasswordEncoder passwordEncoder;
 	private final SessionRepository<?> sessionRepository;
@@ -261,7 +253,6 @@ public class UserService {
 			user.updateUniversity(university);
 		}
 
-
 		if (form.getHobbies() != null) {
 			List<String> categories = categoryRabbitMQUtil.classifyCategory(
 				new CategoryReqMsg(form.getHobbies(), UUIDUtil.bytesToHex(userAiFeature.getUuid())));
@@ -428,99 +419,9 @@ public class UserService {
 		return user.getPoint();
 	}
 
-	/**
-	 * todo: remove pickMe
-	 * 뽑힐 기회 구매
-	 *
-	 * @param req
-	 */
-	@Transactional
-	public void buyPickMe(BuyPickMeReq req) {
-
-		if (req == null || req.getAmount() == null) {
-			throw new BusinessException(ResponseCode.BAD_REQUEST_PICKME);
-		}
-
-		Users user = securityUtil.getCurrentUsersEntity();
-		Long price = 500L;
-		Long userPoint = user.getPoint();
-		Long reqPoint = (req.getAmount() / 3) * (price * 2) + (req.getAmount() % 3) * price;
-
-		if (reqPoint > userPoint) {
-			throw new BusinessException(ResponseCode.NOT_ENOUGH_POINT);
-		}
-
-		if (user.getPickMe() == 0) {
-			Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
-
-			if (isSuccess) {
-				throw new BusinessException(ResponseCode.ADD_PICKME_FAIL);
-			}
-		}
-
-		PointHistory pointHistory = PointHistory.builder()
-			.users(user)
-			.pointHistoryType(PointHistoryType.BUY_PICK_ME)
-			.changeAmount(reqPoint)
-			.build();
-
-		user.subtractPoint(reqPoint);
-		user.addPickMe(req.getAmount());
-
-		pointHistory.setTotalPoint(user.getPoint());
-		pointHistory.setPickMe(user.getPickMe());
-
-		user.getPointHistoryList().add(pointHistory);
-
-		pointHistoryRepository.save(pointHistory);
-	}
-
 	public CurrentPointRes inquiryCurrentPoint() {
 		Users users = securityUtil.getCurrentUsersEntity();
 		return new CurrentPointRes(users.getPoint());
-	}
-
-	//todo: remove pickMe
-	@Transactional
-	public void requestEventPickMe() {
-		Users users = securityUtil.getCurrentUsersEntity();
-		if (users.getEvent1()) {
-			throw new BusinessException(ResponseCode.ALREADY_PARTICIPATED);
-		}
-
-		if (users.getPickMe() <= 0) {
-			userCrudRabbitMQUtil.sendUserChange(users.getUserAiFeature(), UserCrudType.CREATE);
-			users.updatePickMe(0);
-		} else {
-			users.updatePickMe(users.getPickMe() + 3);
-		}
-		users.updateEvent1(true);
-
-	}
-
-	//todo: remove pickMe
-	@Transactional
-	public void notRequestEventPickMe() {
-		Users users = securityUtil.getCurrentUsersEntity();
-		users.updateEvent1(true);
-	}
-
-	//todo: remove pickMe
-	// 그만 뽑히기 기능은 유지해도 좋을 듯? pickMe 횟수 없이 csv에서 지우면 되지 않을까
-	@Transactional
-	public void stopPickMe() {
-		Users user = securityUtil.getCurrentUsersEntity();
-		userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.DELETE);
-	}
-
-	//todo: remove pickMe
-	@Transactional
-	public void restartPickMe() {
-		Users user = securityUtil.getCurrentUsersEntity();
-
-		if (user.getPickMe() > 0) {
-			userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
-		}
 	}
 
 	/**
