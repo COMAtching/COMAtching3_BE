@@ -1,6 +1,6 @@
 services:
   app:
-    image: popeye0618/comatching:latest
+    image: smdmim/comatching3_be-app:latest
     ports:
       - "8080:8080"
     depends_on:

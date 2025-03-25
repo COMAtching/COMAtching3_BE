@@ -74,6 +74,11 @@ dependencies {
     //Swagger - API Documentation
     //implementation 'io.springfox:springfox-swagger-ui:2.9.2'
 
+    //Batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+
+
     //Test Container dependency
     testImplementation "org.testcontainers:testcontainers:1.20.4"
     testImplementation "org.junit.jupiter:junit-jupiter:5.8.1"

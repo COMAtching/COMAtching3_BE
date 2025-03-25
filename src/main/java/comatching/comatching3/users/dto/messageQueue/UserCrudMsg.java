@@ -2,8 +2,6 @@ package comatching.comatching3.users.dto.messageQueue;
 
 import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.entity.UserAiFeature;
-import comatching.comatching3.users.enums.ContactFrequency;
-import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.util.UUIDUtil;
 import java.util.List;
@@ -45,16 +43,5 @@ public class UserCrudMsg {
         }
 
         return hobbyString.toString();
-    }
-
-    public void updateTest() {
-        this.type = UserCrudType.CREATE;
-        this.uuid = UUIDUtil.bytesToHex(UUIDUtil.createUUID());
-        this.mbti = "ENFJ";
-        this.contactFrequency = ContactFrequency.FREQUENT.getAiValue();
-        this.hobby = "a,b";
-        this.age = 12;
-        this.gender = Gender.MALE.getValue();
-        this.major = "depart";
     }
 }

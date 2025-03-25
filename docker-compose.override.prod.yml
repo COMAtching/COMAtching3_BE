@@ -1,9 +1,10 @@
-version: '3.9'
+#version: '3.9'
 
 services:
   app:
     ports:
       - "40010:8080"
+      - "5672:5672"
     volumes:
       - prod_app_logs:/app/logs
 
