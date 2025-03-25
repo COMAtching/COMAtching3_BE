@@ -261,7 +261,7 @@ public class OperatorService {
 
 		universityService.checkUniversity(user, null);
 
-		if (point < 0 && user.getPoint() < point) {
+		if (point < 0 && user.getPoint() < Math.abs(point)) {
 			throw new BusinessException(ResponseCode.BAD_REQUEST);
 		}
 
