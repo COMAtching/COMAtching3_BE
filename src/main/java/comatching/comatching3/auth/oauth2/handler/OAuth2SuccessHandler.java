@@ -2,6 +2,7 @@ package comatching.comatching3.auth.oauth2.handler;
 
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.auth.details.CustomUser;
+import comatching.comatching3.users.enums.Role;
 import comatching.comatching3.users.service.BlackListService;
 import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
@@ -27,7 +28,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final BlackListService blackListService;
 
     @Value("${redirect-url.frontend.role-user}")
-     private String REDIRECT_URL;
+     private String REDIRECT_URL_USER;
 
     @Value("${redirect-url.frontend.role-social}")
     private String REDIRECT_URL_SOCIAL;
@@ -47,7 +48,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             return;
         }
 
-        response.sendRedirect(REDIRECT_URL);
+        if (customUser.getRole().equals(Role.SOCIAL.getRoleName())) {
+            response.sendRedirect(REDIRECT_URL_SOCIAL);
+        } else if (customUser.getRole().equals(Role.USER.getRoleName())) {
+            response.sendRedirect(REDIRECT_URL_USER);
+        }
     }
 
     private CustomUser getOAuth2UserPrincipal(Authentication authentication) {
