@@ -26,8 +26,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final BlackListService blackListService;
 
-    @Value("${redirect-url.frontend}")
+    @Value("${redirect-url.frontend.role-user}")
      private String REDIRECT_URL;
+
+    @Value("${redirect-url.frontend.role-social}")
+    private String REDIRECT_URL_SOCIAL;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
