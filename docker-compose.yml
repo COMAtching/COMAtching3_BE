@@ -1,8 +1,6 @@
 services:
   app:
     image: smdmim/comatching3_be-app:latest
-    ports:
-      - "8080:8080"
     depends_on:
       - mysql
       - redis
