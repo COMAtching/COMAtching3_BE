@@ -45,7 +45,8 @@ public class SecurityConfig {
 		"http://localhost:5173",
 		"http://127.0.0.1:5500",
 		// "https://localhost.com:8080",
-		"https://appleid.apple.com"
+		"https://appleid.apple.com",
+		"https://comatching.site"
 	);
 	private static final List<String> WHITELIST = List.of(
 		"/login", "/admin/**", "/charge-monitor/**", "/app/**",
