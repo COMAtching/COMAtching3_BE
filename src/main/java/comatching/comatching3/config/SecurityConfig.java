@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -63,8 +65,11 @@ public class SecurityConfig {
 	private final CustomRequestEntityConverter customRequestEntityConverter;
 
 	@Bean
-	public ForwardedHeaderFilter forwardedHeaderFilter() {
-		return new ForwardedHeaderFilter();
+	public FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
+		FilterRegistrationBean<ForwardedHeaderFilter> filterRegBean = new FilterRegistrationBean<>();
+		filterRegBean.setFilter(new ForwardedHeaderFilter());
+		filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		return filterRegBean;
 	}
 
 	@Bean
