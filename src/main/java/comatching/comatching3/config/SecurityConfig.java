@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.ForwardedHeaderFilter;
 
 import comatching.comatching3.auth.filter.AdminAuthenticationFilter;
 import comatching.comatching3.auth.filter.RequestLoggingFilter;
@@ -60,6 +61,11 @@ public class SecurityConfig {
 	private final OAuth2FailureHandler oAuth2FailureHandler;
 	private final BlackListService blackListService;
 	private final CustomRequestEntityConverter customRequestEntityConverter;
+
+	@Bean
+	public ForwardedHeaderFilter forwardedHeaderFilter() {
+		return new ForwardedHeaderFilter();
+	}
 
 	@Bean
 	public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
