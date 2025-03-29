@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -24,6 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.ForwardedHeaderFilter;
 
 import comatching.comatching3.auth.filter.AdminAuthenticationFilter;
 import comatching.comatching3.auth.filter.RequestLoggingFilter;
@@ -45,7 +48,8 @@ public class SecurityConfig {
 		"http://localhost:5173",
 		"http://127.0.0.1:5500",
 		// "https://localhost.com:8080",
-		"https://appleid.apple.com"
+		"https://appleid.apple.com",
+		"https://comatching.site"
 	);
 	private static final List<String> WHITELIST = List.of(
 		"/login", "/admin/**", "/charge-monitor/**", "/app/**",
@@ -59,6 +63,14 @@ public class SecurityConfig {
 	private final OAuth2FailureHandler oAuth2FailureHandler;
 	private final BlackListService blackListService;
 	private final CustomRequestEntityConverter customRequestEntityConverter;
+
+	@Bean
+	public FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
+		FilterRegistrationBean<ForwardedHeaderFilter> filterRegBean = new FilterRegistrationBean<>();
+		filterRegBean.setFilter(new ForwardedHeaderFilter());
+		filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		return filterRegBean;
+	}
 
 	@Bean
 	public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {

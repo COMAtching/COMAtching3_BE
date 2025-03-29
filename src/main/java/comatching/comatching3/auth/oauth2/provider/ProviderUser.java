@@ -10,8 +10,6 @@ public interface ProviderUser {
 
     String getSocialId();
 
-    String getUsername();
-
     String getEmail();
 
     List<? extends GrantedAuthority> getAuthorities();

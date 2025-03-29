@@ -20,28 +20,6 @@ public class AppleUser extends OAuth2ProviderUser {
 	}
 
 	@Override
-	public String getUsername() {
-		Object nameObj = getAttributes().get("name");
-		if (nameObj != null && nameObj instanceof Map) {
-			@SuppressWarnings("unchecked")
-			Map<String, Object> nameMap = (Map<String, Object>) nameObj;
-			String firstName = nameMap.get("firstName") != null ? nameMap.get("firstName").toString() : "";
-			String lastName = nameMap.get("lastName") != null ? nameMap.get("lastName").toString() : "";
-			String fullName = (firstName + " " + lastName).trim();
-			if (StringUtils.hasText(fullName)) {
-				return fullName;
-			}
-		}
-
-		Object email = getAttributes().get("email");
-		if (email != null) {
-			return email.toString();
-		}
-
-		return getSocialId();
-	}
-
-	@Override
 	public String getEmail() {
 		Object email = getAttributes().get("email");
 		return email != null ? email.toString() : "";

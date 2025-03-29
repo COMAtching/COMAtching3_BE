@@ -21,15 +21,18 @@ public class Hobby {
 
     private HobbyEnum hobbyType;
 
+    private String category;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_ai_feature_id")
     private UserAiFeature userAiFeature;
 
     @Builder
-    public Hobby(String hobbyName, UserAiFeature userAiFeature, HobbyEnum hobbyType) {
+    public Hobby(String hobbyName, UserAiFeature userAiFeature, HobbyEnum hobbyType, String category) {
         this.hobbyName = hobbyName;
         this.userAiFeature = userAiFeature;
         this.hobbyType = hobbyType;
+        this.category = category;
     }
 
     public void setUserAiFeature(UserAiFeature userAiFeature) {

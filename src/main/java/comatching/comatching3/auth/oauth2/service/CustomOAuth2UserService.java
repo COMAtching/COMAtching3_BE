@@ -97,7 +97,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 	private Users register(OAuth2ProviderUser userInfo) {
 		Users newUser = Users.builder()
-			.username(userInfo.getUsername())
 			.socialId(userInfo.getSocialId())
 			.provider(userInfo.getProvider())
 			.email(userInfo.getEmail())
