@@ -3,7 +3,7 @@ package comatching.comatching3.event.service;
 import comatching.comatching3.admin.entity.Admin;
 import comatching.comatching3.admin.enums.EventType;
 import comatching.comatching3.event.dto.req.DiscountEventRegisterReq;
-import comatching.comatching3.event.dto.res.EventRes;
+import comatching.comatching3.event.dto.res.DiscountEventRes;
 import comatching.comatching3.event.entity.DiscountEvent;
 import comatching.comatching3.event.entity.Event;
 import comatching.comatching3.event.repository.EventRepository;
@@ -92,26 +92,26 @@ public class AdminEventService {
      * @return 현재 존재하는 event list
      */
     @Transactional
-    public List<EventRes> inquiryEvent() {
+    public List<DiscountEventRes> inquiryEvent() {
         List<Event> eventList = eventRepository.findEventsByUniversity(securityUtil.getAdminFromContext().getUniversity());
-        List<EventRes> response = new ArrayList<>();
+        List<DiscountEventRes> response = new ArrayList<>();
 
         if (eventList == null) {
             throw new BusinessException(ResponseCode.NO_EVENT);
         }
 
         for (Event event : eventList) {
-            EventRes eventRes = new EventRes();
-            eventRes.setEnd(event.getEnd());
-            eventRes.setStart(event.getStart());
-            eventRes.setEventId(eventRes.getEventId());
+            DiscountEventRes discountEventRes = new DiscountEventRes();
+            discountEventRes.setEnd(event.getEnd());
+            discountEventRes.setStart(event.getStart());
+            discountEventRes.setEventId(discountEventRes.getEventId());
 
             //할인 이벤트
             if (event instanceof DiscountEvent) {
-                eventRes.setEventType(EventType.DISCOUNT);
-                eventRes.setDiscountRate(((DiscountEvent) event).getDiscountRate());
+                discountEventRes.setEventType(EventType.DISCOUNT);
+                discountEventRes.setDiscountRate(((DiscountEvent) event).getDiscountRate());
             }
-            response.add(eventRes);
+            response.add(discountEventRes);
         }
 
         return response;

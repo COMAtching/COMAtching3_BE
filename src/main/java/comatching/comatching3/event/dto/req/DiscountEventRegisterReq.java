@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 public class DiscountEventRegisterReq {
 
+    private Long eventId;
     private EventType eventType;
     private LocalDateTime start;
     private LocalDateTime end;

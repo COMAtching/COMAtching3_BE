@@ -1,7 +1,7 @@
 package comatching.comatching3.event.controller;
 
 import comatching.comatching3.event.dto.req.DiscountEventRegisterReq;
-import comatching.comatching3.event.dto.res.EventRes;
+import comatching.comatching3.event.dto.res.DiscountEventRes;
 import comatching.comatching3.event.service.AdminEventService;
 import comatching.comatching3.util.Response;
 import lombok.AllArgsConstructor;
@@ -40,7 +40,7 @@ public class AdminEventController {
      * @return
      */
     @GetMapping("/admin/event/inquiry")
-    public Response<List<EventRes>> inquiryEvent() {
+    public Response<List<DiscountEventRes>> inquiryEvent() {
         return Response.ok(adminEventService.inquiryEvent());
     }
 

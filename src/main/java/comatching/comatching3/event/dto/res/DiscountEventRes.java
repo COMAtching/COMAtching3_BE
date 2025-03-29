@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @NoArgsConstructor
-public class EventRes {
+public class DiscountEventRes {
     private Long eventId;
     private LocalDateTime start;
     private LocalDateTime end;

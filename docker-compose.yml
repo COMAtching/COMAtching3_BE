@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     networks:
-      - backend
+      - comatching_be_prod
 
   mysql:
     image: mysql:8.0
@@ -18,7 +18,7 @@ services:
       - mysql-data:/var/lib/mysql
       - ./my.cnf:/etc/mysql/my.cnf
     networks:
-      - backend
+      - comatching_be_prod
 
   redis:
     image: redis:latest
@@ -27,10 +27,12 @@ services:
     volumes:
       - redis-data:/data  # Redis 볼륨 추가
     networks:
-      - backend
+      - comatching_be_prod
 
 networks:
-  backend:
+  comatching_be_prod:
+    name: comatching_be_prod
+    external: true
 
 volumes:
   mysql-data:  # MySQL 볼륨
