@@ -4,7 +4,6 @@ import comatching.comatching3.users.dto.messageQueue.CompensationMsg;
 import comatching.comatching3.users.dto.messageQueue.UserCrudMsg;
 import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.enums.UserCrudType;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.MessagePostProcessor;
@@ -13,6 +12,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -45,9 +46,9 @@ public class UserCrudRabbitMQUtil {
                 correlationData,
                 responseType);
 
-        if (!response.getErrorCode().equals("GEN-000")) {
-            log.warn("[UserCrudResponse Error] errorCode={}  / errorMsg={}\n json = {}", response.getErrorCode(),
-                    response.getErrorMessage(), response.toJson());
+        if (!response.getStateCode().equals("GEN-000")) {
+            log.warn("[UserCrudResponse Error] errorCode={}  / errorMsg={}\n json = {}", response.getStateCode(),
+                    response.getMessage(), response.toJson());
             return false;
         }
 
