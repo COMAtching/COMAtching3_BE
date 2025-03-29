@@ -34,4 +34,10 @@ public class TestController {
         testService.requestTestCrudModify();
         return Response.ok();
     }
+
+    @GetMapping("/admin/test/crud/request/match")
+    public Response requestTestMatch() {
+        testService.requestTestMatch();
+        return Response.ok();
+    }
 }
