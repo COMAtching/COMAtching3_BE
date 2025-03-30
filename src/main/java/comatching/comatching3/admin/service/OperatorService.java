@@ -48,7 +48,7 @@ public class OperatorService {
 	private final UsersRepository usersRepository;
 	private final UserAiFeatureRepository userAiFeatureRepository;
 
-	private final String RESET_LINK = "http://localhost:8080/admin/reset-password";
+	private final String RESET_LINK = "https://backend.comatching.site/admin/reset-password";
 
 	/**
 	 * 아이디 찾기 메일 전송

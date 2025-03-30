@@ -82,7 +82,7 @@ public class OperatorController {
 		@Validated @ModelAttribute ResetPasswordReq resetPasswordReq) throws IOException {
 		operatorService.resetPassword(resetPasswordReq);
 
-		response.sendRedirect("http://localhost:8080/admin");
+		response.sendRedirect("https://comatching.site:8080/admin");
 		return Response.ok();
 	}
 
