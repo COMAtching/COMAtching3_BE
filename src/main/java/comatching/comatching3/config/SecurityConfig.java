@@ -46,12 +46,12 @@ public class SecurityConfig {
 
 	private static final List<String> CORS_WHITELIST = List.of(
 		"http://localhost:5173",
-		"http://localhost:5173/adminpage",
+		"http://localhost:5173/adminpage/mypage",
 		"http://127.0.0.1:5500",
 		// "https://localhost.com:8080",
 		"https://appleid.apple.com",
 		"https://comatching.site",
-		"https://comatching.site/adminpage"
+		"https://comatching.site/adminpage/mypage"
 	);
 	private static final List<String> WHITELIST = List.of(
 		"/login", "/admin/**", "/charge-monitor/**", "/app/**",
