@@ -65,7 +65,7 @@ public class KakaoApiService {
 			.clientId(KakaoClientId)
 			.clientSecret(KakaoClientSecret)
 			.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-			.redirectUri("http://localhost:8080/login/oauth2/code/kakao")
+			.redirectUri("https://backend.comatching.site/login/oauth2/code/kakao")
 			.authorizationUri("https://kauth.kakao.com/oauth/authorize")
 			.tokenUri("https://kauth.kakao.com/oauth/token")
 			.userInfoUri("https://kapi.kakao.com/v2/user/me")
