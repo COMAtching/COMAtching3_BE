@@ -51,6 +51,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         if (customUser.getRole().equals(Role.SOCIAL.getRoleName())) {
             response.sendRedirect(REDIRECT_URL_SOCIAL);
         } else if (customUser.getRole().equals(Role.USER.getRoleName())) {
+            log.info("USER role redirect URL: {}", REDIRECT_URL_USER);
             response.sendRedirect(REDIRECT_URL_USER);
         }
     }
