@@ -49,7 +49,7 @@ public class AdminController {
 	 * 비속어 필터 적용
 	 */
 	@PostMapping("/admin/register")
-	public Response<Void> adminRegister(@Validated @RequestBody AdminRegisterReq form) {
+	public Response<Void> adminRegister(@RequestBody @Validated AdminRegisterReq form) {
 
 		boolean isDuplicated = operatorService.checkEmailDuplicate(form.getSchoolEmail());
 		boolean checkEmailDomain = universityService.checkEmailDomain(form.getSchoolEmail(), form.getUniversity());
