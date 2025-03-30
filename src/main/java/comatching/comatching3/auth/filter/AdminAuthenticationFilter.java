@@ -75,7 +75,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 		SecurityContextHolder.getContext().setAuthentication(authResult);
 
 		request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-		response.sendRedirect("/login-success");
+		response.sendRedirect("https://comatching.site/adminpage/mypage");
 	}
 
 	@Override
