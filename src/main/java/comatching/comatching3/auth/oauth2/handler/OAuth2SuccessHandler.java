@@ -46,9 +46,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
 
         if (customUser.getRole().equals(Role.SOCIAL.getRoleName())) {
-            response.sendRedirect(REDIRECT_URL + "/login-success?role=" + Role.SOCIAL.getRoleName());
+            // response.sendRedirect(REDIRECT_URL + "/login-success?role=" + Role.SOCIAL.getRoleName());
+            response.sendRedirect(REDIRECT_URL + "/profile-builder");
         } else if (customUser.getRole().equals(Role.USER.getRoleName())) {
-            response.sendRedirect(REDIRECT_URL + "/login-success?role=" + Role.USER.getRoleName());
+            // response.sendRedirect(REDIRECT_URL + "/login-success?role=" + Role.USER.getRoleName());
+            response.sendRedirect(REDIRECT_URL + "/login");
         }
     }
 
