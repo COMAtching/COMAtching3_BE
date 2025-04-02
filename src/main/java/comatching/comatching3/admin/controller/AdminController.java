@@ -144,7 +144,7 @@ public class AdminController {
 	 * admin 정보 조회 메소드
 	 * @return admin 정보 반환
 	 */
-	@GetMapping("/auth/semi/info")
+	@GetMapping("/auth/any-admin/info")
 	public Response<AdminInfoRes> getAdminInfo() {
 		AdminInfoRes adminInfo = adminService.getAdminInfo();
 
