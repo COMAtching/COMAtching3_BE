@@ -126,6 +126,7 @@ public class SecurityConfig {
 				.requestMatchers("/auth/admin/**").hasRole("ADMIN")
 				.requestMatchers("/auth/operator/**").hasAnyRole("OPERATOR", "ADMIN")
 				.requestMatchers("/auth/semi/**").hasAnyRole("SEMI_OPERATOR", "SEMI_ADMIN")
+				.requestMatchers("/auth/any-admin/**").hasAnyRole("SEMI_OPERATOR", "SEMI_ADMIN", "OPERATOR", "ADMIN")
 				.requestMatchers("/auth/social/**").hasRole("SOCIAL")
 				.requestMatchers("/auth/user/**", "/payments/**").hasRole("USER")
 				.requestMatchers("/auth/allUser/**").hasAnyRole("SOCIAL", "USER")
