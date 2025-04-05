@@ -129,28 +129,21 @@ public class OperatorController {
 
 	/**
 	 * 유저 기본정보 조회 (검색)
-	 * @param username
-	 * @param email
+	 * @param uuid
 	 */
 	@GetMapping("/auth/operator/user")
 	public Response<UserBasicInfoRes> findUserInfo(
-		@RequestParam(name = "username", required = false) String username,
-		@RequestParam(name = "email", required = false) String email) {
+		@RequestParam(name = "uuid") String uuid) {
 
-		if (username != null && email != null) {
+		if (uuid == null) {
 			throw new BusinessException(ResponseCode.BAD_REQUEST);
 		}
 
-		UserBasicInfoRes result = null;
-
-		if (username != null) {
-			result = operatorService.getUserBasicInfoByUsername(username);
-		} else if (email != null) {
-			result = operatorService.getUserBasicInfoByEmail(email);
-		}
-
+		UserBasicInfoRes result = operatorService.getUserBasicInfoByUuid(uuid);
 		return Response.ok(result);
 	}
+
+
 
 	// 회원 포인트 수동 조작
 	@PatchMapping("/auth/operator/api/point")

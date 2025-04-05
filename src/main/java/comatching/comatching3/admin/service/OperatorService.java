@@ -247,6 +247,24 @@ public class OperatorService {
 			.build();
 	}
 
+	public UserBasicInfoRes getUserBasicInfoByUuid(String uuid) {
+
+		University university = securityUtil.getAdminFromContext().getUniversity();
+
+		Users user = usersRepository.findUsersByUuidAndUniversity(UUIDUtil.uuidStringToBytes(uuid), university)
+			.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+		return UserBasicInfoRes.builder()
+			.uuid(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()))
+			.username(user.getUsername())
+			.email(user.getEmail())
+			.provider(user.getProvider())
+			.point(user.getPoint())
+			.warnCount(user.getWarningCount())
+			.registerAt(user.getCreatedAt())
+			.build();
+	}
+
 	/**
 	 * 유저 포인트 수동 조작
 	 * 같은 학교만 가능
