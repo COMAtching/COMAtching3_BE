@@ -81,7 +81,7 @@ public class TempChargeService {
 	}
 
 	public List<TempChargeRes> getChargeRequests() {
-		List<ChargeRequest> chargeRequests = chargeRequestRepository.findAllByOrderStatus(OrderStatus.ORDER_REQUEST);
+		List<ChargeRequest> chargeRequests = chargeRequestRepository.findAllByOrderStatusOrderByRequestAtDesc(OrderStatus.ORDER_REQUEST);
 
 		return chargeRequests.stream().map(
 			chargeRequest -> TempChargeRes.builder()
