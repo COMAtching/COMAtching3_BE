@@ -57,6 +57,7 @@ public enum ResponseCode {
 
     //Payment exception response
     PAYMENT_FAIL(400, "PAY-001", HttpStatus.BAD_REQUEST, "Payment failed"),
+    ENOUGH_DAILY_CHARGE(400, "PAY-002", HttpStatus.BAD_REQUEST, "일일 결제한도 50000원 초과"),
 
     //Idempotent exception response
     UNPROCESSABLE_ENTITY(422, "IDP-001", HttpStatus.UNPROCESSABLE_ENTITY, "Unprocessable Entity"),
@@ -66,7 +67,9 @@ public enum ResponseCode {
     EVENT_PERIOD_DUPLICATE(400, "EVT-001", HttpStatus.BAD_REQUEST, "Event period is duplicated!"),
     NO_EVENT(200, "EVT-002", HttpStatus.OK, "No event exist"),
     CANT_PARTICIPATE(200, "EVT-003", HttpStatus.OK, "You can't participate event"),
-    EVENT_TIME_OVER(200, "EVT-004", HttpStatus.OK, "Event time over");
+    EVENT_TIME_OVER(200, "EVT-004", HttpStatus.OK, "Event time over")
+
+    ;
 
 
     private final Integer status;
