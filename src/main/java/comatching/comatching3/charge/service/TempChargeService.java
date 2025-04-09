@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.joda.time.tz.DateTimeZoneBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import comatching.comatching3.charge.dto.request.TempChargeApprovalReq;
+import comatching.comatching3.charge.dto.request.TempChargeRequest;
 import comatching.comatching3.charge.dto.response.TempChargeRes;
 import comatching.comatching3.charge.entity.ChargeRequest;
 import comatching.comatching3.charge.repository.ChargeRequestRepository;
@@ -16,6 +18,7 @@ import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.pay.dto.req.OrderReq;
 import comatching.comatching3.pay.dto.res.PayHistoryRes;
 import comatching.comatching3.pay.enums.OrderStatus;
+import comatching.comatching3.pay.service.PayHistoryService;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;
@@ -78,7 +81,7 @@ public class TempChargeService {
 	}
 
 	public List<TempChargeRes> getChargeRequests() {
-		List<ChargeRequest> chargeRequests = chargeRequestRepository.findAllByOrderStatusOrderByRequestAtAsc(OrderStatus.ORDER_REQUEST);
+		List<ChargeRequest> chargeRequests = chargeRequestRepository.findAllByOrderStatusOrderByRequestAtDesc(OrderStatus.ORDER_REQUEST);
 
 		return chargeRequests.stream().map(
 			chargeRequest -> TempChargeRes.builder()
