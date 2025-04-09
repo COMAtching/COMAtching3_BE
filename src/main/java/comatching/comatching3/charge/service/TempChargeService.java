@@ -114,4 +114,25 @@ public class TempChargeService {
 				.build()
 		).collect(Collectors.toList());
 	}
+
+	public List<PayHistoryRes> getAdminChargeHistoryTemp(Users user) {
+
+		List<ChargeRequest> histories = chargeRequestRepository.findAllByUsers(user);
+
+		return histories.stream().map(
+			history -> PayHistoryRes.builder()
+				.orderId(history.getOrderId())
+				.point(history.getPoint())
+				.price(history.getPrice())
+				.requestAt(history.getRequestAt().toString())
+				.approvedAt(history.getApprovedAt() != null ? history.getApprovedAt().toString() : null)
+				.cancelReason(history.getCancelReason())
+				.productName(history.getProductName())
+				.tossPaymentMethod(null)
+				.orderStatus(history.getOrderStatus())
+				.build()
+		).collect(Collectors.toList());
+	}
+
+
 }

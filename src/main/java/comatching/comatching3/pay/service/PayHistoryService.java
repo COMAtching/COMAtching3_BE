@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import comatching.comatching3.charge.service.TempChargeService;
@@ -45,7 +46,7 @@ public class PayHistoryService {
 		Users user = usersRepository.findUsersByUuid(uuid)
 			.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
-		return getAllPayHistoryResList(user);
+		return getAdminPayHistory(user);
 	}
 
 	private List<PayHistoryRes> getSuccessPayHistoryResList(Users user) {
@@ -67,7 +68,7 @@ public class PayHistoryService {
 		return list;
 	}
 
-	private List<PayHistoryRes> getAllPayHistoryResList(Users user) {
+	private List<PayHistoryRes> getAllPayHistoryResList() {
 		// return orderRepository.findAllByUsers(user).stream()
 		// 	.map(order -> PayHistoryRes.builder()
 		// 		.productName(order.getProduct())
@@ -84,5 +85,9 @@ public class PayHistoryService {
 
 		// 자체 결제
 		return tempChargeService.getUserChargeHistoryTemp();
+	}
+
+	private List<PayHistoryRes> getAdminPayHistory(Users user) {
+		return tempChargeService.getAdminChargeHistoryTemp(user);
 	}
 }
