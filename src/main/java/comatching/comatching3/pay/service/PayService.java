@@ -60,13 +60,14 @@ public class PayService {
 	@Transactional
 	public OrderRes makeOrder(OrderReq orderReq) {
 		Users user = securityUtil.getCurrentUsersEntity();
-		// 테스트용
-		// Users user = usersRepository.findBySocialId("3490175542")
-		// 	.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
 		String product = orderReq.getProductName();
 		Long amount = orderReq.getAmount();
 		Long point = orderReq.getPoint();
+
+		if (user.getDailyPoint() + point > 50000) {
+			throw new BusinessException(ResponseCode.ENOUGH_DAILY_CHARGE);
+		}
 
 		Orders order = makeOrderEntity(user, product, amount, point);
 
@@ -126,6 +127,7 @@ public class PayService {
 
 				// 포인트 증가 로직
 				Users user = order.getUsers();
+				user.setDailyPoint(user.getDailyPoint() + order.getPoint());
 				user.addPayedPoint(order.getPoint());
 				user.addPoint(order.getPoint());
 				user.addNewOrder(order);

@@ -1,6 +1,7 @@
 package comatching.comatching3.users.entity;
 
 import comatching.comatching3.admin.entity.University;
+import comatching.comatching3.charge.entity.ChargeRequest;
 import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.match_message.entity.MessageMap;
 import comatching.comatching3.pay.entity.Orders;
@@ -10,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +43,8 @@ public class Users extends BaseEntity {
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MessageMap> receivedMessageMap = new ArrayList<MessageMap>();
 
-/*	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ChargeRequest> chargeRequestList = new ArrayList<>();*/
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ChargeRequest> chargeRequestList = new ArrayList<>();
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Orders> orderList = new ArrayList<>();
@@ -72,6 +74,9 @@ public class Users extends BaseEntity {
     private Long point = 0L;
 
     private Long payedPoint = 0L;
+
+    @Setter
+    private Long dailyPoint = 0L;
 
 	// 사용자가 신고한 목록 (내가 신고한 내역)
 	@OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -172,4 +177,6 @@ public class Users extends BaseEntity {
     public void updateBirthday(String birthday) {
         this.birthday = birthday;
     }
+
+
 }
