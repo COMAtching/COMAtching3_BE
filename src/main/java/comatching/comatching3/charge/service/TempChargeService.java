@@ -2,8 +2,10 @@ package comatching.comatching3.charge.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.joda.time.tz.DateTimeZoneBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,13 @@ public class TempChargeService {
 	@Transactional
 	public void requestCharge(OrderReq request) {
 		Users user = securityUtil.getCurrentUsersEntity();
+
+		Optional<ChargeRequest> chargeRequestOpt = chargeRequestRepository.findByUsersAndOrderStatus(user,
+			OrderStatus.ORDER_REQUEST);
+
+		if (chargeRequestOpt.isPresent()) {
+			throw new BusinessException(ResponseCode.ALREADY_REQUEST_CHARGE);
+		}
 
 		ChargeRequest chargeRequest = ChargeRequest.builder()
 			.users(user)

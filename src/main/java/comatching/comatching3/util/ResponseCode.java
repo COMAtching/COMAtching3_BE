@@ -58,6 +58,7 @@ public enum ResponseCode {
     //Payment exception response
     PAYMENT_FAIL(400, "PAY-001", HttpStatus.BAD_REQUEST, "Payment failed"),
     ENOUGH_DAILY_CHARGE(400, "PAY-002", HttpStatus.BAD_REQUEST, "일일 결제한도 50000원 초과"),
+    ALREADY_REQUEST_CHARGE(400, "PAY-003", HttpStatus.BAD_REQUEST, "이미 대기중인 결제 요청이 있습니다"),
 
     //Idempotent exception response
     UNPROCESSABLE_ENTITY(422, "IDP-001", HttpStatus.UNPROCESSABLE_ENTITY, "Unprocessable Entity"),
