@@ -78,6 +78,9 @@ public class Users extends BaseEntity {
     @Setter
     private Long dailyPoint = 0L;
 
+    @Setter
+    private boolean make1000 = false;
+
 	// 사용자가 신고한 목록 (내가 신고한 내역)
 	@OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Report> reportsMade = new ArrayList<>();

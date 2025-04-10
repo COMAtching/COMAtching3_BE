@@ -50,4 +50,11 @@ public class TempChargeController {
 
 		return Response.ok(chargeRequests);
 	}
+
+	@GetMapping("/auth/user/tempay/make1000")
+	public Response<Void> make1000() {
+		tempChargeService.make1000();
+
+		return Response.ok();
+	}
 }

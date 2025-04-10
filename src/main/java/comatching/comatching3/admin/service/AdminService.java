@@ -25,6 +25,7 @@ import comatching.comatching3.admin.enums.AdminRole;
 import comatching.comatching3.admin.repository.AdminRepository;
 import comatching.comatching3.admin.repository.UniversityRepository;
 import comatching.comatching3.exception.BusinessException;
+import comatching.comatching3.setting.service.SystemSettingService;
 import comatching.comatching3.util.EmailUtil;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
@@ -49,6 +50,7 @@ public class AdminService {
 	private final EmailUtil emailUtil;
 	private final PasswordEncoder passwordEncoder;
 	private final SessionRepository<?> sessionRepository;
+	private final SystemSettingService systemSettingService;
 
 	/**
 	 * 관리자 회원가입
@@ -269,5 +271,9 @@ public class AdminService {
 		} else {
 			throw new BusinessException(ResponseCode.BAD_REQUEST);
 		}
+	}
+
+	public void make1000() {
+		systemSettingService.setBalanceButtonEnabled(!systemSettingService.isBalanceButtonEnabled());
 	}
 }
