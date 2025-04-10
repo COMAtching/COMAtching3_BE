@@ -19,6 +19,7 @@ import comatching.comatching3.pay.dto.req.OrderReq;
 import comatching.comatching3.pay.dto.res.PayHistoryRes;
 import comatching.comatching3.pay.enums.OrderStatus;
 import comatching.comatching3.pay.service.PayHistoryService;
+import comatching.comatching3.setting.service.SystemSettingService;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;
@@ -30,6 +31,7 @@ public class TempChargeService {
 
 	private final SecurityUtil securityUtil;
 	private final ChargeRequestRepository chargeRequestRepository;
+	private final SystemSettingService systemSettingService;
 
 	@Transactional
 	public void requestCharge(OrderReq request) {
@@ -134,5 +136,18 @@ public class TempChargeService {
 		).collect(Collectors.toList());
 	}
 
+	@Transactional
+	public void make1000() {
+		Users user = securityUtil.getCurrentUsersEntity();
+
+		Long point = user.getPoint();
+
+		if (point >= 1000 || user.isMake1000() || !systemSettingService.isBalanceButtonEnabled()) {
+			throw new BusinessException(ResponseCode.BAD_REQUEST);
+		}
+
+		user.addPoint(1000 - point);
+		user.setMake1000(true);
+	}
 
 }
