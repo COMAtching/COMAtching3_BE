@@ -121,9 +121,11 @@ public class OperatorController {
 	public Response<PagedModel<UserBasicInfoRes>> getUserBasicInfoList(
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "50") int size,
+		@RequestParam(required = false) String searchType,
+		@RequestParam(required = false) String keyword,
 		PagedResourcesAssembler assembler) {
 
-		Page<UserBasicInfoRes> result = operatorService.getUserBasicInfoList(page, size);
+		Page<UserBasicInfoRes> result = operatorService.getUserBasicInfoList(searchType, keyword, page, size);
 		return Response.ok(assembler.toModel(result));
 	}
 

@@ -52,4 +52,11 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 
 	List<Users> findAllUserByUniversityId(Long universityId);
 
+	Page<Users> findAllByUniversityAndEmailContainingIgnoreCaseOrderByCreatedAtAsc(
+		University university, String email, Pageable pageable);
+
+	// 사용자명으로 검색하는 페이징 메서드
+	Page<Users> findAllByUniversityAndUsernameContainingIgnoreCaseOrderByCreatedAtAsc(
+		University university, String username, Pageable pageable);
+
 }
