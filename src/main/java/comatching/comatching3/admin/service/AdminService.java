@@ -273,7 +273,9 @@ public class AdminService {
 		}
 	}
 
-	public void make1000() {
+	public String  make1000() {
 		systemSettingService.setBalanceButtonEnabled(!systemSettingService.isBalanceButtonEnabled());
+
+		return systemSettingService.isBalanceButtonEnabled() ? "활성화" : "비활성화";
 	}
 }

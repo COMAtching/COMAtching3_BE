@@ -177,9 +177,9 @@ public class AdminController {
 	}
 
 	@GetMapping("/auth/admin/make1000")
-	public Response<Void> make1000() {
-		adminService.make1000();
+	public Response<String> make1000() {
+		String state = adminService.make1000();
 
-		return Response.ok();
+		return Response.ok(state);
 	}
 }
