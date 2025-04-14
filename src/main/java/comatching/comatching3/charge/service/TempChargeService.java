@@ -142,8 +142,12 @@ public class TempChargeService {
 
 		Long point = user.getPoint();
 
-		if (point >= 1000 || user.isMake1000() || !systemSettingService.isBalanceButtonEnabled()) {
-			throw new BusinessException(ResponseCode.BAD_REQUEST);
+		if (point >= 1000) {
+			throw new BusinessException(ResponseCode.OVER_1000);
+		} else if (user.isMake1000()) {
+			throw new BusinessException(ResponseCode.ALREADY_USE);
+		}else if (!systemSettingService.isBalanceButtonEnabled()) {
+			throw new BusinessException(ResponseCode.BUTTON_NOT_ACTIVE);
 		}
 
 		user.addPoint(1000 - point);
