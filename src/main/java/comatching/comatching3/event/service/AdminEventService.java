@@ -44,6 +44,7 @@ public class AdminEventService {
         DiscountEvent discountEvent = DiscountEvent.builder()
                 .start(req.getStart())
                 .end(req.getEnd())
+                .isActivate(false)
                 .university(admin.getUniversity())
                 .discountRate(req.getDiscountRate())
                 .build();

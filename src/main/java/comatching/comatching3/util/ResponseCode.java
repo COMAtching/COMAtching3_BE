@@ -66,7 +66,8 @@ public enum ResponseCode {
     EVENT_PERIOD_DUPLICATE(400, "EVT-001", HttpStatus.BAD_REQUEST, "Event period is duplicated!"),
     NO_EVENT(200, "EVT-002", HttpStatus.OK, "No event exist"),
     CANT_PARTICIPATE(200, "EVT-003", HttpStatus.OK, "You can't participate event"),
-    EVENT_TIME_OVER(200, "EVT-004", HttpStatus.OK, "Event time over");
+    EVENT_TIME_OVER(200, "EVT-004", HttpStatus.OK, "Event time over"),
+    WRONG_EVENT_STATUS(400, "EVT-005", HttpStatus.BAD_REQUEST, "WRONG EVENT STATUS");
 
 
     private final Integer status;
