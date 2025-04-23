@@ -6,10 +6,15 @@ build/
 !**/src/test/**/build/
 
 src/main/resources/application*
+###for env
 .env
 .docker/
 my.cnf
 rabbitmq_definitions.json
+build_deploy_test.ps1
+local_build.ps1
+data.sql
+
 ### STS ###
 .apt_generated
 .classpath
