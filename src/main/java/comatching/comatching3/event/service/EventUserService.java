@@ -63,8 +63,7 @@ public class EventUserService {
         List<EventRes> eventResList = new ArrayList<>();
         for (Event event : events) {
             if (event instanceof DiscountEvent) {
-                DiscountEvent discountEvent = (DiscountEvent) event;
-                eventResList.add(discountEvent.toEventRes());
+                eventResList.add(((DiscountEvent) event).toEventRes());
             }
         }
 
