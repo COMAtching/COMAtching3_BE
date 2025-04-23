@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
+import comatching.comatching3.charge.service.TempChargeService;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.pay.dto.res.PayHistoryRes;
 import comatching.comatching3.pay.enums.OrderStatus;
@@ -23,6 +25,7 @@ public class PayHistoryService {
 	private final SecurityUtil securityUtil;
 	private final OrderRepository orderRepository;
 	private final UsersRepository usersRepository;
+	private final TempChargeService tempChargeService;
 
 	/**
 	 * 사용자의 결제 내역 조회
@@ -43,7 +46,7 @@ public class PayHistoryService {
 		Users user = usersRepository.findUsersByUuid(uuid)
 			.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
-		return getAllPayHistoryResList(user);
+		return getAdminPayHistory(user);
 	}
 
 	private List<PayHistoryRes> getSuccessPayHistoryResList(Users user) {
@@ -65,19 +68,26 @@ public class PayHistoryService {
 		return list;
 	}
 
-	private List<PayHistoryRes> getAllPayHistoryResList(Users user) {
-		return orderRepository.findAllByUsers(user).stream()
-			.map(order -> PayHistoryRes.builder()
-				.productName(order.getProduct())
-				.orderStatus(order.getOrderStatus())
-				.orderId(order.getOrderUuid())
-				.requestAt(order.getTossPayment().getRequestedAt().toString())
-				.approvedAt(order.getTossPayment().getApprovedAt().toString())
-				.cancelReason(order.getTossPayment().getCancelReason().equals("Not Canceled") ? "정상 결제" : "취소되거나 만료된 주문입니다.")
-				.price(order.getAmount())
-				.point(order.getPoint())
-				.tossPaymentMethod(order.getTossPayment().getTossPaymentMethod())
-				.build())
-			.toList();
+	private List<PayHistoryRes> getAllPayHistoryResList() {
+		// return orderRepository.findAllByUsers(user).stream()
+		// 	.map(order -> PayHistoryRes.builder()
+		// 		.productName(order.getProduct())
+		// 		.orderStatus(order.getOrderStatus())
+		// 		.orderId(order.getOrderUuid())
+		// 		.requestAt(order.getTossPayment().getRequestedAt().toString())
+		// 		.approvedAt(order.getTossPayment().getApprovedAt().toString())
+		// 		.cancelReason(order.getTossPayment().getCancelReason().equals("Not Canceled") ? "정상 결제" : "취소되거나 만료된 주문입니다.")
+		// 		.price(order.getAmount())
+		// 		.point(order.getPoint())
+		// 		.tossPaymentMethod(order.getTossPayment().getTossPaymentMethod())
+		// 		.build())
+		// 	.toList();
+
+		// 자체 결제
+		return tempChargeService.getUserChargeHistoryTemp();
+	}
+
+	private List<PayHistoryRes> getAdminPayHistory(Users user) {
+		return tempChargeService.getAdminChargeHistoryTemp(user);
 	}
 }

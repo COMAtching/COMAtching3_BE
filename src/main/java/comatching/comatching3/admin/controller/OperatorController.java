@@ -82,7 +82,7 @@ public class OperatorController {
 		@Validated @ModelAttribute ResetPasswordReq resetPasswordReq) throws IOException {
 		operatorService.resetPassword(resetPasswordReq);
 
-		response.sendRedirect("http://localhost:8080/admin");
+		response.sendRedirect("https://comatching.site:8080/admin");
 		return Response.ok();
 	}
 
@@ -121,36 +121,31 @@ public class OperatorController {
 	public Response<PagedModel<UserBasicInfoRes>> getUserBasicInfoList(
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "50") int size,
+		@RequestParam(required = false) String searchType,
+		@RequestParam(required = false) String keyword,
 		PagedResourcesAssembler assembler) {
 
-		Page<UserBasicInfoRes> result = operatorService.getUserBasicInfoList(page, size);
+		Page<UserBasicInfoRes> result = operatorService.getUserBasicInfoList(searchType, keyword, page, size);
 		return Response.ok(assembler.toModel(result));
 	}
 
 	/**
 	 * 유저 기본정보 조회 (검색)
-	 * @param username
-	 * @param email
+	 * @param uuid
 	 */
 	@GetMapping("/auth/operator/user")
 	public Response<UserBasicInfoRes> findUserInfo(
-		@RequestParam(name = "username", required = false) String username,
-		@RequestParam(name = "email", required = false) String email) {
+		@RequestParam(name = "uuid") String uuid) {
 
-		if (username != null && email != null) {
+		if (uuid == null) {
 			throw new BusinessException(ResponseCode.BAD_REQUEST);
 		}
 
-		UserBasicInfoRes result = null;
-
-		if (username != null) {
-			result = operatorService.getUserBasicInfoByUsername(username);
-		} else if (email != null) {
-			result = operatorService.getUserBasicInfoByEmail(email);
-		}
-
+		UserBasicInfoRes result = operatorService.getUserBasicInfoByUuid(uuid);
 		return Response.ok(result);
 	}
+
+
 
 	// 회원 포인트 수동 조작
 	@PatchMapping("/auth/operator/api/point")

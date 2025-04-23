@@ -27,11 +27,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final BlackListService blackListService;
 
-    @Value("${redirect-url.frontend.role-user}")
-     private String REDIRECT_URL_USER;
-
-    @Value("${redirect-url.frontend.role-social}")
-    private String REDIRECT_URL_SOCIAL;
+    @Value("${redirect-url.frontend}")
+     private String REDIRECT_URL;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -49,9 +46,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
 
         if (customUser.getRole().equals(Role.SOCIAL.getRoleName())) {
-            response.sendRedirect(REDIRECT_URL_SOCIAL);
+            // response.sendRedirect(REDIRECT_URL + "/login-success?role=" + Role.SOCIAL.getRoleName());
+            response.sendRedirect(REDIRECT_URL + "/profile-builder");
         } else if (customUser.getRole().equals(Role.USER.getRoleName())) {
-            response.sendRedirect(REDIRECT_URL_USER);
+            // response.sendRedirect(REDIRECT_URL + "/login-success?role=" + Role.USER.getRoleName());
+            response.sendRedirect(REDIRECT_URL + "/login");
         }
     }
 

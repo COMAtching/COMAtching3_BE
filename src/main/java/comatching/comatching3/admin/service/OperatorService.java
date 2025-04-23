@@ -48,7 +48,7 @@ public class OperatorService {
 	private final UsersRepository usersRepository;
 	private final UserAiFeatureRepository userAiFeatureRepository;
 
-	private final String RESET_LINK = "http://localhost:8080/admin/reset-password";
+	private final String RESET_LINK = "https://backend.comatching.site/admin/reset-password";
 
 	/**
 	 * 아이디 찾기 메일 전송
@@ -179,15 +179,33 @@ public class OperatorService {
 	}
 
 	/**
-	 * 유저 전체 조회
+	 * 유저 전체 조회 (검색 기능 포함)
 	 * 같은 학교만 가능
+	 * @param searchType 검색 유형 (null, 'email', 'username')
+	 * @param keyword 검색어
+	 * @param page 페이지 번호
+	 * @param size 페이지 크기
 	 */
-	public Page<UserBasicInfoRes> getUserBasicInfoList(int page, int size) {
+	public Page<UserBasicInfoRes> getUserBasicInfoList(String searchType, String keyword, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
-
 		University university = securityUtil.getAdminFromContext().getUniversity();
+		Page<Users> usersPage;
 
-		Page<Users> usersPage = usersRepository.findALlByUniversityOrderByCreatedAtAsc(pageable, university);
+		if (searchType == null || keyword == null || keyword.isEmpty()) {
+			// 검색 조건이 없을 경우 전체 조회
+			usersPage = usersRepository.findALlByUniversityOrderByCreatedAtAsc(pageable, university);
+		} else if ("email".equalsIgnoreCase(searchType)) {
+			// 이메일로 검색
+			usersPage = usersRepository.findAllByUniversityAndEmailContainingIgnoreCaseOrderByCreatedAtAsc(
+				university, keyword, pageable);
+		} else if ("username".equalsIgnoreCase(searchType)) {
+			// 사용자명으로 검색
+			usersPage = usersRepository.findAllByUniversityAndUsernameContainingIgnoreCaseOrderByCreatedAtAsc(
+				university, keyword, pageable);
+		} else {
+			// 잘못된 검색 유형일 경우 전체 조회
+			usersPage = usersRepository.findALlByUniversityOrderByCreatedAtAsc(pageable, university);
+		}
 
 		return usersPage.map(user -> UserBasicInfoRes.builder()
 			.uuid(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()))
@@ -234,6 +252,24 @@ public class OperatorService {
 		University university = securityUtil.getAdminFromContext().getUniversity();
 
 		Users user = usersRepository.findByEmailAndUniversity(email, university)
+			.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+		return UserBasicInfoRes.builder()
+			.uuid(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()))
+			.username(user.getUsername())
+			.email(user.getEmail())
+			.provider(user.getProvider())
+			.point(user.getPoint())
+			.warnCount(user.getWarningCount())
+			.registerAt(user.getCreatedAt())
+			.build();
+	}
+
+	public UserBasicInfoRes getUserBasicInfoByUuid(String uuid) {
+
+		University university = securityUtil.getAdminFromContext().getUniversity();
+
+		Users user = usersRepository.findUsersByUuidAndUniversity(UUIDUtil.uuidStringToBytes(uuid), university)
 			.orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
 		return UserBasicInfoRes.builder()

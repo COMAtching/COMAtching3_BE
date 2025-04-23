@@ -49,7 +49,7 @@ public class AdminController {
 	 * 비속어 필터 적용
 	 */
 	@PostMapping("/admin/register")
-	public Response<Void> adminRegister(@Validated @RequestBody AdminRegisterReq form) {
+	public Response<Void> adminRegister(@RequestBody @Validated AdminRegisterReq form) {
 
 		boolean isDuplicated = operatorService.checkEmailDuplicate(form.getSchoolEmail());
 		boolean checkEmailDomain = universityService.checkEmailDomain(form.getSchoolEmail(), form.getUniversity());
@@ -144,7 +144,7 @@ public class AdminController {
 	 * admin 정보 조회 메소드
 	 * @return admin 정보 반환
 	 */
-	@GetMapping("/auth/operator/info")
+	@GetMapping("/auth/any-admin/info")
 	public Response<AdminInfoRes> getAdminInfo() {
 		AdminInfoRes adminInfo = adminService.getAdminInfo();
 
@@ -174,5 +174,12 @@ public class AdminController {
 		adminService.adminLogout(request, response);
 
 		return Response.ok();
+	}
+
+	@GetMapping("/auth/admin/make1000")
+	public Response<String> make1000() {
+		String state = adminService.make1000();
+
+		return Response.ok(state);
 	}
 }

@@ -46,6 +46,7 @@ public class SecurityConfig {
 
 	private static final List<String> CORS_WHITELIST = List.of(
 		"http://localhost:5173",
+		"http://localhost:5173/adminpage/mypage",
 		"http://127.0.0.1:5500",
 		// "https://localhost.com:8080",
 		"https://appleid.apple.com",
@@ -125,6 +126,7 @@ public class SecurityConfig {
 				.requestMatchers("/auth/admin/**").hasRole("ADMIN")
 				.requestMatchers("/auth/operator/**").hasAnyRole("OPERATOR", "ADMIN")
 				.requestMatchers("/auth/semi/**").hasAnyRole("SEMI_OPERATOR", "SEMI_ADMIN")
+				.requestMatchers("/auth/any-admin/**").hasAnyRole("SEMI_OPERATOR", "SEMI_ADMIN", "OPERATOR", "ADMIN")
 				.requestMatchers("/auth/social/**").hasRole("SOCIAL")
 				.requestMatchers("/auth/user/**", "/payments/**").hasRole("USER")
 				.requestMatchers("/auth/allUser/**").hasAnyRole("SOCIAL", "USER")
