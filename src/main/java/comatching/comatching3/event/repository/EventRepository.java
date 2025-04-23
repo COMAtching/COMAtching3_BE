@@ -19,4 +19,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM Event e WHERE e.university = :university")
     List<Event> findEventsByUniversity(@Param("university") University university);
+
+//    @Query("SELECT e FROM  Event e WHERE e.university = :university AND Now() >= :startTime AND Now() <= :endTime")
+//    Event findEventByUniversityBetween(@Param("university") University university,
+//                                       @Param("startTime") LocalDateTime start,
+//                                       @Param("endTime") LocalDateTime end);
+
+    @Query("SELECT e FROM Event e WHERE e.university = :university AND CURRENT_TIMESTAMP BETWEEN e.start AND e.end")
+    List<Event> findOngoingEventsByUniversity(@Param("university") University university);
+
 }

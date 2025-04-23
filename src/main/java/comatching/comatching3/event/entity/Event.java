@@ -1,6 +1,8 @@
 package comatching.comatching3.event.entity;
 
 import comatching.comatching3.admin.entity.University;
+import comatching.comatching3.event.dto.res.EventRes;
+import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,12 +14,12 @@ import java.time.LocalDateTime;
 @DiscriminatorColumn(name = "event_type")
 @Setter
 @Getter
-public abstract class Event {
+public abstract class Event extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "event_id")
-    private Long id;
+    protected Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id")
@@ -26,4 +28,8 @@ public abstract class Event {
     protected LocalDateTime start;
 
     protected LocalDateTime end;
+
+    protected Boolean isActivate;
+
+    abstract EventRes toEventRes();
 }

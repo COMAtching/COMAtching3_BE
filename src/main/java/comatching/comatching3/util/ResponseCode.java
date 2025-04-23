@@ -69,13 +69,13 @@ public enum ResponseCode {
     NO_EVENT(200, "EVT-002", HttpStatus.OK, "No event exist"),
     CANT_PARTICIPATE(200, "EVT-003", HttpStatus.OK, "You can't participate event"),
     EVENT_TIME_OVER(200, "EVT-004", HttpStatus.OK, "Event time over"),
+    WRONG_EVENT_STATUS(400, "EVT-005", HttpStatus.BAD_REQUEST, "WRONG EVENT STATUS"),
 
     // Charge
     OVER_1000(400, "CHR-001", HttpStatus.BAD_REQUEST, "보유 포인트가 1000원 이상"),
     ALREADY_USE(400, "CHR-002", HttpStatus.BAD_REQUEST, "이미 천원 버튼 사용"),
-    BUTTON_NOT_ACTIVE(400, "CHR-003", HttpStatus.BAD_REQUEST, "천원 버튼 비활성화 상태"),
+    BUTTON_NOT_ACTIVE(400, "CHR-003", HttpStatus.BAD_REQUEST, "천원 버튼 비활성화 상태");
 
-    ;
 
 
     private final Integer status;
