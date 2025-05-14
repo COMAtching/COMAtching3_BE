@@ -43,16 +43,23 @@ public class Notice extends BaseEntity {
     @NotNull
     private NoticeType noticeType;
 
+    private Boolean cancelled = Boolean.FALSE;
+
     public NoticeRes toResponse() {
         return new NoticeRes(id, title, content, postedAt, closedAt);
     }
 
+    public void cancel() {
+        this.cancelled = Boolean.TRUE;
+    }
+
     @Builder
-    public Notice(String title, String content, LocalDateTime postedAt, LocalDateTime closedAt, NoticeType noticeType) {
+    public Notice(String title, String content, LocalDateTime postedAt, LocalDateTime closedAt, NoticeType noticeType, University university) {
         this.title = title;
         this.content = content;
         this.postedAt = postedAt;
         this.closedAt = closedAt;
         this.noticeType = noticeType;
+        this.university = university;
     }
 }
