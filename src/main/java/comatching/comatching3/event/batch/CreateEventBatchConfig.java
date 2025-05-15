@@ -84,7 +84,7 @@ public class CreateEventBatchConfig {
                 if (index < users.size()) {
                     return users.get(index++);
                 }
-                return null;  // 끝에 도달하면 null 반환
+                return null;
             }
         };
     }

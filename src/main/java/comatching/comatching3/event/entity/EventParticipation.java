@@ -1,6 +1,7 @@
 package comatching.comatching3.event.entity;
 
 import comatching.comatching3.users.entity.Users;
+import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class EventParticipation {
+public class EventParticipation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
