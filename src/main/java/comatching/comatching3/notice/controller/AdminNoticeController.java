@@ -35,11 +35,11 @@ public class AdminNoticeController {
 
     @GetMapping
     public Response getOpenNotice(@RequestParam String state) {
-        
-        if (state.equals("open")) {
+
+        if (state.equals("OPEN")) {
             List<NoticeRes> res = adminNoticeService.getOpenNotices();
             return Response.ok(res);
-        } else if (state.equals("history")) {
+        } else if (state.equals("HISTORY")) {
             List<NoticeRes> res = adminNoticeService.getClosedNotices();
         }
 

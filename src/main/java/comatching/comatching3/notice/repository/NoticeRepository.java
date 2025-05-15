@@ -16,4 +16,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     @Query("SELECT n FROM Notice n WHERE n.closedAt < :now AND n.cancelled = false")
     List<Notice> findCloseNotice(@Param("now") LocalDateTime now);
 
+    @Query("SELECT n FROM Notice n WHERE n.postedAt < :now AND n.closedAt > :now AND n.cancelled = false")
+    List<Notice> findPostedNotice(@Param("now") LocalDateTime now);
+
 }
