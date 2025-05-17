@@ -255,7 +255,7 @@ public class UserService {
 
 		if (form.getHobbies() != null) {
 			List<String> categories = categoryRabbitMQUtil.classifyCategory(
-				new CategoryReqMsg(form.getHobbies(), UUIDUtil.bytesToHex(userAiFeature.getUuid())));
+				new CategoryReqMsg(form.getHobbies(), UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory();
 
 			List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 			userAiFeature.removeHobby(existingHobbies);
