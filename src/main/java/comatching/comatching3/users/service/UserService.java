@@ -169,6 +169,8 @@ public class UserService {
 		String raw = categoryRabbitMQUtil.classifyCategory(
 			new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory().get(0);
 
+		System.out.println("----------------" + raw + "--------------------");
+
 		raw = raw.substring(1, raw.length() - 1);
 		String[] parts = raw.split(",");
 		List<String> categories = Arrays.stream(parts)
