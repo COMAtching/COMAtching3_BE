@@ -165,8 +165,8 @@ public class UserService {
 	 */
 	private void handleUserHobbies(UserAiFeature userAiFeature, List<String> hobbyNames) {
 
-		// List<String> categories = categoryRabbitMQUtil.classifyCategory(
-		// 	new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid())));
+		List<String> categories = categoryRabbitMQUtil.classifyCategory(
+			new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory();
 
 		List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 		userAiFeature.removeHobby(existingHobbies);
@@ -176,7 +176,7 @@ public class UserService {
 			.mapToObj(i -> Hobby.builder()
 				.hobbyName(hobbyNames.get(i))
 				.userAiFeature(userAiFeature)
-				// .category(categories.get(i))
+				.category(categories.get(i))
 				.build())
 			.collect(Collectors.toList());
 		hobbyRepository.saveAll(newHobbyList);
