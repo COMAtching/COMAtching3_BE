@@ -168,6 +168,8 @@ public class UserService {
 		List<String> categories = categoryRabbitMQUtil.classifyCategory(
 			new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory();
 
+		System.out.println(categories);
+
 		List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 		userAiFeature.removeHobby(existingHobbies);
 		hobbyRepository.deleteAll(existingHobbies);
