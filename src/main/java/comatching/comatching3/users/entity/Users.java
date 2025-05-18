@@ -2,16 +2,13 @@ package comatching.comatching3.users.entity;
 
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.charge.entity.ChargeRequest;
+import comatching.comatching3.chat.domain.entity.ChatRoom;
 import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.match_message.entity.MessageMap;
 import comatching.comatching3.pay.entity.Orders;
 import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +40,8 @@ public class Users extends BaseEntity {
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MessageMap> receivedMessageMap = new ArrayList<MessageMap>();
 
-	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ChargeRequest> chargeRequestList = new ArrayList<>();
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChargeRequest> chargeRequestList = new ArrayList<>();
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Orders> orderList = new ArrayList<>();
@@ -52,6 +49,12 @@ public class Users extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id")
     private University university;
+
+    @OneToMany(mappedBy = "picker", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoom> chatRoomsPickedByMe = new ArrayList<>();
+
+    @OneToMany(mappedBy = "picked", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoom> chatRoomsWhoPickedMe = new ArrayList<>();
 
     private String socialId;
 
@@ -81,13 +84,13 @@ public class Users extends BaseEntity {
     @Setter
     private boolean make1000 = false;
 
-	// 사용자가 신고한 목록 (내가 신고한 내역)
-	@OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Report> reportsMade = new ArrayList<>();
+    // 사용자가 신고한 목록 (내가 신고한 내역)
+    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reportsMade = new ArrayList<>();
 
-	// 사용자가 신고당한 목록 (내가 신고된 내역)
-	@OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Report> reportsReceived = new ArrayList<>();
+    // 사용자가 신고당한 목록 (내가 신고된 내역)
+    @OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reportsReceived = new ArrayList<>();
 
 
     private String schoolEmail;
@@ -106,6 +109,13 @@ public class Users extends BaseEntity {
         this.role = role;
         this.username = username;
         this.password = password;
+    }
+
+    public List<ChatRoom> getAllChatRooms() {
+        List<ChatRoom> all = new ArrayList<>();
+        all.addAll(chatRoomsPickedByMe);
+        all.addAll(chatRoomsWhoPickedMe);
+        return all;
     }
 
     public void addNewOrder(Orders order) {
@@ -147,7 +157,7 @@ public class Users extends BaseEntity {
     public void updateUsername(String username) {
         this.username = username;
     }
-    
+
 
     public void addPayedPoint(Long payedPoint) {
         this.payedPoint += payedPoint;

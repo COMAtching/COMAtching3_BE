@@ -54,7 +54,7 @@ public class AdminNoticeService {
         List<Users> users = usersRepository.findAllUserByUniversityId(univ.getId());
 
         log.info("before batch");
-        batchInsertNoticeConfirms(users, newNotice.getId());
+        //batchInsertNoticeConfirms(users, newNotice.getId());
     }
 
     private void batchInsertNoticeConfirms(List<Users> users, Long noticeId) {
