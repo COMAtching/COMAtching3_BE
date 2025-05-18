@@ -74,9 +74,10 @@ public enum ResponseCode {
     // Charge
     OVER_1000(400, "CHR-001", HttpStatus.BAD_REQUEST, "보유 포인트가 1000원 이상"),
     ALREADY_USE(400, "CHR-002", HttpStatus.BAD_REQUEST, "이미 천원 버튼 사용"),
-    BUTTON_NOT_ACTIVE(400, "CHR-003", HttpStatus.BAD_REQUEST, "천원 버튼 비활성화 상태");
+    BUTTON_NOT_ACTIVE(400, "CHR-003", HttpStatus.BAD_REQUEST, "천원 버튼 비활성화 상태"),
 
-
+    // Chat
+    BAD_WORD_INCLUDE(200, "CHT-001", HttpStatus.OK, "비속어가 포함되어 있습니다");
 
     private final Integer status;
     private final String code;

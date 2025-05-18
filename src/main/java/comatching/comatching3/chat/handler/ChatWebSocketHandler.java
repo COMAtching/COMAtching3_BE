@@ -7,6 +7,7 @@ import comatching.comatching3.chat.service.ChatService;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.repository.UsersRepository;
+import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +47,9 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         Long chatRoomId = chatMessageDto.getChatRoomId();
 
         Users sender = SocketSecurityUtil.getCurrentUsersEntity(session, usersRepository);
-        chatService.saveChatMessage(sender, chatMessageDto.getContent(), chatRoomId);
+        Response responseDto = chatService.saveChatMessage(sender, chatMessageDto.getContent(), chatRoomId);
 
-        String response = objectMapper.writeValueAsString(chatMessageDto);
+        String response = objectMapper.writeValueAsString(responseDto);
         List<WebSocketSession> sessions = chatRoomSessions.getOrDefault(chatRoomId, List.of());
 
         for (WebSocketSession s : sessions) {
