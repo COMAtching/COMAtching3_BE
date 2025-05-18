@@ -27,6 +27,5 @@ public class ChatRoom extends BaseEntity {
         this.picked = picked;
         this.picker = picker;
     }
-
     // Todo: equals/hashCode에서 picker/picked 조합으로 중복 방지
 }
