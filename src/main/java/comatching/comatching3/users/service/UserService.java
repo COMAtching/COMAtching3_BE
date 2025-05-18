@@ -2,6 +2,7 @@ package comatching.comatching3.users.service;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -165,10 +166,14 @@ public class UserService {
 	 */
 	private void handleUserHobbies(UserAiFeature userAiFeature, List<String> hobbyNames) {
 
-		List<String> categories = categoryRabbitMQUtil.classifyCategory(
-			new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory();
+		String raw = categoryRabbitMQUtil.classifyCategory(
+			new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory().get(0);
 
-		System.out.println(categories);
+		raw = raw.substring(1, raw.length() - 1);
+		String[] parts = raw.split(",");
+		List<String> categories = Arrays.stream(parts)
+			.map(s -> s.replace("\"", ""))
+			.collect(Collectors.toList());
 
 		List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 		userAiFeature.removeHobby(existingHobbies);
