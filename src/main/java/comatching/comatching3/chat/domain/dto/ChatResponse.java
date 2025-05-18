@@ -1,9 +1,11 @@
 package comatching.comatching3.chat.domain.dto;
 
 import comatching.comatching3.chat.domain.ChatRole;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@Data
 public class ChatResponse {
 
     private LocalDateTime timestamp;

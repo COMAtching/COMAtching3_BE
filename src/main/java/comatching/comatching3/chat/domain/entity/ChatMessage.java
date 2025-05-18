@@ -4,8 +4,10 @@ import comatching.comatching3.chat.domain.ChatRole;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @NoArgsConstructor
 public class ChatMessage extends BaseEntity {
