@@ -79,6 +79,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 		OAuth2ProviderUser oAuth2UserInfo = OAuth2ProviderFactory.getOAuth2UserInfo(clientRegistration, oAuth2User);
 
+		if (oAuth2UserInfo.getEmail().equals("anonymous@anonymous.com")) {
+			throw new BusinessException(ResponseCode.INVALID_LOGIN);
+		}
+
 		Optional<Users> userOpt = usersRepository.findBySocialId(oAuth2UserInfo.getSocialId());
 
 		Users user = userOpt.orElseGet(() -> register(oAuth2UserInfo));
