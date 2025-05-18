@@ -16,6 +16,9 @@ import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vane.badwordfiltering.BadWordFiltering;
 
 import comatching.comatching3.admin.dto.request.EmailVerifyReq;
@@ -171,21 +174,27 @@ public class UserService {
 
 		System.out.println("----------------" + raw + "--------------------");
 
-		raw = raw.substring(1, raw.length() - 1);
-		String[] parts = raw.split(",");
-		List<String> categories = Arrays.stream(parts)
-			.map(s -> s.replace("\"", ""))
-			.collect(Collectors.toList());
+		ObjectMapper mapper = new ObjectMapper();
+		List<String> categories = null;
+		try {
+			categories = mapper.readValue(
+				raw,
+				new TypeReference<List<String>>() {}
+			);
+		} catch (JsonProcessingException e) {
+			throw new BusinessException(ResponseCode.INTERNAL_SERVER_ERROR);
+		}
 
 		List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 		userAiFeature.removeHobby(existingHobbies);
 		hobbyRepository.deleteAll(existingHobbies);
 
+		List<String> finalCategories = categories;
 		List<Hobby> newHobbyList = IntStream.range(0, hobbyNames.size())
 			.mapToObj(i -> Hobby.builder()
 				.hobbyName(hobbyNames.get(i))
 				.userAiFeature(userAiFeature)
-				.category(categories.get(i))
+				.category(finalCategories.get(i))
 				.build())
 			.collect(Collectors.toList());
 		hobbyRepository.saveAll(newHobbyList);
