@@ -172,7 +172,6 @@ public class UserService {
 		List<String> rawCategories = categoryRabbitMQUtil.classifyCategory(
 			new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory();
 
-		System.out.println(">> rawCategories = " + rawCategories);
 
 		List<String> categories = rawCategories.stream()
 			.map(s -> s.replaceAll("[\\{\\}\"]", "").trim())
@@ -264,8 +263,12 @@ public class UserService {
 		}
 
 		if (form.getHobbies() != null) {
-			List<String> categories = categoryRabbitMQUtil.classifyCategory(
+			List<String> rawCategories = categoryRabbitMQUtil.classifyCategory(
 				new CategoryReqMsg(form.getHobbies(), UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory();
+
+			List<String> categories = rawCategories.stream()
+				.map(s -> s.replaceAll("[\\{\\}\"]", "").trim())
+				.collect(Collectors.toList());
 
 			List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 			userAiFeature.removeHobby(existingHobbies);
