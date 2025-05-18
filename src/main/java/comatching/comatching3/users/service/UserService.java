@@ -169,32 +169,24 @@ public class UserService {
 	 */
 	private void handleUserHobbies(UserAiFeature userAiFeature, List<String> hobbyNames) {
 
-		String raw = categoryRabbitMQUtil.classifyCategory(
-			new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory().get(0);
+		List<String> rawCategories = categoryRabbitMQUtil.classifyCategory(
+			new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory();
 
-		System.out.println("----------------" + raw + "--------------------");
+		System.out.println(">> rawCategories = " + rawCategories);
 
-		ObjectMapper mapper = new ObjectMapper();
-		List<String> categories = null;
-		try {
-			categories = mapper.readValue(
-				raw,
-				new TypeReference<List<String>>() {}
-			);
-		} catch (JsonProcessingException e) {
-			throw new BusinessException(ResponseCode.INTERNAL_SERVER_ERROR);
-		}
+		List<String> categories = rawCategories.stream()
+			.map(s -> s.replaceAll("[\\{\\}\"]", "").trim())
+			.collect(Collectors.toList());
 
 		List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 		userAiFeature.removeHobby(existingHobbies);
 		hobbyRepository.deleteAll(existingHobbies);
 
-		List<String> finalCategories = categories;
 		List<Hobby> newHobbyList = IntStream.range(0, hobbyNames.size())
 			.mapToObj(i -> Hobby.builder()
 				.hobbyName(hobbyNames.get(i))
 				.userAiFeature(userAiFeature)
-				.category(finalCategories.get(i))
+				.category(categories.get(i))
 				.build())
 			.collect(Collectors.toList());
 		hobbyRepository.saveAll(newHobbyList);
