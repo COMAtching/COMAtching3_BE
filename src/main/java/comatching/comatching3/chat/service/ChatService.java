@@ -30,13 +30,28 @@ public class ChatService {
     private final UsersRepository usersRepository;
     private final SecurityUtil securityUtil;
 
-
-    public void createChatRoom(Users picker, Users picked) {
+    /**
+     * 채팅방 생성 메서드
+     *
+     * @param picker
+     * @param picked
+     */
+    public Long createChatRoom(Users picker, Users picked) {
 
         ChatRoom newChatRoom = new ChatRoom(picker, picked);
         chatRoomRepository.save(newChatRoom);
+
+        return newChatRoom.getId();
     }
 
+    /**
+     * 대화 저장 메서드
+     *
+     * @param sender
+     * @param content
+     * @param ChatRoomNumber
+     * @return
+     */
     public Response saveChatMessage(Users sender, String content, Long ChatRoomNumber) {
 
         Response response;
@@ -74,6 +89,11 @@ public class ChatService {
     }
 
 
+    /**
+     * 유저가 속한 채팅방 내역 조회
+     *
+     * @return
+     */
     public List<ChatRoomInfoRes> getChatRoomList() {
         Users user = securityUtil.getCurrentUsersEntity();
         List<ChatRoomInfoRes> chatRoomInfoResList = new ArrayList<>();
@@ -106,6 +126,12 @@ public class ChatService {
         return chatRoomInfoResList;
     }
 
+    /**
+     * 채팅방 대화 내역 조회
+     *
+     * @param roomId
+     * @return
+     */
     public List<ChatResponse> getRoomChats(Long roomId) {
 
         List<ChatResponse> response = new ArrayList<>();
@@ -117,7 +143,7 @@ public class ChatService {
         Long pickerId = chatRoom.getPicker().getId();
         Long pickedId = chatRoom.getPicked().getId();
 
-        if (pickerId.equals(user.getId()) || pickedId.equals(user.getId())) {
+        if (!pickerId.equals(user.getId()) && !pickedId.equals(user.getId())) {
             throw new BusinessException(ResponseCode.BAD_REQUEST);
         }
 
