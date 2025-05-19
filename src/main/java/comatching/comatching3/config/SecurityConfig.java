@@ -114,7 +114,9 @@ public class SecurityConfig {
 
 		http
 			.sessionManagement((session) -> session
-				.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+				.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+				.invalidSessionUrl("https://comatching.site")
+			);
 
 		http
 			.authenticationProvider(authenticationProvider());
