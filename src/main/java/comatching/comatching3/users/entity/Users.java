@@ -67,7 +67,7 @@ public class Users extends BaseEntity {
 
     private String comment;
 
-    private Long point = 0L;
+    private Long point = 1500L;
 
     private Long payedPoint = 0L;
 
@@ -188,5 +188,5 @@ public class Users extends BaseEntity {
     public void updatePickedCount() {
         this.pickedCount++;
     }
-    
+
 }
