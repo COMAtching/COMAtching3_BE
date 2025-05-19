@@ -77,7 +77,8 @@ public enum ResponseCode {
     BUTTON_NOT_ACTIVE(400, "CHR-003", HttpStatus.BAD_REQUEST, "천원 버튼 비활성화 상태"),
 
     // Chat
-    BAD_WORD_INCLUDE(200, "CHT-001", HttpStatus.OK, "비속어가 포함되어 있습니다");
+    BAD_WORD_INCLUDE(200, "CHT-001", HttpStatus.OK, "비속어가 포함되어 있습니다"),
+    NO_CHAT_ROOMS(200, "CHT-002", HttpStatus.OK, "채팅방이 없습니다");
 
     private final Integer status;
     private final String code;

@@ -3,6 +3,7 @@ package comatching.comatching3.chat.service;
 import com.vane.badwordfiltering.BadWordFiltering;
 import comatching.comatching3.chat.domain.ChatRole;
 import comatching.comatching3.chat.domain.dto.ChatResponse;
+import comatching.comatching3.chat.domain.dto.ChatRoomInfoRes;
 import comatching.comatching3.chat.domain.entity.ChatMessage;
 import comatching.comatching3.chat.domain.entity.ChatRoom;
 import comatching.comatching3.chat.repository.ChatMessageRepository;
@@ -12,9 +13,12 @@ import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.Response;
 import comatching.comatching3.util.ResponseCode;
+import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +28,7 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final UsersRepository usersRepository;
+    private final SecurityUtil securityUtil;
 
 
     public void createChatRoom(Users picker, Users picked) {
@@ -67,4 +72,51 @@ public class ChatService {
         ChatRoom newChatRoom = new ChatRoom(picker, picked);
         chatRoomRepository.save(newChatRoom);
     }
+
+
+    public List<ChatRoomInfoRes> getChatRoomList() {
+        Users user = securityUtil.getCurrentUsersEntity();
+        List<ChatRoomInfoRes> chatRoomInfoResList = new ArrayList<>();
+
+        List<ChatRoom> pickerChat = user.getChatRoomsPickedByMe();
+        List<ChatRoom> pickedChat = user.getChatRoomsWhoPickedMe();
+
+        for (ChatRoom chatRoom : pickerChat) {
+            ChatRoomInfoRes res = new ChatRoomInfoRes(
+                    chatRoom.getId(),
+                    ChatRole.PICKER,
+                    chatRoom.getPicker().getUsername(),
+                    chatRoom.getPicked().getUsername()
+            );
+
+            chatRoomInfoResList.add(res);
+        }
+
+        for (ChatRoom chatRoom : pickedChat) {
+            ChatRoomInfoRes res = new ChatRoomInfoRes(
+                    chatRoom.getId(),
+                    ChatRole.PICKED,
+                    chatRoom.getPicker().getUsername(),
+                    chatRoom.getPicked().getUsername()
+            );
+
+            chatRoomInfoResList.add(res);
+        }
+
+        return chatRoomInfoResList;
+    }
+//
+//    public void getRoomInfo(Long roomId) {
+//
+//        Users user = securityUtil.getCurrentUsersEntity();
+//        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new BusinessException(ResponseCode.BAD_REQUEST));
+//
+//        if (chatRoom.getPicker().equals(user)) {
+//
+//        }
+//
+//
+//        securityUtil.getCurrentUsersEntity();
+//
+//    }
 }
