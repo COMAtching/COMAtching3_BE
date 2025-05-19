@@ -31,7 +31,7 @@ public class MatchRes {
                 .comment(users.getComment())
                 .mbti(users.getUserAiFeature().getMbti())
                 .contactFrequency(users.getUserAiFeature().getContactFrequency())
-                .hobbyList(users.getUserAiFeature().getHobbyCategoryList())
+                .hobbyList(users.getUserAiFeature().getHobbyNameList())
                 .age(users.getUserAiFeature().getAge())
                 .major(users.getUserAiFeature().getMajor())
                 .contactId(users.getContactId())
