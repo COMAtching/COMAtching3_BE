@@ -7,11 +7,9 @@ import comatching.comatching3.util.Response;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -27,7 +25,7 @@ public class AdminEventController {
      * @param req
      * @return
      */
-    @PostMapping("/admin/event/register/discount")
+    @PostMapping("/auth/admin/event/discount")
     public Response registerDiscountEvent(@Validated @RequestBody DiscountEventRegisterReq req) {
 
         adminEventService.registerDiscountEvent(req);
@@ -39,9 +37,18 @@ public class AdminEventController {
      *
      * @return
      */
-    @GetMapping("/admin/event/inquiry")
-    public Response<List<EventRes>> inquiryEvent() {
-        return Response.ok(adminEventService.inquiryEvent());
+    @GetMapping("/auth/admin/event")
+    public Response<List<EventRes>> inquiryEvent(@RequestParam String status) {
+
+        List<EventRes> response = new ArrayList<>();
+
+        if (status.equals("OPEN")) {
+            response = adminEventService.inquiryEvent();
+        } else if (status.equals("CLOSED")) {
+            response = adminEventService.inquiryClosedEvent();
+        }
+
+        return Response.ok(response);
     }
 
 }
