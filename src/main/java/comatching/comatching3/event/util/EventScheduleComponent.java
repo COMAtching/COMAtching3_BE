@@ -2,6 +2,7 @@ package comatching.comatching3.event.util;
 
 import comatching.comatching3.event.entity.Event;
 import comatching.comatching3.event.repository.EventRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -10,10 +11,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class EventScheduleComponent {
 
-    private EventRepository eventRepository;
-
+    private final EventRepository eventRepository;
 
     /**
      * 10분 마다 등록된 event의 활성화/비활성화 여부 판단
