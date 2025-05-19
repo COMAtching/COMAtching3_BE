@@ -1,6 +1,6 @@
 package comatching.comatching3.users.enums;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -19,7 +19,11 @@ public enum HobbyEnum {
         this.value = value;
     }
 
-    @JsonCreator
+    @JsonValue
+    public String getValue() {
+        return value;
+    }
+
     public static HobbyEnum from(String value) {
         for (HobbyEnum hobbyEnum : HobbyEnum.values()) {
             if (hobbyEnum.getValue().equals(value)) {

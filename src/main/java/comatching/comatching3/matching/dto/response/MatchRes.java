@@ -1,7 +1,6 @@
 package comatching.comatching3.matching.dto.response;
 
 import comatching.comatching3.chat.domain.ChatRole;
-import comatching.comatching3.users.entity.Hobby;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
@@ -17,7 +16,7 @@ public class MatchRes {
     private String comment;
     private String mbti;
     private ContactFrequency contactFrequency;
-    private List<Hobby> hobbyList;
+    private List<String> hobbyList;
     private Integer age;
     private Gender gender;
     private String major;
@@ -32,7 +31,7 @@ public class MatchRes {
                 .comment(users.getComment())
                 .mbti(users.getUserAiFeature().getMbti())
                 .contactFrequency(users.getUserAiFeature().getContactFrequency())
-                .hobbyList(users.getUserAiFeature().getHobbyList())
+                .hobbyList(users.getUserAiFeature().getHobbyCategoryList())
                 .age(users.getUserAiFeature().getAge())
                 .major(users.getUserAiFeature().getMajor())
                 .contactId(users.getContactId())

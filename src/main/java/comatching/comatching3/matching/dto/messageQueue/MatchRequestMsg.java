@@ -32,7 +32,7 @@ public class MatchRequestMsg {
         this.matcherUuid = UUIDUtil.bytesToHex(applierFeature.getUuid());
         this.contactFrequencyOption = matchReq.getContactFrequencyOption();
         this.genderOption = applierFeature.getGender().getAiValue();
-        this.hobbyOption = matchReq.getHobbyEnumOption();
+        this.hobbyOption = matchReq.getHobbyOption();
         this.sameMajorOption = matchReq.getSameMajorOption();
         this.ageOption = matchReq.getAgeOption();
         this.mbtiOption = matchReq.getMbtiOption();

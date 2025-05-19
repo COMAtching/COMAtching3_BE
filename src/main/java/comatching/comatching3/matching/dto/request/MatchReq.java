@@ -22,7 +22,7 @@ public class MatchReq {
     private String mbtiOption;
 
     @ValidEnum(enumClass = HobbyEnum.class)
-    private ArrayList<HobbyEnum> hobbyEnumOption;
+    private ArrayList<HobbyEnum> hobbyOption;
 
     @ValidEnum(enumClass = ContactFrequencyOption.class)
     private ContactFrequencyOption contactFrequencyOption;
