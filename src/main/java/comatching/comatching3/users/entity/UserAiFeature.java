@@ -62,6 +62,15 @@ public class UserAiFeature {
         return hobbyCategoryList;
     }
 
+    public List<String> getHobbyNameList() {
+        List<String> hobbyCategoryList = new ArrayList<>();
+        for (Hobby hobby : hobbyList) {
+            hobbyCategoryList.add(hobby.getHobbyName());
+        }
+
+        return hobbyCategoryList;
+    }
+
     public void updateMbti(String mbti) {
         this.mbti = mbti;
     }

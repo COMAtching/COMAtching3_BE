@@ -25,7 +25,6 @@ public class UserCrudMsg {
     private List<String> hobby;
     private String major;
     private String mbti;
-    private String duplication = "kim_seung_won_sa_rang_hae";
 
 
     public void updateFromUserAIFeatureAndType(UserCrudType type, UserAiFeature userAiFeature) {
