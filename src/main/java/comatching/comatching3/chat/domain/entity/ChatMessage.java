@@ -1,6 +1,7 @@
 package comatching.comatching3.chat.domain.entity;
 
 import comatching.comatching3.chat.domain.ChatRole;
+import comatching.comatching3.chat.domain.dto.ChatResponse;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.*;
@@ -31,6 +32,10 @@ public class ChatMessage extends BaseEntity {
         this.content = content;
         this.chatRoom = chatRoom;
         this.chatRole = chatRole;
+    }
+
+    public ChatResponse toResponse() {
+        return new ChatResponse(this.getCreatedAt(), this.content, this.chatRole);
     }
 }
 

@@ -78,7 +78,8 @@ public enum ResponseCode {
 
     // Chat
     BAD_WORD_INCLUDE(200, "CHT-001", HttpStatus.OK, "비속어가 포함되어 있습니다"),
-    NO_CHAT_ROOMS(200, "CHT-002", HttpStatus.OK, "채팅방이 없습니다");
+    NO_CHAT_ROOMS(200, "CHT-002", HttpStatus.OK, "채팅방이 없습니다"),
+    NOT_USER_ROOM(200, "CHT-003", HttpStatus.OK, "소속된 채팅방이 아닙니다");
 
     private final Integer status;
     private final String code;

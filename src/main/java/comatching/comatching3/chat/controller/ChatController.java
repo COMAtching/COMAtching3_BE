@@ -1,5 +1,6 @@
 package comatching.comatching3.chat.controller;
 
+import comatching.comatching3.chat.domain.dto.ChatResponse;
 import comatching.comatching3.chat.domain.dto.ChatRoomInfoRes;
 import comatching.comatching3.chat.domain.dto.ChatRoomReq;
 import comatching.comatching3.chat.service.ChatService;
@@ -27,8 +28,15 @@ public class ChatController {
     }
 
     @GetMapping
-    public Response<List<ChatRoomInfoRes>> getChatRooms(@RequestParam Long roomId) {
+    public Response<List<ChatRoomInfoRes>> getChatRooms() {
         List<ChatRoomInfoRes> res = chatService.getChatRoomList();
+
+        return Response.ok(res);
+    }
+
+    @GetMapping("/room")
+    public Response<List<ChatResponse>> getChatRooms(Long roomId) {
+        List<ChatResponse> res = chatService.getRoomChats(roomId);
 
         return Response.ok(res);
     }

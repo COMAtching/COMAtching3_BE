@@ -105,18 +105,28 @@ public class ChatService {
 
         return chatRoomInfoResList;
     }
-//
-//    public void getRoomInfo(Long roomId) {
-//
-//        Users user = securityUtil.getCurrentUsersEntity();
-//        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new BusinessException(ResponseCode.BAD_REQUEST));
-//
-//        if (chatRoom.getPicker().equals(user)) {
-//
-//        }
-//
-//
-//        securityUtil.getCurrentUsersEntity();
-//
-//    }
+
+    public List<ChatResponse> getRoomChats(Long roomId) {
+
+        List<ChatResponse> response = new ArrayList<>();
+        Users user = securityUtil.getCurrentUsersEntity();
+
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.BAD_REQUEST));
+
+        Long pickerId = chatRoom.getPicker().getId();
+        Long pickedId = chatRoom.getPicked().getId();
+
+        if (pickerId.equals(user.getId()) || pickedId.equals(user.getId())) {
+            throw new BusinessException(ResponseCode.BAD_REQUEST);
+        }
+
+        List<ChatMessage> chats = chatMessageRepository.findByChatRoomOrderByCreatedAt(chatRoom);
+        for (ChatMessage chat : chats) {
+            response.add(chat.toResponse());
+        }
+
+        return response;
+
+    }
 }
