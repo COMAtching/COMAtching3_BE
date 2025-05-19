@@ -4,7 +4,6 @@ import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.charge.entity.ChargeRequest;
 import comatching.comatching3.chat.domain.entity.ChatRoom;
 import comatching.comatching3.history.entity.PointHistory;
-import comatching.comatching3.match_message.entity.MessageMap;
 import comatching.comatching3.pay.entity.Orders;
 import comatching.comatching3.util.BaseEntity;
 import jakarta.persistence.*;
@@ -33,12 +32,6 @@ public class Users extends BaseEntity {
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PointHistory> pointHistoryList = new ArrayList<PointHistory>();
-
-    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MessageMap> sentMessageMap = new ArrayList<MessageMap>();
-
-    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MessageMap> receivedMessageMap = new ArrayList<MessageMap>();
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChargeRequest> chargeRequestList = new ArrayList<>();
@@ -101,6 +94,8 @@ public class Users extends BaseEntity {
 
     private int warningCount = 0;
 
+    private int pickedCount = 0;
+
     @Builder
     public Users(String provider, String socialId, String email, String role, String username, String password) {
         this.provider = provider;
@@ -158,7 +153,6 @@ public class Users extends BaseEntity {
         this.username = username;
     }
 
-
     public void addPayedPoint(Long payedPoint) {
         this.payedPoint += payedPoint;
     }
@@ -191,5 +185,8 @@ public class Users extends BaseEntity {
         this.birthday = birthday;
     }
 
-
+    public void updatePickedCount() {
+        this.pickedCount++;
+    }
+    
 }

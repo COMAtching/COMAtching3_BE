@@ -25,6 +25,7 @@ public class MatchRequestMsg {
     private String myMajor;
     private Integer myAge;
     private String university;
+    private String importantOption;
     private List<String> duplicationList = new ArrayList<String>();
 
     public void fromMatchReqAndUserAiFeature(MatchReq matchReq, UserAiFeature applierFeature, String university) {
@@ -38,6 +39,7 @@ public class MatchRequestMsg {
         this.myMajor = applierFeature.getMajor();
         this.myAge = applierFeature.getAge();
         this.university = university;
+        this.importantOption = matchReq.getImportantOption();
     }
 
     public void updateDuplicationListFromHistory(List<MatchingHistory> matchingHistories) {

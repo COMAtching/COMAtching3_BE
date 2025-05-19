@@ -18,6 +18,7 @@ import java.util.ArrayList;
 public class MatchReq {
     @ValidEnum(enumClass = AgeOption.class)
     private AgeOption ageOption;
+
     private String mbtiOption;
 
     @ValidEnum(enumClass = HobbyEnum.class)
@@ -25,6 +26,8 @@ public class MatchReq {
 
     @ValidEnum(enumClass = ContactFrequencyOption.class)
     private ContactFrequencyOption contactFrequencyOption;
+
     private Boolean sameMajorOption;
-    private String duplicationList;
+
+    private String importantOption;
 }
