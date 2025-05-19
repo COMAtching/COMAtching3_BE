@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -34,15 +35,16 @@ public class AdminNoticeController {
     }
 
     @GetMapping
-    public Response getOpenNotice(@RequestParam String state) {
+    public Response<List<NoticeRes>> getOpenNotice(@RequestParam String state) {
 
+        List<NoticeRes> res = new ArrayList<>();
         if (state.equals("OPEN")) {
-            List<NoticeRes> res = adminNoticeService.getOpenNotices();
-            return Response.ok(res);
+            res = adminNoticeService.getOpenNotices();
+
         } else if (state.equals("HISTORY")) {
-            List<NoticeRes> res = adminNoticeService.getClosedNotices();
+            res = adminNoticeService.getClosedNotices();
         }
 
-        return Response.ok();
+        return Response.ok(res);
     }
 }
