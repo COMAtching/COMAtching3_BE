@@ -43,7 +43,7 @@ public class AdminEventController {
         List<EventRes> response = new ArrayList<>();
 
         if (status.equals("OPEN")) {
-            response = adminEventService.inquiryEvent();
+            response = adminEventService.inquiryOpenEvent();
         } else if (status.equals("CLOSED")) {
             response = adminEventService.inquiryClosedEvent();
         }

@@ -94,7 +94,7 @@ public class AdminEventService {
      */
     @Transactional
     public List<EventRes> inquiryEvent() {
-        List<Event> eventList = eventRepository.findEventsByUniversity(securityUtil.getAdminFromContext().getUniversity());
+        List<Event> eventList = eventRepository.findOngoingEventsByUniversity(securityUtil.getAdminFromContext().getUniversity());
         List<EventRes> response = new ArrayList<>();
 
         if (eventList == null) {
@@ -113,7 +113,7 @@ public class AdminEventService {
 
     @Transactional
     public List<EventRes> inquiryOpenEvent() {
-        List<Event> eventList = eventRepository.findEventsByUniversity(securityUtil.getAdminFromContext().getUniversity());
+        List<Event> eventList = eventRepository.findOngoingEventsByUniversity(securityUtil.getAdminFromContext().getUniversity());
         List<EventRes> response = new ArrayList<>();
 
         if (eventList == null) {
