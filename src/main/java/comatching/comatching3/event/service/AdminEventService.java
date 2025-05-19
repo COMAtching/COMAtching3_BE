@@ -111,4 +111,42 @@ public class AdminEventService {
         return response;
     }
 
+    @Transactional
+    public List<EventRes> inquiryOpenEvent() {
+        List<Event> eventList = eventRepository.findEventsByUniversity(securityUtil.getAdminFromContext().getUniversity());
+        List<EventRes> response = new ArrayList<>();
+
+        if (eventList == null) {
+            throw new BusinessException(ResponseCode.NO_EVENT);
+        }
+
+        for (Event event : eventList) {
+
+            //할인 이벤트
+            if (event instanceof DiscountEvent) response.add(((DiscountEvent) event).toEventRes());
+
+        }
+
+        return response;
+    }
+
+    @Transactional
+    public List<EventRes> inquiryClosedEvent() {
+        List<Event> eventList = eventRepository.findCloseEventsByUniversity(securityUtil.getAdminFromContext().getUniversity());
+        List<EventRes> response = new ArrayList<>();
+
+        if (eventList == null) {
+            throw new BusinessException(ResponseCode.NO_EVENT);
+        }
+
+        for (Event event : eventList) {
+
+            //할인 이벤트
+            if (event instanceof DiscountEvent) response.add(((DiscountEvent) event).toEventRes());
+
+        }
+
+        return response;
+    }
+
 }
