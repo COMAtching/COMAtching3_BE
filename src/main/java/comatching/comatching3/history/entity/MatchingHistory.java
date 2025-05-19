@@ -46,6 +46,8 @@ public class MatchingHistory extends BaseEntity {
 
     private Boolean noSameMajorOption;
 
+    private String importantOption;
+
     @Builder
     public MatchingHistory(Users applier, Users enemy, String mbtiOption, AgeOption ageOption,
                            ContactFrequencyOption contactFrequencyOption, List<HobbyEnum> hobbyEnumOption, Boolean noSameMajorOption) {
@@ -65,6 +67,7 @@ public class MatchingHistory extends BaseEntity {
         this.ageOption = matchRequestMsg.getAgeOption();
         this.mbtiOption = matchRequestMsg.getMbtiOption();
         this.contactFrequencyOption = matchRequestMsg.getContactFrequencyOption();
+        this.importantOption = matchRequestMsg.getImportantOption();
     }
 
     @Override

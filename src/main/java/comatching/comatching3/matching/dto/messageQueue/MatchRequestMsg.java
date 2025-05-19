@@ -25,19 +25,21 @@ public class MatchRequestMsg {
     private String myMajor;
     private Integer myAge;
     private String university;
+    private String importantOption;
     private List<String> duplicationList = new ArrayList<String>();
 
     public void fromMatchReqAndUserAiFeature(MatchReq matchReq, UserAiFeature applierFeature, String university) {
         this.matcherUuid = UUIDUtil.bytesToHex(applierFeature.getUuid());
         this.contactFrequencyOption = matchReq.getContactFrequencyOption();
         this.genderOption = applierFeature.getGender().getAiValue();
-        this.hobbyOption = matchReq.getHobbyEnumOption();
+        this.hobbyOption = matchReq.getHobbyOption();
         this.sameMajorOption = matchReq.getSameMajorOption();
         this.ageOption = matchReq.getAgeOption();
         this.mbtiOption = matchReq.getMbtiOption();
         this.myMajor = applierFeature.getMajor();
         this.myAge = applierFeature.getAge();
         this.university = university;
+        this.importantOption = matchReq.getImportantOption();
     }
 
     public void updateDuplicationListFromHistory(List<MatchingHistory> matchingHistories) {

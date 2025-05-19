@@ -52,6 +52,9 @@ public class UserCrudRabbitMQUtil {
             return false;
         }
 
+        log.warn("[UserCrudResponse] code={}, Msg={}\n json = {}", response.getStateCode(),
+                response.getMessage(), response.toJson());
+
         return true;
     }
 }
