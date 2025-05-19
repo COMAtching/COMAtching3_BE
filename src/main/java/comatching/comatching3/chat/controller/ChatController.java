@@ -35,7 +35,7 @@ public class ChatController {
     }
 
     @GetMapping("/room")
-    public Response<List<ChatResponse>> getChatRooms(Long roomId) {
+    public Response<List<ChatResponse>> getChatRooms(@RequestParam Long roomId) {
         List<ChatResponse> res = chatService.getRoomChats(roomId);
 
         return Response.ok(res);
