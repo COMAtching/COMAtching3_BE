@@ -63,6 +63,7 @@ public class MatchService {
         MatchRequestMsg requestMsg = new MatchRequestMsg();
         requestMsg.fromMatchReqAndUserAiFeature(matchReq, applier.getUserAiFeature(),
                 applier.getUniversity().getUniversityName());
+        requestMsg.updateWeight();
 
         //중복 유저 조회 및 브로커 메세지 반영
         Optional<List<MatchingHistory>> matchingHistories = matchingHistoryRepository.findByApplier(applier);
