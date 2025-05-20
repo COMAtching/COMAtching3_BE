@@ -106,7 +106,11 @@ public class ChatService {
                     chatRoom.getId(),
                     ChatRole.PICKER,
                     chatRoom.getPicker().getUsername(),
-                    chatRoom.getPicked().getUsername()
+                    chatRoom.getPicked().getUsername(),
+                    chatRoom.getPicker().getUserAiFeature().getMajor(),
+                    chatRoom.getPicker().getUserAiFeature().getAge(),
+                    chatRoom.getPicked().getUserAiFeature().getMajor(),
+                    chatRoom.getPicked().getUserAiFeature().getAge()
             );
 
             chatRoomInfoResList.add(res);
@@ -117,7 +121,11 @@ public class ChatService {
                     chatRoom.getId(),
                     ChatRole.PICKED,
                     chatRoom.getPicker().getUsername(),
-                    chatRoom.getPicked().getUsername()
+                    chatRoom.getPicked().getUsername(),
+                    chatRoom.getPicker().getUserAiFeature().getMajor(),
+                    chatRoom.getPicker().getUserAiFeature().getAge(),
+                    chatRoom.getPicked().getUserAiFeature().getMajor(),
+                    chatRoom.getPicked().getUserAiFeature().getAge()
             );
 
             chatRoomInfoResList.add(res);
