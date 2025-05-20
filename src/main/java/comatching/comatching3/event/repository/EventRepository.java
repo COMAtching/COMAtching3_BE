@@ -28,7 +28,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e WHERE e.university = :university AND CURRENT_TIMESTAMP > e.end ")
     List<Event> findCloseEventsByUniversity(@Param("university") University university);
 
-    @Query("SELECT e FROM Event e WHERE e.university = :university AND CURRENT_TIMESTAMP > e.start ")
+    @Query("SELECT e FROM Event e WHERE e.university = :university AND CURRENT_TIMESTAMP < e.end ")
     List<Event> findOpenEventsByUniversity(@Param("university") University university);
 
 
