@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,14 +79,6 @@ public class MatchService {
 
         //포인트 계산
         Long usePoint = calcPoint(matchReq);
-        Optional<Event> discountEventOpt = eventRepository.findCurrentlyActiveEventByUniversity(
-                LocalDateTime.now(), applier.getUniversity());
-
-        //할인 이벤트가 존재한다면 적용
-        if (discountEventOpt.isPresent() && discountEventOpt.get() instanceof DiscountEvent discountEvent) {
-            int discountRate = discountEvent.getDiscountRate();
-            usePoint = usePoint * (100 - discountRate) / 100;
-        }
 
         //유저저 포인트가 부족한지 체크
         if (usePoint > applier.getPoint()) {
