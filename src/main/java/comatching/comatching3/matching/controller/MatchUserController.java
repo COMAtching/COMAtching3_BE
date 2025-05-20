@@ -29,9 +29,4 @@ public class MatchUserController {
         MatchRes res = matchService.requestMatch(req);
         return Response.ok(res);
     }
-
-    @GetMapping("/request")
-    public void requestTest() {
-        matchService.requestTestCrud();
-    }
 }

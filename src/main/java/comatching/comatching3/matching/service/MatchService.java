@@ -3,6 +3,7 @@ package comatching.comatching3.matching.service;
 import comatching.comatching3.chat.service.ChatService;
 import comatching.comatching3.event.entity.DiscountEvent;
 import comatching.comatching3.event.entity.Event;
+import comatching.comatching3.event.repository.EventRepository;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.history.entity.MatchingHistory;
 import comatching.comatching3.history.repository.MatchingHistoryRepository;
@@ -10,7 +11,6 @@ import comatching.comatching3.matching.dto.messageQueue.MatchRequestMsg;
 import comatching.comatching3.matching.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.matching.dto.request.MatchReq;
 import comatching.comatching3.matching.dto.response.MatchRes;
-import comatching.comatching3.users.entity.UserAiFeature;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,12 +42,7 @@ public class MatchService {
     private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
     private final UserAiFeatureRepository userAiFeatureRepository;
     private final ChatService chatService;
-
-
-    public void requestTestCrud() {
-        UserAiFeature feature = userAiFeatureRepository.findById(1L).get();
-        userCrudRabbitMQUtil.sendUserChange(feature, UserCrudType.CREATE);
-    }
+    private final EventRepository eventRepository;
 
     /**
      * 괸리자 매칭 서비스 리퀘스트 메서드 메세지 브로커에게 리퀘스트를 publish
@@ -82,16 +78,26 @@ public class MatchService {
             userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
         }
 
-        //포인트 차감
+        //포인트 계산
         Long usePoint = calcPoint(matchReq);
+        Optional<Event> discountEventOpt = eventRepository.findCurrentlyActiveEventByUniversity(
+                LocalDateTime.now(), applier.getUniversity());
 
+        //할인 이벤트가 존재한다면 적용
+        if (discountEventOpt.isPresent() && discountEventOpt.get() instanceof DiscountEvent discountEvent) {
+            int discountRate = discountEvent.getDiscountRate();
+            usePoint = usePoint * (100 - discountRate) / 100;
+        }
+
+        //유저저 포인트가 부족한지 체크
         if (usePoint > applier.getPoint()) {
             throw new BusinessException(ResponseCode.INSUFFICIENT_POINT);
         }
 
+        //포인트 차감
         applier.subtractPoint(usePoint);
 
-        //history 생성
+        //matching history 생성
         MatchingHistory history = MatchingHistory.builder()
                 .enemy(enemy)
                 .applier(applier)
@@ -150,7 +156,7 @@ public class MatchService {
 //        }
 
         if (msg.getSameMajorOption()) {
-            point += 300;
+            point += 200;
         }
 
         if (!msg.getImportantOption().equals("UNSELECTED")) {
