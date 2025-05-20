@@ -434,7 +434,7 @@ public class UserService {
 		return PointRes.builder()
 			.socialId(user.getSocialId())
 			.username(user.getUsername())
-			.realName(user.getRealName())
+			.realName(user.getRealName() == null ? null : user.getRealName())
 			.point(user.getPoint())
 			.build();
 	}
