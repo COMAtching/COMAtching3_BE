@@ -27,6 +27,11 @@ public class MatchRequestMsg {
     private String university;
     private String importantOption;
     private List<String> duplicationList = new ArrayList<String>();
+    private Double mbtiWeight = 0.25;
+    private Double ageWeight = 0.25;
+    private Double hobbyWeight = 0.25;
+    private Double contactFrequencyWeight = 0.25;
+
 
     public void fromMatchReqAndUserAiFeature(MatchReq matchReq, UserAiFeature applierFeature, String university) {
         this.matcherUuid = UUIDUtil.bytesToHex(applierFeature.getUuid());
@@ -40,6 +45,36 @@ public class MatchRequestMsg {
         this.myAge = applierFeature.getAge();
         this.university = university;
         this.importantOption = matchReq.getImportantOption();
+
+    }
+
+    public void updateWeight() {
+        switch (this.importantOption) {
+            case "ageOption" -> {
+                this.mbtiWeight = 0.2;
+                this.ageWeight = 0.4;
+                this.hobbyWeight = 0.2;
+                this.contactFrequencyWeight = 0.2;
+            }
+            case "mbtiOption" -> {
+                this.mbtiWeight = 0.4;
+                this.ageWeight = 0.2;
+                this.hobbyWeight = 0.2;
+                this.contactFrequencyWeight = 0.2;
+            }
+            case "hobbyOption" -> {
+                this.mbtiWeight = 0.2;
+                this.ageWeight = 0.2;
+                this.hobbyWeight = 0.4;
+                this.contactFrequencyWeight = 0.2;
+            }
+            case "contactFrequencyOption" -> {
+                this.mbtiWeight = 0.2;
+                this.ageWeight = 0.2;
+                this.hobbyWeight = 0.2;
+                this.contactFrequencyWeight = 0.4;
+            }
+        }
     }
 
     public void updateDuplicationListFromHistory(List<MatchingHistory> matchingHistories) {
