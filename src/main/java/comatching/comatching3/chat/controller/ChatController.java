@@ -28,7 +28,7 @@ public class ChatController {
     }
 
     @GetMapping
-    public Response<List<ChatRoomInfoRes>> getChatRooms() {
+    public Response<List<ChatRoomInfoRes>> getChatRoomList() {
         List<ChatRoomInfoRes> res = chatService.getChatRoomList();
 
         return Response.ok(res);
