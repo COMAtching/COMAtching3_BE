@@ -118,7 +118,7 @@ public class AdminEventService {
         for (Event event : eventList) {
 
             //할인 이벤트
-            if (event instanceof DiscountEvent) response.add(((DiscountEvent) event).toEventRes());
+            if (event instanceof DiscountEvent discountEvent) response.add(discountEvent.toEventRes());
 
         }
 
