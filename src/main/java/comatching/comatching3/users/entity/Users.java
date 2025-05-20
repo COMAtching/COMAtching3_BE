@@ -67,7 +67,7 @@ public class Users extends BaseEntity {
 
     private String comment;
 
-    private Long point = 1000L;
+    private Long point = 0L;
 
     private Long payedPoint = 0L;
 
