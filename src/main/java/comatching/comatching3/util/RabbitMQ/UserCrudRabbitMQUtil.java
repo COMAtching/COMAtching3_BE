@@ -46,7 +46,7 @@ public class UserCrudRabbitMQUtil {
                 correlationData,
                 responseType);
 
-        if (!response.getStateCode().equals("GEN-000")) {
+        if (!response.getStateCode().equals("CRUD-000")) {
             log.warn("[UserCrudResponse Error] errorCode={}  / errorMsg={}\n json = {}", response.getStateCode(),
                     response.getMessage(), response.toJson());
             return false;

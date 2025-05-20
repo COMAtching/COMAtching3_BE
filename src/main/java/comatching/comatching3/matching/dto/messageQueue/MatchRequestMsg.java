@@ -45,7 +45,6 @@ public class MatchRequestMsg {
         this.myAge = applierFeature.getAge();
         this.university = university;
         this.importantOption = matchReq.getImportantOption();
-
     }
 
     public void updateWeight() {
