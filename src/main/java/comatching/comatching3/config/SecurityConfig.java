@@ -144,7 +144,7 @@ public class SecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable);
 
 		http
-			.addFilterBefore(new RequestLoggingFilter(), UsernamePasswordAuthenticationFilter.class)
+			// .addFilterBefore(new RequestLoggingFilter(), UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(adminAuthFilter, UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(userAuthFilter, UsernamePasswordAuthenticationFilter.class);
 		http
