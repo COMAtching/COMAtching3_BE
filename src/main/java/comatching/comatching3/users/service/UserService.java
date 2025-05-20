@@ -41,11 +41,13 @@ import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.Role;
+import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.HobbyRepository;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.EmailUtil;
 import comatching.comatching3.util.RabbitMQ.CategoryRabbitMQUtil;
+import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
@@ -73,6 +75,7 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final SessionRepository<?> sessionRepository;
 	private final CategoryRabbitMQUtil categoryRabbitMQUtil;
+	private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
 
 	public Long getParticipations() {
 		return usersRepository.count();
@@ -138,10 +141,10 @@ public class UserService {
 		updateUsersEntity(user, form, university, userAiFeature, request);
 
 		// todo: rabbitMQ 연결 후 주석 해제
-		// Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
-		// if(!isSuccess){
-		//     throw new BusinessException(ResponseCode.INPUT_FEATURE_FAIL);
-		// }
+		Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+		if(!isSuccess){
+		    throw new BusinessException(ResponseCode.INPUT_FEATURE_FAIL);
+		}
 
 	}
 
