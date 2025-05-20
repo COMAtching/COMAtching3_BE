@@ -41,4 +41,12 @@ public class UserEventController {
 
         return Response.ok(result);
     }
+
+    @GetMapping("/event")
+    public Response<EventRes> requestCurrentEVnet() {
+
+        EventRes result = eventUserService.inquiryCurrentEvent();
+        return Response.ok(result);
+    }
+
 }

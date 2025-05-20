@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
@@ -30,4 +31,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM Event e WHERE e.university = :university AND CURRENT_TIMESTAMP > e.end ")
     List<Event> findCloseEventsByUniversity(@Param("university") University university);
+
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.start <= :now " +
+            "AND e.end >= :now " +
+            "AND e.isActivate = true " +  // 공백 추가
+            "AND e.university = :university")
+    Optional<Event> findCurrentlyActiveEventByUniversity(@Param("now") LocalDateTime now,
+                                                         @Param("university") University university);
+
+
 }

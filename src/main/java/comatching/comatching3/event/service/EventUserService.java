@@ -69,4 +69,17 @@ public class EventUserService {
 
         return eventResList;
     }
+
+    @Transactional
+    public EventRes inquiryCurrentEvent() {
+        University userUniversity = securityUtil.getCurrentUsersEntity().getUniversity();
+        Event event = eventRepository.findCurrentlyActiveEventByUniversity(LocalDateTime.now(), userUniversity).
+                orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+        if (event instanceof DiscountEvent discountEvent) {
+            return discountEvent.toEventRes();
+        }
+
+        throw new BusinessException(ResponseCode.NO_EVENT);
+    }
 }
