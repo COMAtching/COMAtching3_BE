@@ -87,33 +87,9 @@ public class AdminEventService {
         );
     }
 
-    /**
-     * 관리자 - 현재 학교의 event 조회
-     *
-     * @return 현재 존재하는 event list
-     */
-    @Transactional
-    public List<EventRes> inquiryEvent() {
-        List<Event> eventList = eventRepository.findOngoingEventsByUniversity(securityUtil.getAdminFromContext().getUniversity());
-        List<EventRes> response = new ArrayList<>();
-
-        if (eventList == null) {
-            throw new BusinessException(ResponseCode.NO_EVENT);
-        }
-
-        for (Event event : eventList) {
-
-            //할인 이벤트
-            if (event instanceof DiscountEvent) response.add(((DiscountEvent) event).toEventRes());
-
-        }
-
-        return response;
-    }
-
     @Transactional
     public List<EventRes> inquiryOpenEvent() {
-        List<Event> eventList = eventRepository.findOngoingEventsByUniversity(securityUtil.getAdminFromContext().getUniversity());
+        List<Event> eventList = eventRepository.findOpenEventsByUniversity(securityUtil.getAdminFromContext().getUniversity());
         List<EventRes> response = new ArrayList<>();
 
         if (eventList == null) {
