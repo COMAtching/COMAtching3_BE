@@ -50,6 +50,7 @@ public enum ResponseCode {
     NO_MATCH_RESPONSE(400, "MAT-005", HttpStatus.BAD_REQUEST, "Couldn't receive the response message from ai server"),
     NO_ENEMY_AVAILABLE(400, "MAT-006", HttpStatus.BAD_REQUEST, "NO ENEMY"),
     INSUFFICIENT_POINT(400, "MAT-007", HttpStatus.BAD_REQUEST, "insufficient point to match"),
+    MATCH_COUNT_OVER(400, "MAT-008", HttpStatus.BAD_REQUEST, "MATCH_COUNT_OVER"),
 
 
     //History exception response
