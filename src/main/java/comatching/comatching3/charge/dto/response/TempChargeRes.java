@@ -18,4 +18,5 @@ public class TempChargeRes {
 	private Long price;
 	private String requestAt;
 	private String realName;
+	private String contact;
 }
