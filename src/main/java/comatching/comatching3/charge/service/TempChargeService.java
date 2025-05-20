@@ -97,6 +97,7 @@ public class TempChargeService {
 				.orderId(chargeRequest.getOrderId())
 				.requestAt(chargeRequest.getRequestAt().toString())
 				.realName(chargeRequest.getRealName())
+				.contact(chargeRequest.getUsers().getContactId())
 				.build()
 		).collect(Collectors.toList());
 	}
