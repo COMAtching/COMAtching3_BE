@@ -38,8 +38,8 @@ public class TestService {
     }
 
 
-    public void requestTestCrudDelete() {
-        UserAiFeature userAiFeature = userAiFeatureRepository.findById(1L)
+    public void requestTestCrudDelete(Long id) {
+        UserAiFeature userAiFeature = userAiFeatureRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.MATCH_CODE_CHECK_FAIL));
         userCrudRabbitMQUtil.sendUserChange(userAiFeature, UserCrudType.DELETE);
     }

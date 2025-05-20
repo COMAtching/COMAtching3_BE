@@ -10,6 +10,7 @@ import comatching.comatching3.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -32,8 +33,8 @@ public class TestController {
     }
 
     @GetMapping("/admin/test/crud/request/delete")
-    public Response requestTestDelete() {
-        testService.requestTestCrudDelete();
+    public Response requestTestDelete(@RequestParam Long userId) {
+        testService.requestTestCrudDelete(userId);
         return Response.ok();
     }
 
