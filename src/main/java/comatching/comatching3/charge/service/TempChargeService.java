@@ -51,6 +51,7 @@ public class TempChargeService {
 			.point(request.getPoint())
 			.cancelReason("결제 대기")
 			.orderStatus(OrderStatus.ORDER_REQUEST)
+			.realName(request.getRealName())
 			.build();
 
 		chargeRequestRepository.save(chargeRequest);
@@ -93,6 +94,7 @@ public class TempChargeService {
 				.username(chargeRequest.getUsers().getUsername())
 				.orderId(chargeRequest.getOrderId())
 				.requestAt(chargeRequest.getRequestAt().toString())
+				.realName(chargeRequest.getRealName())
 				.build()
 		).collect(Collectors.toList());
 	}

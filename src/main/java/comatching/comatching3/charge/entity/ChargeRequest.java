@@ -51,9 +51,11 @@ public class ChargeRequest extends BaseEntity {
 
     private String orderId;
 
+    private String realName;
+
 
     @Builder
-    public ChargeRequest(Users users, String productName, OrderStatus orderStatus, Long price, Long point, LocalDateTime approvedAt, String cancelReason) {
+    public ChargeRequest(Users users, String productName, OrderStatus orderStatus, Long price, Long point, LocalDateTime approvedAt, String cancelReason, String realName) {
         this.users = users;
         this.productName = productName;
         this.orderStatus = orderStatus;
@@ -63,5 +65,6 @@ public class ChargeRequest extends BaseEntity {
         this.approvedAt = approvedAt;
         this.cancelReason = cancelReason;
         this.orderId = UUID.randomUUID().toString().substring(0, 13);
+        this.realName = realName;
     }
 }

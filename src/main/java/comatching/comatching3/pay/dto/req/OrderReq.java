@@ -7,4 +7,5 @@ public class OrderReq {
 	private String productName;
 	private Long amount;
 	private Long point;
+	private String realName;
 }
