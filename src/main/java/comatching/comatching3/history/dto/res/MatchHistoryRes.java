@@ -20,6 +20,7 @@ public class MatchHistoryRes {
     private String comment;
     private String song;
     private String contactId;
+    private String username;
 
     public void updateFromUsers(Users users) {
         UserAiFeature userAiFeature = users.getUserAiFeature();
@@ -32,6 +33,7 @@ public class MatchHistoryRes {
         this.comment = users.getComment();
         this.song = users.getSong();
         this.contactId = users.getContactId();
+        this.username = users.getUsername();
     }
 
 
