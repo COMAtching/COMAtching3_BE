@@ -7,6 +7,7 @@ import comatching.comatching3.users.dto.request.UserFeatureReq;
 import comatching.comatching3.users.dto.request.UserRegisterReq;
 import comatching.comatching3.users.dto.request.UserUpdateInfoReq;
 import comatching.comatching3.users.dto.response.CurrentPointRes;
+import comatching.comatching3.users.dto.response.PointRes;
 import comatching.comatching3.users.dto.response.UserInfoRes;
 import comatching.comatching3.users.dto.response.UsernamePointRes;
 import comatching.comatching3.users.service.UserService;
@@ -142,8 +143,8 @@ public class UserController {
      * @return 유저 포인트
      */
     @GetMapping("/auth/user/api/points")
-    public Response<Long> getPoints() {
-        Long points = userService.getPoints();
+    public Response<PointRes> getPoints() {
+        PointRes points = userService.getPoints();
         return Response.ok(points);
     }
 
