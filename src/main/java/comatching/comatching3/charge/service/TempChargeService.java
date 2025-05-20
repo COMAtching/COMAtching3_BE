@@ -54,6 +54,8 @@ public class TempChargeService {
 			.realName(request.getRealName())
 			.build();
 
+		user.setRealName(request.getRealName());
+
 		chargeRequestRepository.save(chargeRequest);
 	}
 

@@ -32,6 +32,7 @@ import comatching.comatching3.users.dto.request.UserFeatureReq;
 import comatching.comatching3.users.dto.request.UserRegisterReq;
 import comatching.comatching3.users.dto.request.UserUpdateInfoReq;
 import comatching.comatching3.users.dto.response.CurrentPointRes;
+import comatching.comatching3.users.dto.response.PointRes;
 import comatching.comatching3.users.dto.response.UserInfoRes;
 import comatching.comatching3.users.dto.response.UsernamePointRes;
 import comatching.comatching3.users.entity.Hobby;
@@ -427,9 +428,15 @@ public class UserService {
 	 *
 	 * @return 유저 포인트
 	 */
-	public Long getPoints() {
+	public PointRes getPoints() {
 		Users user = securityUtil.getCurrentUsersEntity();
-		return user.getPoint();
+
+		return PointRes.builder()
+			.socialId(user.getSocialId())
+			.username(user.getUsername())
+			.realName(user.getRealName())
+			.point(user.getPoint())
+			.build();
 	}
 
 	public CurrentPointRes inquiryCurrentPoint() {

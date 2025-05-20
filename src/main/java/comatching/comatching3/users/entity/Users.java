@@ -96,6 +96,9 @@ public class Users extends BaseEntity {
 
     private int pickedCount = 0;
 
+    @Setter
+    private String realName;
+
     @Builder
     public Users(String provider, String socialId, String email, String role, String username, String password) {
         this.provider = provider;
