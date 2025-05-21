@@ -87,7 +87,7 @@ public class MatchService {
 
         //유저저 포인트가 부족한지 체크
         if (usePoint > applier.getPoint()) {
-            log.info("[MatchService] - user point lack usePoint = {} calcPoint={}", usePoint, usePoint);
+            log.info("[MatchService] - user point lack applierPoint = {} calcPoint={}", applier.getPoint(), usePoint);
             throw new BusinessException(ResponseCode.INSUFFICIENT_POINT);
         }
 
