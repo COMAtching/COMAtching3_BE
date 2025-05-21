@@ -72,7 +72,7 @@ public class TestService {
 
         for (Users user : allUsers) {
             Thread.sleep(100);
-            if (user.getUserAiFeature().getContactFrequency() == null) continue;
+            if (user.getUserAiFeature().getContactFrequency() == null || user.getPickedCount() >= 5) continue;
             userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
         }
     }
