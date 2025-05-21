@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class AnonymousUser {
 
-	private String username = "anonymous";
+	private String username = "탈퇴한 사용자";
 
 	private String password = "anonymous";
 
