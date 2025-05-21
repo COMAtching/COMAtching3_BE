@@ -37,6 +37,7 @@ public class MatchRabbitMQUtil {
         ParameterizedTypeReference<MatchResponseMsg> responseType = new ParameterizedTypeReference<MatchResponseMsg>() {
         };
 
+        log.info("[MatchRabbitMQUtil] try to matching - applier = {}", requestMsg.getMatcherUuid());
         MatchResponseMsg response = rabbitTemplate.convertSendAndReceiveAsType(
                 matchRequestQueue,
                 requestMsg,

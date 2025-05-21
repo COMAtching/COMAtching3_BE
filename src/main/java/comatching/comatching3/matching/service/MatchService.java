@@ -51,6 +51,7 @@ public class MatchService {
      */
     @Transactional
     public MatchRes requestMatch(MatchReq matchReq) {
+        log.info("[MatchService] ===================== matching process start ===================== ");
         String requestId = UUID.randomUUID().toString();
         Users applier = securityUtil.getCurrentUsersEntity();
         String applierUuid = UUIDUtil.bytesToHex(applier.getUserAiFeature().getUuid());
@@ -64,12 +65,15 @@ public class MatchService {
         Optional<List<MatchingHistory>> matchingHistories = matchingHistoryRepository.findByApplier(applier);
         matchingHistories.ifPresent(requestMsg::updateDuplicationListFromHistory);
 
+        log.info("[MatchService] - try to match applierId = {}", applier.getId());
         MatchResponseMsg responseMsg = matchRabbitMQUtil.match(requestMsg, requestId);
 
         //상대방 조회
         byte[] enemyUuid = UUIDUtil.uuidStringToBytes(responseMsg.getEnemyUuid());
         Users enemy = usersRepository.findUsersByUuid(enemyUuid)
                 .orElseThrow(() -> new BusinessException(ResponseCode.NO_ENEMY_AVAILABLE));
+
+        log.info("[MatchService] - finish match enemyId = {}", enemy.getId());
 
         //상대방 뽑힌 횟수 처리
         enemy.updatePickedCount();
@@ -107,6 +111,7 @@ public class MatchService {
         log.info("[MatchService] - Match Process Success!! applierUuid = {}, enemyUuid = {} ", applierUuid,
                 UUIDUtil.bytesToHex(enemyUuid));
 
+        log.info("[MatchService] ===================== matching process end ===================== ");
         return response;
     }
 

@@ -47,12 +47,12 @@ public class UserCrudRabbitMQUtil {
                 responseType);
 
         if (!response.getStateCode().equals("CRUD-000")) {
-            log.warn("[UserCrudResponse Error] errorCode={}  / errorMsg={}\n json = {}", response.getStateCode(),
+            log.warn("[UserCrudResponse] errorCode={}  / errorMsg={}\n json = {}", response.getStateCode(),
                     response.getMessage(), response.toJson());
             return false;
         }
 
-        log.warn("[UserCrudResponse] code={}, Msg={}\n json = {}", response.getStateCode(),
+        log.info("[UserCrudResponse] code={}, Msg={}\n json = {}", response.getStateCode(),
                 response.getMessage(), response.toJson());
 
         return true;
