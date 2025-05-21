@@ -78,6 +78,7 @@ public class MatchService {
         //상대방 뽑힌 횟수 처리
         enemy.updatePickedCount();
         if (enemy.getPickedCount() >= 5) {
+            log.info("[MatchService] - enemy picked 5 times now delete enemy = {}", enemy.getId());
             userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
         }
 
@@ -86,6 +87,7 @@ public class MatchService {
 
         //유저저 포인트가 부족한지 체크
         if (usePoint > applier.getPoint()) {
+            log.info("[MatchService] - user point lack usePoint = {} calcPoint={}", usePoint, usePoint);
             throw new BusinessException(ResponseCode.INSUFFICIENT_POINT);
         }
 
