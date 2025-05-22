@@ -457,7 +457,12 @@ public class UserService {
 	public void removeUser(HttpServletRequest request, HttpServletResponse response) {
 		Users user = securityUtil.getCurrentUsersEntity();
 
-		testService.requestTestCrudDelete(user.getId());
+		try {
+			testService.requestTestCrudDelete(user.getId());
+		} catch (Exception e) {
+			log.info("csv에 없는 유저의 탈퇴 요청");
+		}
+
 
 		AnonymousUser anonymousUser = new AnonymousUser();
 
