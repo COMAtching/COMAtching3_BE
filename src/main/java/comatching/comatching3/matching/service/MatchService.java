@@ -61,6 +61,10 @@ public class MatchService {
                 applier.getUniversity().getUniversityName());
         requestMsg.updateWeight();
 
+        if (matchingHistoryRepository.countByApplier(applier) >= 10) {
+            throw new BusinessException(ResponseCode.MATCH_COUNT_OVER);
+        }
+
         //중복 유저 조회 및 브로커 메세지 반영
         Optional<List<MatchingHistory>> matchingHistories = matchingHistoryRepository.findByApplier(applier);
         matchingHistories.ifPresent(requestMsg::updateDuplicationListFromHistory);

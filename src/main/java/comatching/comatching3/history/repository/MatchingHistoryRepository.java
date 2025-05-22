@@ -18,4 +18,6 @@ public interface MatchingHistoryRepository extends JpaRepository<MatchingHistory
 
     Optional<List<MatchingHistory>> findByApplier(Users users);
 
+    Long countByApplier(Users users);
+
 }
