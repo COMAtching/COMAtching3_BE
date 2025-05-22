@@ -15,5 +15,5 @@ public class AnonymousUser {
 
 	private String schoolEmail = "anonymous";
 
-	private String contactId = "anonymous";
+	private String contactId = "탈퇴한 사용자";
 }
