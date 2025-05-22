@@ -45,7 +45,7 @@ public class MatchRabbitMQUtil {
                 correlationData,
                 responseType);
 
-        if (response == null) {
+        if (response == null || response.getEnemyUuid() == null) {
             throw new BusinessException(ResponseCode.NO_MATCH_RESPONSE);
         }
 
