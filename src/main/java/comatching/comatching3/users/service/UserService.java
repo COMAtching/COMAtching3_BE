@@ -26,6 +26,7 @@ import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.admin.repository.UniversityRepository;
 import comatching.comatching3.admin.service.UniversityService;
 import comatching.comatching3.exception.BusinessException;
+import comatching.comatching3.matching.service.TestService;
 import comatching.comatching3.users.dto.AnonymousUser;
 import comatching.comatching3.users.dto.messageQueue.CategoryReqMsg;
 import comatching.comatching3.users.dto.request.UserFeatureReq;
@@ -76,6 +77,7 @@ public class UserService {
 	private final SessionRepository<?> sessionRepository;
 	private final CategoryRabbitMQUtil categoryRabbitMQUtil;
 	private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
+	private final TestService testService;
 
 	public Long getParticipations() {
 		return usersRepository.count();
@@ -454,6 +456,8 @@ public class UserService {
 	@Transactional
 	public void removeUser(HttpServletRequest request, HttpServletResponse response) {
 		Users user = securityUtil.getCurrentUsersEntity();
+
+		testService.requestTestCrudDelete(user.getId());
 
 		AnonymousUser anonymousUser = new AnonymousUser();
 
