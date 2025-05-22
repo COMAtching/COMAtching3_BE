@@ -42,10 +42,12 @@ public class CategoryRabbitMQUtil {
                 responseType);
 
         if (response == null) {
+            log.info("[ClassifyCategory] - response is null !!");
             throw new BusinessException(ResponseCode.NO_MATCH_RESPONSE);
         }
 
         log.info("[ClassifyCategory] small={} big={}", requestMsg.getSmallCategory().toString(), response.getBigCategory().toString());
+        log.info("[ClassifyCategory] classify success - state_code={}, message={}", response.getStateCode(), response.getMessage());
         return response;
     }
 }
