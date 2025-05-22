@@ -34,6 +34,8 @@ public class CategoryRabbitMQUtil {
         ParameterizedTypeReference<CategoryResMsg> responseType = new ParameterizedTypeReference<CategoryResMsg>() {
         };
 
+        log.info("[ClassifyCategory] start classify small={}", requestMsg.getSmallCategory().toString());
+
         CategoryResMsg response = rabbitTemplate.convertSendAndReceiveAsType(
                 categoryQueue,
                 requestMsg,
