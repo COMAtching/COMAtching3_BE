@@ -20,4 +20,6 @@ public interface MatchingHistoryRepository extends JpaRepository<MatchingHistory
 
     Long countByApplier(Users users);
 
+    @Query("SELECT COUNT(h) FROM MatchingHistory h WHERE h.applier = :applier AND DATE(h.createdAt) = CURRENT_DATE")
+    Long countTodayByApplier(@Param("applier") Users applier);
 }

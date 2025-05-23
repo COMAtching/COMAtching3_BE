@@ -61,7 +61,8 @@ public class MatchService {
                 applier.getUniversity().getUniversityName());
         requestMsg.updateWeight();
 
-        if (matchingHistoryRepository.countByApplier(applier) >= 10) {
+        log.info("[MatchService] - try to match applierId = {}", applier.getId());
+        if (matchingHistoryRepository.countTodayByApplier(applier) >= 10) {
             throw new BusinessException(ResponseCode.MATCH_COUNT_OVER);
         }
 
@@ -69,7 +70,6 @@ public class MatchService {
         Optional<List<MatchingHistory>> matchingHistories = matchingHistoryRepository.findByApplier(applier);
         matchingHistories.ifPresent(requestMsg::updateDuplicationListFromHistory);
 
-        log.info("[MatchService] - try to match applierId = {}", applier.getId());
         MatchResponseMsg responseMsg = matchRabbitMQUtil.match(requestMsg, requestId);
 
         //상대방 조회
