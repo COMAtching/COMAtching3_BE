@@ -49,6 +49,7 @@ dependencies {
     //Cache dependency
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.session:spring-session-data-redis'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
 
     //Security & Auth dependency
