@@ -6,12 +6,14 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.users.entity.Users;
+import jakarta.persistence.LockModeType;
 
 @Repository
 public interface UsersRepository extends JpaRepository<Users, Long> {
@@ -58,5 +60,9 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 	// 사용자명으로 검색하는 페이징 메서드
 	Page<Users> findAllByUniversityAndUsernameContainingIgnoreCaseOrderByCreatedAtAsc(
 		University university, String username, Pageable pageable);
+
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	@Query("SELECT u FROM Users u JOIN u.userAiFeature uf WHERE uf.uuid = :uuid")
+	Optional<Users> findUsersByUuidForUpdate(@Param("uuid") byte[] uuid);
 
 }
