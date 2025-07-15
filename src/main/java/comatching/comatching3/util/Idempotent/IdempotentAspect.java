@@ -1,15 +1,9 @@
 package comatching.comatching3.util.Idempotent;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import comatching.comatching3.util.Idempotent.Exception.IdempotentException;
-import comatching.comatching3.util.RedisUtil;
-import comatching.comatching3.util.ResponseCode;
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -20,73 +14,72 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
+import comatching.comatching3.util.Idempotent.Exception.IdempotentException;
+import comatching.comatching3.util.ResponseCode;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Aspect
 @Component
 @RequiredArgsConstructor
 public class IdempotentAspect {
 
+	private final StringRedisTemplate stringRedisTemplate;
 
-    private final StringRedisTemplate stringRedisTemplate;
+	@Pointcut("@annotation(idempotent)")
+	public void pointCut(Idempotent idempotent) {
+	}
 
+	@Before(value = "pointCut(idempotent)", argNames = "joinPoint, idempotent")
+	public void before(JoinPoint joinPoint, Idempotent idempotent) throws IOException {
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
 
-    @Pointcut("@annotation(idempotent)")
-    public void pointCut(Idempotent idempotent){
-    }
+		String requestKey = getRequestKey(request);
+		String requestValue = getRequestValue(request);
 
-    @Before(value = "pointCut(idempotent)", argNames = "joinPoint, idempotent")
-    public void before(JoinPoint joinPoint, Idempotent idempotent) throws IOException{
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		int expireTime = idempotent.expireTime();
 
-        String requestKey = getRequestKey(request);
-        String requestValue = getRequestValue(request);
+		Boolean isPoss = stringRedisTemplate
+			.opsForValue()
+			.setIfAbsent(requestKey, requestValue, expireTime, TimeUnit.SECONDS);
 
-        log.info("[IdempotentAspect] ({}) 요청 데이터 :: {}",  requestKey, requestValue);
+		if (Boolean.FALSE.equals(isPoss)) {
+			handleRequestException(requestKey, requestValue);
+		}
 
-        int expireTime = idempotent.expireTime();
+	}
 
-        Boolean isPoss = stringRedisTemplate
-                .opsForValue()
-                .setIfAbsent(requestKey, requestValue, expireTime, TimeUnit.SECONDS);
+	private String getRequestKey(final HttpServletRequest request) {
+		String token = request.getHeader("requestKey");
 
-        if(Boolean.FALSE.equals(isPoss)){
-            handleRequestException(requestKey, requestValue);
-        }
+		if (token == null)
+			throw new IllegalArgumentException();
 
-    }
+		return token;
+	}
 
-    private String getRequestKey(final HttpServletRequest request){
-        String token = request.getHeader("requestKey");
+	private String getRequestValue(final HttpServletRequest request) {
+		if (!"GET".equalsIgnoreCase(request.getMethod())) {
+			ContentCachingRequestWrapper cachingRequest = (ContentCachingRequestWrapper)request;
 
-        if(token == null)
-            throw new IllegalArgumentException();
+			return new String(cachingRequest.getContentAsByteArray(), StandardCharsets.UTF_8);
+		} else {
+			return request.getQueryString();
+		}
+	}
 
-        return token;
-    }
+	private void handleRequestException(final String requestKey, final String requestValue) {
 
-    private String getRequestValue(final HttpServletRequest request){
-        if(!"GET".equalsIgnoreCase(request.getMethod())){
-            ContentCachingRequestWrapper cachingRequest = (ContentCachingRequestWrapper) request;
+		String originRequestValue = stringRedisTemplate.opsForValue().get(requestKey);
 
-            return new String(cachingRequest.getContentAsByteArray(), StandardCharsets.UTF_8);
-        }
+		//요청이 내용이 비어있지 않으면서 원래 요청이랑 같은 경우
+		if (!requestValue.isBlank() && !requestValue.equals(originRequestValue))
+			throw new IdempotentException(ResponseCode.UNPROCESSABLE_ENTITY);
 
-        else{
-            return request.getQueryString();
-        }
-    }
-
-    private void handleRequestException(final String requestKey, final String requestValue) {
-
-        String originRequestValue = stringRedisTemplate.opsForValue().get(requestKey);
-        log.info("[IdempotentAspect] ({}) 기존의 요청 데이터 :: {}", requestKey, originRequestValue);
-
-        //요청이 내용이 비어있지 않으면서 원래 요청이랑 같은 경우
-        if (!requestValue.isBlank() && !requestValue.equals(originRequestValue))
-            throw new IdempotentException(ResponseCode.UNPROCESSABLE_ENTITY);
-
-        //요청이 같지 않은 경우
-        else
-            throw new IdempotentException(ResponseCode.CONFLICT);
-    }
+			//요청이 같지 않은 경우
+		else
+			throw new IdempotentException(ResponseCode.CONFLICT);
+	}
 }

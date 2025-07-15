@@ -3,6 +3,7 @@ package comatching.comatching3.exception;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -57,7 +58,9 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler({IdempotentException.class})
-	public Response<ResponseCode> handelIdempotentException(IdempotentException ex) {
-		return new Response<>(ex.getResponseCode());
+	public ResponseEntity handelIdempotentException(IdempotentException ex) {
+		return ResponseEntity
+			.status(ex.getResponseCode().getHttpStatus())
+			.body(new Response<>(ex.getResponseCode()));
 	}
 }
