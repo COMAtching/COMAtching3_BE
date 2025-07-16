@@ -3,7 +3,7 @@
 <table align="center">
   <tr>
     <td> <img src="https://github.com/COMAtching/.github/blob/main/assets/icon.png?raw=true" width="30px"> </td>
-    <td> <h1>COMAtching</h1> </td>
+    <td> <a href="https://comatching.site"> <h1>COMAtching</h1> </a> </td>
     <td> <img src="https://github.com/COMAtching/.github/blob/main/assets/icon.png?raw=true" width="30px"></td>
   </tr>
 </table>
