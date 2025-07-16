@@ -56,8 +56,9 @@ public class RabbitMQConfig {
 	public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
 		var factory = new SimpleRabbitListenerContainerFactory();
 		factory.setConnectionFactory(connectionFactory);
-		factory.setConcurrentConsumers(10);
-		factory.setPrefetchCount(1);
+		factory.setConcurrentConsumers(10);         // 기본 consumer 수
+		factory.setMaxConcurrentConsumers(100);      // 부하 시 최대 확장
+		factory.setPrefetchCount(10);                // 한 consumer가 한 번에 처리할 메시지 수
 		return factory;
 	}
 }
