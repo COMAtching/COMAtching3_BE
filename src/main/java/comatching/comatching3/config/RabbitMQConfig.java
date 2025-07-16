@@ -1,5 +1,6 @@
 package comatching.comatching3.config;
 
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -26,6 +27,7 @@ public class RabbitMQConfig {
 
 	@Value("${spring.rabbitmq.password}")
 	private String password;
+
 	@Bean
 	public ConnectionFactory connectionFactory() {
 		CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
@@ -46,7 +48,16 @@ public class RabbitMQConfig {
 	public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(jackson2JsonMessageConverter());
-
+		rabbitTemplate.setReplyTimeout(15000);
 		return rabbitTemplate;
+	}
+
+	@Bean
+	public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+		var factory = new SimpleRabbitListenerContainerFactory();
+		factory.setConnectionFactory(connectionFactory);
+		factory.setConcurrentConsumers(10);
+		factory.setPrefetchCount(1);
+		return factory;
 	}
 }

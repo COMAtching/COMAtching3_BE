@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,9 +60,9 @@ public class MatchService {
 			applier.getUniversity().getUniversityName());
 		requestMsg.updateWeight();
 
-		if (matchingHistoryRepository.countTodayByApplier(applier) >= MAX_MATCH_COUNT) {
-			throw new BusinessException(ResponseCode.MATCH_COUNT_OVER);
-		}
+		// if (matchingHistoryRepository.countTodayByApplier(applier) >= MAX_MATCH_COUNT) {
+		// 	throw new BusinessException(ResponseCode.MATCH_COUNT_OVER);
+		// }
 
 		//중복 유저 조회 및 브로커 메세지 반영
 		Optional<List<MatchingHistory>> matchingHistories = matchingHistoryRepository.findByApplier(applier);
@@ -105,6 +106,34 @@ public class MatchService {
 		response.updateChatRoom(chatRoomId);
 
 		return response;
+	}
+
+	@Transactional
+	public void updateEnemyPickedCount(byte[] uuid) {
+		int retryCount = 3;  // 최대 재시도 횟수
+		while (retryCount-- > 0) {
+			try {
+				// 사용자 조회
+				Users enemy = usersRepository.findUsersByUuid(uuid)
+					.orElseThrow(() -> new BusinessException(ResponseCode.NO_ENEMY_AVAILABLE));
+
+				// pickedCount 업데이트
+				enemy.updatePickedCount();  // 예: enemy.setPickedCount(enemy.getPickedCount() + 1);
+
+				// 트랜잭션 종료 시점에 flush 되면서 버전 체크가 이루어짐
+				// 버전 충돌이 일어나면 OptimisticLockingFailureException 발생
+
+				// 성공 시 트랜잭션 커밋
+				break;  // 성공하면 반복문을 종료
+			} catch (OptimisticLockingFailureException e) {
+				if (retryCount == 0) {
+					// 최대 재시도 횟수 도달 시 예외를 던짐
+					throw new BusinessException(ResponseCode.BAD_REQUEST);
+				}
+				// 재시도
+				log.warn("Optimistic lock failure, retrying... ({} retries left)", retryCount);
+			}
+		}
 	}
 
 	/**

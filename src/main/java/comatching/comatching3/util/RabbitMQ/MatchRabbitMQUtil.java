@@ -24,6 +24,7 @@ public class MatchRabbitMQUtil {
 
 	public MatchRabbitMQUtil(RabbitTemplate rabbitTemplate) {
 		this.rabbitTemplate = rabbitTemplate;
+		this.rabbitTemplate.setReceiveTimeout(10000);
 	}
 
 	/**
@@ -39,7 +40,6 @@ public class MatchRabbitMQUtil {
 		};
 
 		log.info("[MatchRabbitMQUtil] try to matching - applier = {}", requestMsg.getMatcherUuid());
-		rabbitTemplate.setReceiveTimeout(10000);
 		MatchResponseMsg response = rabbitTemplate.convertSendAndReceiveAsType(
 			matchRequestQueue,
 			requestMsg,
