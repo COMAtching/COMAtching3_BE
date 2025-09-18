@@ -1,6 +1,7 @@
 package comatching.comatching3.history.entity;
 
 import comatching.comatching3.matching.dto.messageQueue.MatchRequestMsg;
+import comatching.comatching3.matching.dto.request.MatchReq;
 import comatching.comatching3.matching.enums.AgeOption;
 import comatching.comatching3.matching.enums.ContactFrequencyOption;
 import comatching.comatching3.users.entity.Users;
@@ -68,6 +69,15 @@ public class MatchingHistory extends BaseEntity {
         this.mbtiOption = matchRequestMsg.getMbtiOption();
         this.contactFrequencyOption = matchRequestMsg.getContactFrequencyOption();
         this.importantOption = matchRequestMsg.getImportantOption();
+    }
+
+    public void updateOptionsFromRequestMsg(MatchReq matchReq) {
+        this.noSameMajorOption = matchReq.getSameMajorOption();
+        this.hobbyEnumOption = matchReq.getHobbyOption();
+        this.ageOption = matchReq.getAgeOption();
+        this.mbtiOption = matchReq.getMbtiOption();
+        this.contactFrequencyOption = matchReq.getContactFrequencyOption();
+        this.importantOption = matchReq.getImportantOption();
     }
 
     @Override
