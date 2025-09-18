@@ -143,10 +143,10 @@ public class UserService {
 		updateUsersEntity(user, form, university, userAiFeature, request);
 
 		// todo: rabbitMQ 연결 후 주석 해제
-		Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
+		/*Boolean isSuccess = userCrudRabbitMQUtil.sendUserChange(user.getUserAiFeature(), UserCrudType.CREATE);
 		if(!isSuccess){
 		    throw new BusinessException(ResponseCode.INPUT_FEATURE_FAIL);
-		}
+		}*/
 
 	}
 
@@ -175,23 +175,21 @@ public class UserService {
 	 */
 	private void handleUserHobbies(UserAiFeature userAiFeature, List<String> hobbyNames) {
 
-		List<String> rawCategories = categoryRabbitMQUtil.classifyCategory(
-			new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory();
+		// List<String> rawCategories = categoryRabbitMQUtil.classifyCategory(
+		// 	new CategoryReqMsg(hobbyNames, UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory();
 
-
-		List<String> categories = rawCategories.stream()
-			.map(s -> s.replaceAll("[\\{\\}\"]", "").trim())
-			.collect(Collectors.toList());
+		// List<String> categories = rawCategories.stream()
+		// 	.map(s -> s.replaceAll("[\\{\\}\"]", "").trim())
+		// 	.collect(Collectors.toList());
 
 		List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 		userAiFeature.removeHobby(existingHobbies);
 		hobbyRepository.deleteAll(existingHobbies);
 
-		List<Hobby> newHobbyList = IntStream.range(0, hobbyNames.size())
-			.mapToObj(i -> Hobby.builder()
-				.hobbyName(hobbyNames.get(i))
+		List<Hobby> newHobbyList = hobbyNames.stream().map(hobbyName -> Hobby.builder()
+				.hobbyName(hobbyName)
 				.userAiFeature(userAiFeature)
-				.category(categories.get(i))
+				// .category(categories.get(i))
 				.build())
 			.collect(Collectors.toList());
 		hobbyRepository.saveAll(newHobbyList);
@@ -269,12 +267,12 @@ public class UserService {
 		}
 
 		if (form.getHobbies() != null) {
-			List<String> rawCategories = categoryRabbitMQUtil.classifyCategory(
-				new CategoryReqMsg(form.getHobbies(), UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory();
-
-			List<String> categories = rawCategories.stream()
-				.map(s -> s.replaceAll("[\\{\\}\"]", "").trim())
-				.collect(Collectors.toList());
+			// List<String> rawCategories = categoryRabbitMQUtil.classifyCategory(
+			// 	new CategoryReqMsg(form.getHobbies(), UUIDUtil.bytesToHex(userAiFeature.getUuid()))).getBigCategory();
+			//
+			// List<String> categories = rawCategories.stream()
+			// 	.map(s -> s.replaceAll("[\\{\\}\"]", "").trim())
+			// 	.collect(Collectors.toList());
 
 			List<Hobby> existingHobbies = hobbyRepository.findAllByUserAiFeature(userAiFeature);
 			userAiFeature.removeHobby(existingHobbies);
@@ -284,7 +282,7 @@ public class UserService {
 				.mapToObj(i -> Hobby.builder()
 					.hobbyName(form.getHobbies().get(i))
 					.userAiFeature(userAiFeature)
-					.category(categories.get(i))
+					// .category(categories.get(i))
 					.build())
 				.collect(Collectors.toList());
 			hobbyRepository.saveAll(newHobbyList);
