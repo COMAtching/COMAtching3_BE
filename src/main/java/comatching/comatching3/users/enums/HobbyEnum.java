@@ -9,7 +9,7 @@ public enum HobbyEnum {
     예술("예술"),
     문화("문화"),
     여행("여행"),
-    자기계발("자기계발"),
+    일상공부("일상/공부"),
     게임("게임"),
     UNSELECTED("UNSELECTED");
 

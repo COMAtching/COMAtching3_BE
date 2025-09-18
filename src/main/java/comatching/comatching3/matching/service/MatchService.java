@@ -43,6 +43,7 @@ public class MatchService {
 	private final MatchingHistoryRepository matchingHistoryRepository;
 	private final UserCrudRabbitMQUtil userCrudRabbitMQUtil;
 	private final ChatService chatService;
+	private final NoAiMatchingService noAiMatchingService;
 
 	/**
 	 * 괸리자 매칭 서비스 리퀘스트 메서드 메세지 브로커에게 리퀘스트를 publish
@@ -52,8 +53,9 @@ public class MatchService {
 	 */
 	@Transactional
 	public MatchRes requestMatch(MatchReq matchReq) {
-		String requestId = UUID.randomUUID().toString();
 		Users applier = securityUtil.getCurrentUsersEntity();
+		/*String requestId = UUID.randomUUID().toString();
+
 
 		MatchRequestMsg requestMsg = new MatchRequestMsg();
 		requestMsg.fromMatchReqAndUserAiFeature(matchReq, applier.getUserAiFeature(),
@@ -74,13 +76,14 @@ public class MatchService {
 		//상대방 조회
 		byte[] enemyUuid = UUIDUtil.uuidStringToBytes(responseMsg.getEnemyUuid());
 		Users enemy = usersRepository.findUsersByUuidForUpdate(enemyUuid)
-			.orElseThrow(() -> new BusinessException(ResponseCode.NO_ENEMY_AVAILABLE));
+			.orElseThrow(() -> new BusinessException(ResponseCode.NO_ENEMY_AVAILABLE));*/
 
+		Users enemy = noAiMatchingService.noAiMatching(matchReq);
 		//상대방 뽑힌 횟수 처리 & 뽑힌 횟수 체크 후 CSV 반영
 		enemy.updatePickedCount();
-		if (enemy.getPickedCount() >= MAX_PICKED_COUNT) {
-			userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
-		}
+		// if (enemy.getPickedCount() >= MAX_PICKED_COUNT) {
+		// 	userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
+		// }
 
 		//포인트 계산
 		Long usePoint = calcPoint(matchReq);
@@ -95,7 +98,8 @@ public class MatchService {
 		applier.subtractPoint(usePoint);
 
 		//history 생성
-		createHistory(requestMsg, applier, enemy);
+		// createHistory(requestMsg, applier, enemy);
+		noAiMatchingService.createHistory(matchReq, applier, enemy);
 
 		//채팅방 생성
 		Long chatRoomId = chatService.createChatRoom(applier, enemy);
