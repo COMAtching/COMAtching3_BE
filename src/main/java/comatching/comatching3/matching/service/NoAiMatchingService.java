@@ -20,6 +20,7 @@ import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
+import comatching.comatching3.util.HobbyCategoryUtil;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -33,17 +34,6 @@ public class NoAiMatchingService {
 	private final SecurityUtil securityUtil;
 	private final UserAiFeatureRepository userAiFeatureRepository;
 	private final MatchingHistoryRepository matchingHistoryRepository;
-
-	private static final Map<String, List<String>> HOBBY_CATEGORY_MAP = Map.of(
-		"스포츠", List.of("헬스", "수영", "러닝", "축구", "농구", "야구", "배드민턴", "테니스", "클라이밍", "복싱", "골프"),
-		"문화예술",
-		List.of("인디음악", "락", "랩/힙합", "발라드", "RnB", "팝송", "K-팝", "클래식", "독서", "영화", "패션", "전시", "공예", "뮤지컬", "사진", "뷰티",
-			"커피", "술/와인", "페스티벌"),
-		"악기", List.of("피아노", "기타", "바이올린", "드럼", "플룻"),
-		"여행", List.of("국내여행", "해외여행", "맛집탐방", "캠핑", "등산", "드라이브"),
-		"일상/공부", List.of("공부", "테크", "사랑", "시사/정치", "취업", "철학", "연구", "천문학", "과학", "시/문학"),
-		"게임", List.of("배틀그라운드", "메이플스토리", "오버워치", "발로란트", "피파", "롤")
-	);
 
 	public MatchingResult noAiMatching(MatchReq matchReq, Long usePoint) {
 
@@ -215,14 +205,14 @@ public class NoAiMatchingService {
 	private FilteredResult checkHobby(List<UserAiFeature> enemyList, String hobbyOption, boolean isImportant,
 		Users applier, boolean refunded) {
 
-		if (hobbyOption == null || hobbyOption.isBlank() || !HOBBY_CATEGORY_MAP.containsKey(hobbyOption)) {
+		if (hobbyOption == null || hobbyOption.isBlank() || !HobbyCategoryUtil.isValidCategory(hobbyOption)) {
 			return FilteredResult.builder()
 				.filteredUsers(enemyList)
 				.refunded(false)
 				.build();
 		}
 
-		List<String> targetSubCategories = HOBBY_CATEGORY_MAP.get(hobbyOption);
+		String targetCategory = HobbyCategoryUtil.getCategory(hobbyOption);
 
 		List<UserAiFeature> filtered = enemyList.stream()
 			.filter(user -> {
@@ -232,7 +222,7 @@ public class NoAiMatchingService {
 
 				return hobbies.stream()
 					.map(Hobby::getCategory)
-					.anyMatch(targetSubCategories::contains);
+					.anyMatch(category -> category.equals(targetCategory));
 			})
 			.toList();
 
