@@ -82,22 +82,28 @@ public class NoAiMatchingService {
 
 		FilteredResult filteredResult = new FilteredResult(enemyList, false);
 
+		log.info("들어오는 요청 파라미터 importantOption: {}, age: {}", importantOption, age);
+
 		if (importantOption != null && !importantOption.equals("UNSELECTED")) {
 			switch (importantOption) {
 				case "ageOption":
+					log.info("switch문 ageOption 로그");
 					filteredResult = checkAge(filteredResult.getFilteredUsers(), matchReq.getAgeOption(), age, true,
 						filteredResult.isRefunded(), applier);
 					break;
 				case "mbtiOption":
+					log.info("switch문 mbtiOption 로그");
 					filteredResult = checkMbti(filteredResult.getFilteredUsers(), matchReq.getMbtiOption(), true,
 						filteredResult.isRefunded(), applier);
 					break;
 				case "hobbyOption":
+					log.info("switch문 hobbyOption 로그");
 					filteredResult = checkHobby(filteredResult.getFilteredUsers(),
 						matchReq.getHobbyOption().get(0).getValue(), true,
 						filteredResult.isRefunded(), applier);
 					break;
 				case "contactFrequencyOption":
+					log.info("switch문 contactFrequencyOption 로그");
 					filteredResult = checkContactFrequency(filteredResult.getFilteredUsers(),
 						matchReq.getContactFrequencyOption(), true,
 						filteredResult.isRefunded(), applier);
