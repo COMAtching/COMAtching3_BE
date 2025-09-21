@@ -47,6 +47,7 @@ import comatching.comatching3.users.repository.HobbyRepository;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.EmailUtil;
+import comatching.comatching3.util.HobbyCategoryUtil;
 import comatching.comatching3.util.RabbitMQ.CategoryRabbitMQUtil;
 import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
 import comatching.comatching3.util.ResponseCode;
@@ -189,7 +190,7 @@ public class UserService {
 		List<Hobby> newHobbyList = hobbyNames.stream().map(hobbyName -> Hobby.builder()
 				.hobbyName(hobbyName)
 				.userAiFeature(userAiFeature)
-				// .category(categories.get(i))
+				.category(HobbyCategoryUtil.getCategory(hobbyName))
 				.build())
 			.collect(Collectors.toList());
 		hobbyRepository.saveAll(newHobbyList);
