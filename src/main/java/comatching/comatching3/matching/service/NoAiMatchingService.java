@@ -217,17 +217,15 @@ public class NoAiMatchingService {
 			.build();
 	}
 
-	private FilteredResult checkHobby(List<UserAiFeature> enemyList, String hobbyOption, boolean isImportant,
+	private FilteredResult checkHobby(List<UserAiFeature> enemyList, String hobbyCategory, boolean isImportant,
 		boolean refunded, Users applier) {
 
-		if (hobbyOption == null || hobbyOption.isBlank() || !HobbyCategoryUtil.isValidCategory(hobbyOption)) {
+		if (hobbyCategory == null || hobbyCategory.isBlank()) {
 			return FilteredResult.builder()
 				.filteredUsers(enemyList)
 				.refunded(refunded)
 				.build();
 		}
-
-		String targetCategory = HobbyCategoryUtil.getCategory(hobbyOption);
 
 		List<UserAiFeature> filtered = enemyList.stream()
 			.filter(user -> {
@@ -237,14 +235,14 @@ public class NoAiMatchingService {
 
 				return hobbies.stream()
 					.map(Hobby::getCategory)
-					.anyMatch(category -> category.equals(targetCategory));
+					.anyMatch(category -> category.equals(hobbyCategory));
 			})
 			.toList();
 
 		int minSize = isImportant ? 1 : 3;
 
 		if (isImportant) {
-			log.info("important option: {}, important option filter result size: {} ", "hobby", filtered.size());
+			log.info("important option: {}, important option filter result size: {} ", "hobbyCategory", filtered.size());
 			refunded = checkAndReturnImportantOptionPay(filtered.size(), applier);
 		}
 
