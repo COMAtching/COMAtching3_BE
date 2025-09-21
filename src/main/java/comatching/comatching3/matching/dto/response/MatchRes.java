@@ -24,6 +24,7 @@ public class MatchRes {
     private String contactId;
     private ChatRole myChaRole;
     private Long chatRoomId;
+    private boolean refunded;
 
     public static MatchRes fromUsers(Users users) {
         return MatchRes.builder()
@@ -46,5 +47,9 @@ public class MatchRes {
 
     public void updateCurrentPoint(Long point) {
         this.currentPoint = point;
+    }
+
+    public void updateRefunded(boolean refunded) {
+        this.refunded = refunded;
     }
 }
