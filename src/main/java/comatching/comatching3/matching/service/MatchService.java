@@ -1,9 +1,5 @@
 package comatching.comatching3.matching.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,16 +11,14 @@ import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.history.entity.MatchingHistory;
 import comatching.comatching3.history.repository.MatchingHistoryRepository;
 import comatching.comatching3.matching.dto.messageQueue.MatchRequestMsg;
-import comatching.comatching3.matching.dto.messageQueue.MatchResponseMsg;
 import comatching.comatching3.matching.dto.request.MatchReq;
 import comatching.comatching3.matching.dto.response.MatchRes;
+import comatching.comatching3.matching.dto.response.MatchingResult;
 import comatching.comatching3.users.entity.Users;
-import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.UsersRepository;
 import comatching.comatching3.util.RabbitMQ.MatchRabbitMQUtil;
 import comatching.comatching3.util.RabbitMQ.UserCrudRabbitMQUtil;
 import comatching.comatching3.util.ResponseCode;
-import comatching.comatching3.util.UUIDUtil;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,13 +72,6 @@ public class MatchService {
 		Users enemy = usersRepository.findUsersByUuidForUpdate(enemyUuid)
 			.orElseThrow(() -> new BusinessException(ResponseCode.NO_ENEMY_AVAILABLE));*/
 
-		Users enemy = noAiMatchingService.noAiMatching(matchReq);
-		//상대방 뽑힌 횟수 처리 & 뽑힌 횟수 체크 후 CSV 반영
-		enemy.updatePickedCount();
-		// if (enemy.getPickedCount() >= MAX_PICKED_COUNT) {
-		// 	userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
-		// }
-
 		//포인트 계산
 		Long usePoint = calcPoint(matchReq);
 
@@ -97,6 +84,15 @@ public class MatchService {
 		//포인트 차감
 		applier.subtractPoint(usePoint);
 
+		MatchingResult matchingResult = noAiMatchingService.noAiMatching(matchReq, usePoint);
+		Users enemy = matchingResult.getEnemyUser();
+		boolean refunded = matchingResult.isRefunded();
+		//상대방 뽑힌 횟수 처리 & 뽑힌 횟수 체크 후 CSV 반영
+		enemy.updatePickedCount();
+		// if (enemy.getPickedCount() >= MAX_PICKED_COUNT) {
+		// 	userCrudRabbitMQUtil.sendUserChange(enemy.getUserAiFeature(), UserCrudType.DELETE);
+		// }
+
 		//history 생성
 		// createHistory(requestMsg, applier, enemy);
 		noAiMatchingService.createHistory(matchReq, applier, enemy);
@@ -108,6 +104,7 @@ public class MatchService {
 		MatchRes response = MatchRes.fromUsers(enemy);
 		response.updateCurrentPoint(applier.getPoint());
 		response.updateChatRoom(chatRoomId);
+		response.updateRefunded(refunded);
 
 		return response;
 	}
@@ -142,6 +139,7 @@ public class MatchService {
 
 	/**
 	 * 매칭 결과 저장 메서드
+	 *
 	 * @param matchReq
 	 * @param applier
 	 * @param enemy

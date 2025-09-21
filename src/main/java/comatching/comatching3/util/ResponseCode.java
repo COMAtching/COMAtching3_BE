@@ -48,7 +48,7 @@ public enum ResponseCode {
     MATCH_CODE_GENERATE_FAIL(400, "MAT-003", HttpStatus.BAD_REQUEST, "Match auth code generate failed"),
     MATCH_CODE_CHECK_FAIL(400, "MAT-004", HttpStatus.BAD_REQUEST, "Match auth code authentication failed"),
     NO_MATCH_RESPONSE(400, "MAT-005", HttpStatus.BAD_REQUEST, "Couldn't receive the response message from ai server"),
-    NO_ENEMY_AVAILABLE(400, "MAT-006", HttpStatus.BAD_REQUEST, "NO ENEMY"),
+    NO_ENEMY_AVAILABLE(400, "MAT-006", HttpStatus.BAD_REQUEST, "매칭 대상이 없습니다. 포인트는 차감되지 않습니다."),
     INSUFFICIENT_POINT(400, "MAT-007", HttpStatus.BAD_REQUEST, "insufficient point to match"),
     MATCH_COUNT_OVER(400, "MAT-008", HttpStatus.BAD_REQUEST, "MATCH_COUNT_OVER"),
 
