@@ -23,7 +23,9 @@ import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.util.ResponseCode;
 import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NoAiMatchingService {
@@ -136,7 +138,7 @@ public class NoAiMatchingService {
 	}
 
 	private List<UserAiFeature> getUserList(Gender gender, String major, Users applier, Long usePoint) {
-		List<UserAiFeature> result;
+		List<UserAiFeature> result = null;
 
 		if (major != null) {
 			result = userAiFeatureRepository.findAllByGenderAndMajorNotWithHobbiesExcludingPreviousMatches(gender,
@@ -146,7 +148,8 @@ public class NoAiMatchingService {
 				applier.getId());
 		}
 
-		if (result.isEmpty()) {
+		if (result.isEmpty() || result == null) {
+			log.info("상대 리스트 값 비어있음");
 			applier.addPoint(usePoint);
 			throw new BusinessException(ResponseCode.NO_ENEMY_AVAILABLE);
 		}
