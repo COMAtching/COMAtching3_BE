@@ -40,7 +40,7 @@ public class NoAiMatchingService {
 		Users currentUser = securityUtil.getCurrentUsersEntity();
 		UserAiFeature currentUserAiFeature = currentUser.getUserAiFeature();
 
-		boolean refunded = false;
+		boolean refunded;
 		String importantOption = matchReq.getImportantOption();
 
 		Gender gender = currentUserAiFeature.getGender();
@@ -50,7 +50,7 @@ public class NoAiMatchingService {
 		List<UserAiFeature> enemyList = getUserList(gender, matchReq.getSameMajorOption() ? major : null, currentUser,
 			usePoint);
 
-		FilteredResult filteredResult = applyFiltersInOrder(enemyList, matchReq, importantOption, age);
+		FilteredResult filteredResult = applyFiltersInOrder(enemyList, matchReq, importantOption, age, currentUser);
 		List<UserAiFeature> result = filteredResult.getFilteredUsers();
 		refunded = filteredResult.isRefunded();
 
@@ -78,7 +78,7 @@ public class NoAiMatchingService {
 	}
 
 	private FilteredResult applyFiltersInOrder(List<UserAiFeature> enemyList, MatchReq matchReq, String importantOption,
-		Integer age) {
+		Integer age, Users applier) {
 
 		FilteredResult filteredResult = new FilteredResult(enemyList, false);
 
@@ -86,45 +86,45 @@ public class NoAiMatchingService {
 			switch (importantOption) {
 				case "ageOption":
 					filteredResult = checkAge(filteredResult.getFilteredUsers(), matchReq.getAgeOption(), age, true,
-						filteredResult.isRefunded());
+						filteredResult.isRefunded(), applier);
 					break;
 				case "mbtiOption":
 					filteredResult = checkMbti(filteredResult.getFilteredUsers(), matchReq.getMbtiOption(), true,
-						filteredResult.isRefunded());
+						filteredResult.isRefunded(), applier);
 					break;
 				case "hobbyOption":
 					filteredResult = checkHobby(filteredResult.getFilteredUsers(),
 						matchReq.getHobbyOption().get(0).getValue(), true,
-						filteredResult.isRefunded());
+						filteredResult.isRefunded(), applier);
 					break;
 				case "contactFrequencyOption":
 					filteredResult = checkContactFrequency(filteredResult.getFilteredUsers(),
 						matchReq.getContactFrequencyOption(), true,
-						filteredResult.isRefunded());
+						filteredResult.isRefunded(), applier);
 					break;
 			}
 		}
 
 		if (!"ageOption".equals(importantOption)) {
 			filteredResult = checkAge(filteredResult.getFilteredUsers(), matchReq.getAgeOption(), age, false,
-				filteredResult.isRefunded());
+				filteredResult.isRefunded(), applier);
 		}
 
 		if (!"mbtiOption".equals(importantOption)) {
 			filteredResult = checkMbti(filteredResult.getFilteredUsers(), matchReq.getMbtiOption(), false,
-				filteredResult.isRefunded());
+				filteredResult.isRefunded(), applier);
 		}
 
 		if (!"hobbyOption".equals(importantOption)) {
 			filteredResult = checkHobby(filteredResult.getFilteredUsers(), matchReq.getHobbyOption().get(0).getValue(),
 				false,
-				filteredResult.isRefunded());
+				filteredResult.isRefunded(), applier);
 		}
 
 		if (!"contactFrequencyOption".equals(importantOption)) {
 			filteredResult = checkContactFrequency(filteredResult.getFilteredUsers(),
 				matchReq.getContactFrequencyOption(), false,
-				filteredResult.isRefunded());
+				filteredResult.isRefunded(), applier);
 		}
 
 		return filteredResult;
@@ -150,7 +150,7 @@ public class NoAiMatchingService {
 	}
 
 	private FilteredResult checkAge(List<UserAiFeature> enemyList, AgeOption ageOption, Integer baseAge,
-		boolean isImportant, boolean refunded) {
+		boolean isImportant, boolean refunded, Users applier) {
 		List<UserAiFeature> filtered = enemyList.stream()
 			.filter(user -> {
 				Integer age = user.getAge();
@@ -169,8 +169,9 @@ public class NoAiMatchingService {
 
 		int minSize = isImportant ? 1 : 3;
 
-		if (isImportant && filtered.isEmpty()) {
-			refunded = true;
+		if (isImportant) {
+			log.info("important option: {}, important option filter result size: {} ", "age", filtered.size());
+			refunded = checkAndReturnImportantOptionPay(filtered.size(), applier);
 		}
 
 		return FilteredResult.builder()
@@ -181,7 +182,7 @@ public class NoAiMatchingService {
 	}
 
 	private FilteredResult checkContactFrequency(List<UserAiFeature> enemyList, ContactFrequencyOption option,
-		boolean isImportant, boolean refunded) {
+		boolean isImportant, boolean refunded, Users applier) {
 		List<UserAiFeature> filtered = enemyList.stream()
 			.filter(user -> {
 				ContactFrequency cf = user.getContactFrequency();
@@ -198,6 +199,12 @@ public class NoAiMatchingService {
 			.toList();
 
 		int minSize = isImportant ? 1 : 3;
+
+		if (isImportant) {
+			log.info("important option: {}, important option filter result size: {} ", "frequency", filtered.size());
+			refunded = checkAndReturnImportantOptionPay(filtered.size(), applier);
+		}
+
 		return FilteredResult.builder()
 			.filteredUsers(filtered.size() >= minSize ? filtered : enemyList)
 			.refunded(refunded)
@@ -205,7 +212,7 @@ public class NoAiMatchingService {
 	}
 
 	private FilteredResult checkHobby(List<UserAiFeature> enemyList, String hobbyOption, boolean isImportant,
-		boolean refunded) {
+		boolean refunded, Users applier) {
 
 		if (hobbyOption == null || hobbyOption.isBlank() || !HobbyCategoryUtil.isValidCategory(hobbyOption)) {
 			return FilteredResult.builder()
@@ -229,6 +236,12 @@ public class NoAiMatchingService {
 			.toList();
 
 		int minSize = isImportant ? 1 : 3;
+
+		if (isImportant) {
+			log.info("important option: {}, important option filter result size: {} ", "hobby", filtered.size());
+			refunded = checkAndReturnImportantOptionPay(filtered.size(), applier);
+		}
+
 		return FilteredResult.builder()
 			.filteredUsers(filtered.size() >= minSize ? filtered : enemyList)
 			.refunded(refunded)
@@ -236,7 +249,7 @@ public class NoAiMatchingService {
 	}
 
 	private FilteredResult checkMbti(List<UserAiFeature> enemyList, String mbtiOptions, boolean isImportant,
-		boolean refunded) {
+		boolean refunded, Users applier) {
 		if (mbtiOptions == null || mbtiOptions.isBlank() || mbtiOptions.length() != 2) {
 			return FilteredResult.builder()
 				.filteredUsers(enemyList)
@@ -261,6 +274,12 @@ public class NoAiMatchingService {
 			.toList();
 
 		int minSize = isImportant ? 1 : 3;
+
+		if (isImportant) {
+			log.info("important option: {}, important option filter result size: {} ", "mbti", filtered.size());
+			refunded = checkAndReturnImportantOptionPay(filtered.size(), applier);
+		}
+
 		return FilteredResult.builder()
 			.filteredUsers(filtered.size() >= minSize ? filtered : enemyList)
 			.refunded(refunded)
