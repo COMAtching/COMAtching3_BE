@@ -25,4 +25,5 @@ public class UserInfoRes {
 	private String comment;
 	private boolean schoolAuth;
 	private String schoolEmail;
+	private int matchCount;
 }

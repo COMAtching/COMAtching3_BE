@@ -413,6 +413,7 @@ public class UserService {
 			.gender(user.getUserAiFeature().getGender())
 			.schoolAuth(user.isSchoolAuth())
 			.schoolEmail(user.getSchoolEmail())
+			.matchCount(user.getMatchCount())
 			.build();
 	}
 

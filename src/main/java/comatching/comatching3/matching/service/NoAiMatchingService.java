@@ -38,6 +38,11 @@ public class NoAiMatchingService {
 	public MatchingResult noAiMatching(MatchReq matchReq, Long usePoint) {
 
 		Users currentUser = securityUtil.getCurrentUsersEntity();
+
+		if (currentUser.getMatchCount() > 10) {
+			throw new BusinessException(ResponseCode.MATCH_COUNT_OVER);
+		}
+
 		UserAiFeature currentUserAiFeature = currentUser.getUserAiFeature();
 
 		boolean refunded;
@@ -60,6 +65,8 @@ public class NoAiMatchingService {
 			UserAiFeature selectedUserFeature = result.get(random.nextInt(result.size()));
 			enemyUser = selectedUserFeature.getUsers();
 		}
+
+		currentUser.addMatchCount();
 
 		return MatchingResult.builder()
 			.enemyUser(enemyUser)

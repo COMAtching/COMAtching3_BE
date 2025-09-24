@@ -96,6 +96,8 @@ public class Users extends BaseEntity {
 
     private int pickedCount = 0;
 
+    private int matchCount = 0;
+
     @Setter
     private String realName;
 
@@ -190,6 +192,10 @@ public class Users extends BaseEntity {
 
     public void updatePickedCount() {
         this.pickedCount++;
+    }
+
+    public void addMatchCount() {
+        this.matchCount++;
     }
 
 }
