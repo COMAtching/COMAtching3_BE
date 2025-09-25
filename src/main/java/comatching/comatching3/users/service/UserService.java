@@ -2,13 +2,11 @@ package comatching.comatching3.users.service;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,9 +14,6 @@ import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vane.badwordfiltering.BadWordFiltering;
 
 import comatching.comatching3.admin.dto.request.EmailVerifyReq;
@@ -28,7 +23,7 @@ import comatching.comatching3.admin.service.UniversityService;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.matching.service.TestService;
 import comatching.comatching3.users.dto.AnonymousUser;
-import comatching.comatching3.users.dto.messageQueue.CategoryReqMsg;
+import comatching.comatching3.users.dto.request.UpdateContactMethodReq;
 import comatching.comatching3.users.dto.request.UserFeatureReq;
 import comatching.comatching3.users.dto.request.UserRegisterReq;
 import comatching.comatching3.users.dto.request.UserUpdateInfoReq;
@@ -42,7 +37,6 @@ import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.enums.ContactFrequency;
 import comatching.comatching3.users.enums.Gender;
 import comatching.comatching3.users.enums.Role;
-import comatching.comatching3.users.enums.UserCrudType;
 import comatching.comatching3.users.repository.HobbyRepository;
 import comatching.comatching3.users.repository.UserAiFeatureRepository;
 import comatching.comatching3.users.repository.UsersRepository;
@@ -222,6 +216,7 @@ public class UserService {
 		user.updateRole(Role.USER.getRoleName());
 		user.updateUniversity(university);
 		user.updateContactId(form.getContactId());
+		user.updateContactType(form.getContactType());
 		user.updateUserAiFeature(userAiFeature);
 		user.updateUsername(form.getUsername());
 		user.updateBirthday(form.getYear() + "-" + form.getMonth() + "-" + form.getDay());
@@ -246,9 +241,10 @@ public class UserService {
 	 * 연락처 업데이트
 	 */
 	@Transactional
-	public void updateContactId(String contactId) {
+	public void updateContactId(UpdateContactMethodReq req) {
 		Users user = securityUtil.getCurrentUsersEntity();
-		user.updateContactId(contactId);
+		user.updateContactId(req.getContactId());
+		user.updateContactType(req.getContactType());
 	}
 
 	/**
@@ -279,11 +275,10 @@ public class UserService {
 			userAiFeature.removeHobby(existingHobbies);
 			hobbyRepository.deleteAll(existingHobbies);
 
-			List<Hobby> newHobbyList = IntStream.range(0, form.getHobbies().size())
-				.mapToObj(i -> Hobby.builder()
-					.hobbyName(form.getHobbies().get(i))
+			List<Hobby> newHobbyList = form.getHobbies().stream().map(hobbyName -> Hobby.builder()
+					.hobbyName(hobbyName)
 					.userAiFeature(userAiFeature)
-					// .category(categories.get(i))
+					.category(HobbyCategoryUtil.getCategory(hobbyName))
 					.build())
 				.collect(Collectors.toList());
 			hobbyRepository.saveAll(newHobbyList);
@@ -301,6 +296,10 @@ public class UserService {
 
 		if (form.getContactId() != null) {
 			user.updateContactId(form.getContactId());
+		}
+
+		if (form.getContactType() != null) {
+			user.updateContactType(form.getContactType());
 		}
 
 		if (form.getMbti() != null) {
@@ -405,6 +404,7 @@ public class UserService {
 			.university(user.getUniversity().getUniversityName())
 			.major(user.getUserAiFeature().getMajor())
 			.contactId(user.getContactId())
+			.contactType(user.getContactType())
 			.hobbies(hobbyResList)
 			.mbti(user.getUserAiFeature().getMbti())
 			.contactFrequency(user.getUserAiFeature().getContactFrequency())
@@ -462,7 +462,6 @@ public class UserService {
 		} catch (Exception e) {
 			log.info("csv에 없는 유저의 탈퇴 요청");
 		}
-
 
 		AnonymousUser anonymousUser = new AnonymousUser();
 
