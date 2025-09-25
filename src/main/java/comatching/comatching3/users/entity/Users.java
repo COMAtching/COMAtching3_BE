@@ -92,6 +92,8 @@ public class Users extends BaseEntity {
 
     private String contactId;
 
+    private String contactType;
+
     private int warningCount = 0;
 
     private int pickedCount = 0;
@@ -152,6 +154,10 @@ public class Users extends BaseEntity {
 
     public void updateContactId(String contactId) {
         this.contactId = contactId;
+    }
+
+    public void updateContactType(String contactType) {
+        this.contactType = contactType;
     }
 
     public void updateUsername(String username) {

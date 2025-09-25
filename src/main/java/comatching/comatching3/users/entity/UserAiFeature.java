@@ -37,8 +37,6 @@ public class UserAiFeature {
     @OneToMany(mappedBy = "userAiFeature", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Hobby> hobbyList = new ArrayList<>();
 
-    @Min(20)
-    @Max(30)
     private Integer age;
 
     @Enumerated(EnumType.STRING)

@@ -13,6 +13,7 @@ public class UserFeatureReq {
     private String university;
     private String major;
     private String contactId;
+    private String contactType;
     private String gender;
     private String username;
     private String year;

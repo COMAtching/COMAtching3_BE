@@ -17,6 +17,7 @@ public class UserInfoRes {
 	private String university;
 	private String major;
 	private String contactId;
+	private String contactType;
 	private String song;
 	private String mbti;
 	private List<String> hobbies;

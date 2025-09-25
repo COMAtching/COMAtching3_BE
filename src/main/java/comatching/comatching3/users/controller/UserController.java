@@ -78,12 +78,12 @@ public class UserController {
     /**
      * contactId 변경
      */
-    @Deprecated
+    // @Deprecated
     // @PatchMapping("/auth/user/api/user/info/{contactId}")
-    public Response<Void> updateContactId(@PathVariable String contactId) {
-        userService.updateContactId(contactId);
-        return Response.ok();
-    }
+    // public Response<Void> updateContactId(@PathVariable String contactId) {
+    //     userService.updateContactId(contactId);
+    //     return Response.ok();
+    // }
 
     @GetMapping("/auth/user/school-domain/{universityName}")
     public Response<String> getSchoolDomain(@PathVariable String universityName) {

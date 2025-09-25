@@ -10,6 +10,7 @@ public class UserUpdateInfoReq {
 	private String university;
 	private String major;
 	private String contactId;
+	private String contactType;
 	private List<String> hobbies;
 	private String song;
 	private String mbti;
