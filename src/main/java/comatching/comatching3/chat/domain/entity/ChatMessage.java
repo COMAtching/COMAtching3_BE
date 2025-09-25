@@ -1,5 +1,8 @@
 package comatching.comatching3.chat.domain.entity;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 import comatching.comatching3.chat.domain.ChatRole;
 import comatching.comatching3.chat.domain.dto.ChatResponse;
 import comatching.comatching3.users.entity.Users;
@@ -23,13 +26,14 @@ public class ChatMessage extends BaseEntity {
     @ManyToOne
     private Users sender;
 
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private ChatRole chatRole;
 
     public ChatMessage(Users sender, String content, ChatRoom chatRoom, ChatRole chatRole) {
         this.sender = sender;
-        this.content = content;
+        this.content = encode(content);
         this.chatRoom = chatRoom;
         this.chatRole = chatRole;
     }
@@ -37,5 +41,11 @@ public class ChatMessage extends BaseEntity {
     public ChatResponse toResponse() {
         return new ChatResponse(this.getCreatedAt(), this.content, this.chatRole);
     }
+
+    private String encode(String plainText) {
+        return Base64.getEncoder()
+            .encodeToString(plainText.getBytes(StandardCharsets.UTF_8));
+    }
+
 }
 
