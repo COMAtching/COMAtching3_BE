@@ -39,7 +39,7 @@ public class NoAiMatchingService {
 
 		Users currentUser = securityUtil.getCurrentUsersEntity();
 
-		if (currentUser.getMatchCount() > 10) {
+		if (currentUser.getMatchCount() > 100) {
 			throw new BusinessException(ResponseCode.MATCH_COUNT_OVER);
 		}
 
