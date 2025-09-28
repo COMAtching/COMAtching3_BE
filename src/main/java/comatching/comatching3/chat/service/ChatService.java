@@ -108,7 +108,7 @@ public class ChatService {
         for (ChatRoom chatRoom : me.getAllChatRooms()) {
             // 마지막 메시지
             String lastMessage = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom)
-                .map(ChatMessage::getContent)
+                .map(m -> new String(Base64.getDecoder().decode(m.getContent()), StandardCharsets.UTF_8))
                 .orElse(null);
 
             // 마지막 읽은 시간
