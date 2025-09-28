@@ -39,7 +39,7 @@ public class ChatMessage extends BaseEntity {
     }
 
     public ChatResponse toResponse() {
-        return new ChatResponse(this.getCreatedAt(), decode(this.content), this.chatRole);
+        return new ChatResponse(this.getCreatedAt(), this.content, this.chatRole);
     }
 
     private String encode(String plainText) {
