@@ -130,20 +130,12 @@ public class ChatService {
                 chatRoom.getPicked().getUserAiFeature().getAge()
             );
 
-            ChatRoomListRes res = new ChatRoomListRes(info, unreadCount, decodeContent(lastMessage));
+            ChatRoomListRes res = new ChatRoomListRes(info, unreadCount, lastMessage);
             results.add(res);
         }
 
         return results;
     }
-
-    private String decodeContent(String content) {
-        return new String(
-            Base64.getDecoder().decode(content),
-            StandardCharsets.UTF_8
-        );
-    }
-
 
     /**
      * 채팅방 대화 내역 조회
