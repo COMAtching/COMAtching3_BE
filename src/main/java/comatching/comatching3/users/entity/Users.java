@@ -3,6 +3,7 @@ package comatching.comatching3.users.entity;
 import comatching.comatching3.admin.entity.University;
 import comatching.comatching3.charge.entity.ChargeRequest;
 import comatching.comatching3.chat.domain.entity.ChatRoom;
+import comatching.comatching3.chat.domain.entity.ChatRoomUser;
 import comatching.comatching3.history.entity.PointHistory;
 import comatching.comatching3.pay.entity.Orders;
 import comatching.comatching3.util.BaseEntity;
@@ -48,6 +49,9 @@ public class Users extends BaseEntity {
 
     @OneToMany(mappedBy = "picked", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoom> chatRoomsWhoPickedMe = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
 
     private String socialId;
 
