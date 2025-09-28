@@ -20,8 +20,10 @@ import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -128,11 +130,18 @@ public class ChatService {
                 chatRoom.getPicked().getUserAiFeature().getAge()
             );
 
-            ChatRoomListRes res = new ChatRoomListRes(info, unreadCount, lastMessage);
+            ChatRoomListRes res = new ChatRoomListRes(info, unreadCount, decodeContent(lastMessage));
             results.add(res);
         }
 
         return results;
+    }
+
+    private String decodeContent(String content) {
+        return new String(
+            Base64.getDecoder().decode(content),
+            StandardCharsets.UTF_8
+        );
     }
 
 

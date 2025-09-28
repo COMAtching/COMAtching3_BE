@@ -20,13 +20,6 @@ public class ChatRoomListRes {
 	public ChatRoomListRes(ChatRoomInfoRes chatRoomInfoRes, Long unreadCount, String lastMessage) {
 		this.chatRoomInfoRes = chatRoomInfoRes;
 		this.unreadCount = unreadCount;
-		this.lastMessage = decodeContent(lastMessage);
-	}
-
-	public String decodeContent(String content) {
-		return new String(
-			Base64.getDecoder().decode(content),
-			StandardCharsets.UTF_8
-		);
+		this.lastMessage = lastMessage;
 	}
 }
