@@ -20,8 +20,10 @@ import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -134,7 +136,6 @@ public class ChatService {
 
         return results;
     }
-
 
     /**
      * 채팅방 대화 내역 조회
