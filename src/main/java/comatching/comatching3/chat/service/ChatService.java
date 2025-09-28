@@ -6,8 +6,11 @@ import comatching.comatching3.chat.domain.dto.ChatResponse;
 import comatching.comatching3.chat.domain.dto.ChatRoomInfoRes;
 import comatching.comatching3.chat.domain.entity.ChatMessage;
 import comatching.comatching3.chat.domain.entity.ChatRoom;
+import comatching.comatching3.chat.domain.entity.ChatRoomUser;
+import comatching.comatching3.chat.dto.ChatRoomListRes;
 import comatching.comatching3.chat.repository.ChatMessageRepository;
 import comatching.comatching3.chat.repository.ChatRoomRepository;
+import comatching.comatching3.chat.repository.ChatRoomUserRepository;
 import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.users.repository.UsersRepository;
@@ -17,6 +20,7 @@ import comatching.comatching3.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +31,7 @@ public class ChatService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatRoomUserRepository chatRoomUserRepository;
     private final UsersRepository usersRepository;
     private final SecurityUtil securityUtil;
 
@@ -94,45 +99,42 @@ public class ChatService {
      *
      * @return
      */
-    public List<ChatRoomInfoRes> getChatRoomList() {
-        Users user = securityUtil.getCurrentUsersEntity();
-        List<ChatRoomInfoRes> chatRoomInfoResList = new ArrayList<>();
+    public List<ChatRoomListRes> getChatRoomList() {
+        Users me = securityUtil.getCurrentUsersEntity();
+        List<ChatRoomListRes> results = new ArrayList<>();
 
-        List<ChatRoom> pickerChat = user.getChatRoomsPickedByMe();
-        List<ChatRoom> pickedChat = user.getChatRoomsWhoPickedMe();
+        for (ChatRoom chatRoom : me.getAllChatRooms()) {
+            // 마지막 메시지
+            String lastMessage = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom)
+                .map(ChatMessage::getContent)
+                .orElse(null);
 
-        for (ChatRoom chatRoom : pickerChat) {
-            ChatRoomInfoRes res = new ChatRoomInfoRes(
-                    chatRoom.getId(),
-                    ChatRole.PICKER,
-                    chatRoom.getPicker().getUsername(),
-                    chatRoom.getPicked().getUsername(),
-                    chatRoom.getPicker().getUserAiFeature().getMajor(),
-                    chatRoom.getPicker().getUserAiFeature().getAge(),
-                    chatRoom.getPicked().getUserAiFeature().getMajor(),
-                    chatRoom.getPicked().getUserAiFeature().getAge()
+            // 마지막 읽은 시간
+            LocalDateTime lastReadAt = getLastReadAt(chatRoom, me);
+
+            // 안 읽은 개수
+            long unreadCount = (lastReadAt != null)
+                ? chatMessageRepository.countByChatRoomAndCreatedAtAfterAndSenderNot(chatRoom, lastReadAt, me)
+                : chatMessageRepository.countByChatRoomAndSenderNot(chatRoom, me);
+
+            ChatRoomInfoRes info = new ChatRoomInfoRes(
+                chatRoom.getId(),
+                chatRoom.getPicker().getId().equals(me.getId()) ? ChatRole.PICKER : ChatRole.PICKED,
+                chatRoom.getPicker().getUsername(),
+                chatRoom.getPicked().getUsername(),
+                chatRoom.getPicker().getUserAiFeature().getMajor(),
+                chatRoom.getPicker().getUserAiFeature().getAge(),
+                chatRoom.getPicked().getUserAiFeature().getMajor(),
+                chatRoom.getPicked().getUserAiFeature().getAge()
             );
 
-            chatRoomInfoResList.add(res);
+            ChatRoomListRes res = new ChatRoomListRes(info, unreadCount, lastMessage);
+            results.add(res);
         }
 
-        for (ChatRoom chatRoom : pickedChat) {
-            ChatRoomInfoRes res = new ChatRoomInfoRes(
-                    chatRoom.getId(),
-                    ChatRole.PICKED,
-                    chatRoom.getPicker().getUsername(),
-                    chatRoom.getPicked().getUsername(),
-                    chatRoom.getPicker().getUserAiFeature().getMajor(),
-                    chatRoom.getPicker().getUserAiFeature().getAge(),
-                    chatRoom.getPicked().getUserAiFeature().getMajor(),
-                    chatRoom.getPicked().getUserAiFeature().getAge()
-            );
-
-            chatRoomInfoResList.add(res);
-        }
-
-        return chatRoomInfoResList;
+        return results;
     }
+
 
     /**
      * 채팅방 대화 내역 조회
@@ -162,5 +164,11 @@ public class ChatService {
 
         return response;
 
+    }
+
+    private LocalDateTime getLastReadAt(ChatRoom chatRoom, Users me) {
+        return chatRoomUserRepository.findByChatRoomAndUser(chatRoom, me)
+            .map(ChatRoomUser::getLastReadAt)
+            .orElse(null);
     }
 }
