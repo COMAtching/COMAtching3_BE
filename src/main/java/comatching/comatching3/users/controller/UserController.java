@@ -75,7 +75,7 @@ public class UserController {
         return Response.ok(userService.isContactIdDuplicated(contactId));
     }
 
-    @GetMapping("/auth/allUser/api/check/{username}")
+    @GetMapping("/auth/allUser/api/check-username/{username}")
     public Response<Boolean> isUsernameDuplicated(@PathVariable String username) {
         return Response.ok(userService.checkUsernameDuplicated(username));
     }
