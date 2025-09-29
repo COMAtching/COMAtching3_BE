@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Builder
@@ -30,5 +31,6 @@ public class ChatRoomUser {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Users user;
 
+	@Setter
 	private LocalDateTime lastReadAt;
 }

@@ -48,6 +48,21 @@ public class ChatService {
         ChatRoom newChatRoom = new ChatRoom(picker, picked);
         chatRoomRepository.save(newChatRoom);
 
+        ChatRoomUser pickerMapping = ChatRoomUser.builder()
+            .chatRoom(newChatRoom)
+            .user(picker)
+            .lastReadAt(LocalDateTime.now()) // 처음 생성 시 현재시간으로 초기화 가능
+            .build();
+
+        ChatRoomUser pickedMapping = ChatRoomUser.builder()
+            .chatRoom(newChatRoom)
+            .user(picked)
+            .lastReadAt(LocalDateTime.now())
+            .build();
+
+        chatRoomUserRepository.save(pickerMapping);
+        chatRoomUserRepository.save(pickedMapping);
+
         return newChatRoom.getId();
     }
 
@@ -168,6 +183,11 @@ public class ChatService {
         if (!pickerId.equals(user.getId()) && !pickedId.equals(user.getId())) {
             throw new BusinessException(ResponseCode.BAD_REQUEST);
         }
+
+        ChatRoomUser cru = chatRoomUserRepository.findByChatRoomAndUser(chatRoom, user)
+            .orElseThrow(() -> new BusinessException(ResponseCode.BAD_REQUEST));
+        cru.setLastReadAt(LocalDateTime.now());
+        chatRoomUserRepository.save(cru);
 
         List<ChatMessage> chats = chatMessageRepository.findByChatRoomOrderByCreatedAt(chatRoom);
         for (ChatMessage chat : chats) {
