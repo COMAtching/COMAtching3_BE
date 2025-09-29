@@ -27,12 +27,23 @@ public interface UserAiFeatureRepository extends JpaRepository<UserAiFeature, Lo
 
 	@Query("SELECT u FROM UserAiFeature u LEFT JOIN FETCH u.hobbyList " +
 		"WHERE u.gender <> :gender " +
-		"AND u.users.id NOT IN (SELECT mh.enemy.id FROM MatchingHistory mh WHERE mh.applier.id = :applierId)")
-	List<UserAiFeature> findAllByGenderWithHobbiesExcludingPreviousMatches(@Param("gender") Gender gender, @Param("applierId") Long applierId);
+		"AND u.users.id NOT IN (" +
+		"   SELECT mh.enemy.id FROM MatchingHistory mh WHERE mh.applier.id = :applierId " +
+		"   UNION " +
+		"   SELECT mh.applier.id FROM MatchingHistory mh WHERE mh.enemy.id = :applierId" +
+		")")
+	List<UserAiFeature> findAllByGenderWithHobbiesExcludingPreviousMatches(@Param("gender") Gender gender,
+		@Param("applierId") Long applierId);
 
 	@Query("SELECT u FROM UserAiFeature u LEFT JOIN FETCH u.hobbyList " +
 		"WHERE u.gender <> :gender " +
 		"AND u.major <> :major " +
-		"AND u.users.id NOT IN (SELECT mh.enemy.id FROM MatchingHistory mh WHERE mh.applier.id = :applierId)")
-	List<UserAiFeature> findAllByGenderAndMajorNotWithHobbiesExcludingPreviousMatches(@Param("gender") Gender gender, @Param("major") String major, @Param("applierId") Long applierId);
+		"AND u.users.id NOT IN (" +
+		"   SELECT mh.enemy.id FROM MatchingHistory mh WHERE mh.applier.id = :applierId " +
+		"   UNION " +
+		"   SELECT mh.applier.id FROM MatchingHistory mh WHERE mh.enemy.id = :applierId" +
+		")")
+	List<UserAiFeature> findAllByGenderAndMajorNotWithHobbiesExcludingPreviousMatches(@Param("gender") Gender gender,
+		@Param("major") String major,
+		@Param("applierId") Long applierId);
 }
