@@ -3,6 +3,7 @@ package comatching.comatching3.chat.service;
 import com.vane.badwordfiltering.BadWordFiltering;
 import comatching.comatching3.chat.domain.ChatRole;
 import comatching.comatching3.chat.domain.dto.ChatResponse;
+import comatching.comatching3.chat.domain.dto.ChatRoomDetailRes;
 import comatching.comatching3.chat.domain.dto.ChatRoomInfoRes;
 import comatching.comatching3.chat.domain.entity.ChatMessage;
 import comatching.comatching3.chat.domain.entity.ChatRoom;
@@ -258,9 +259,7 @@ public class ChatService {
      * @param roomId
      * @return
      */
-    public List<ChatResponse> getRoomChats(Long roomId) {
-
-        List<ChatResponse> response = new ArrayList<>();
+    public ChatRoomDetailRes getRoomChats(Long roomId) {
         Users user = securityUtil.getCurrentUsersEntity();
 
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
@@ -273,17 +272,25 @@ public class ChatService {
             throw new BusinessException(ResponseCode.BAD_REQUEST);
         }
 
+        Users opponent = pickerId.equals(user.getId()) ? chatRoom.getPicked() : chatRoom.getPicker();
+        UserInfoRes opponentProfile = UserInfoRes.from(opponent, opponent.getUserAiFeature().getHobbyNameList());
+
+        // 마지막 읽은 시간 업데이트
         ChatRoomUser cru = chatRoomUserRepository.findByChatRoomAndUser(chatRoom, user)
             .orElseThrow(() -> new BusinessException(ResponseCode.BAD_REQUEST));
         cru.setLastReadAt(LocalDateTime.now());
         chatRoomUserRepository.save(cru);
 
+        // 채팅 메시지 조회
         List<ChatMessage> chats = chatMessageRepository.findByChatRoomOrderByCreatedAt(chatRoom);
-        for (ChatMessage chat : chats) {
-            response.add(chat.toResponse());
-        }
+        List<ChatResponse> chatResponses = chats.stream()
+            .map(ChatMessage::toResponse)
+            .toList();
 
-        return response;
+        return ChatRoomDetailRes.builder()
+            .chatMessages(chatResponses)
+            .opponentProfile(opponentProfile)
+            .build();
 
     }
 
