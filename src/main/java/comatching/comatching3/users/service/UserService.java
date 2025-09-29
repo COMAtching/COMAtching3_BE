@@ -285,10 +285,8 @@ public class UserService {
 			userAiFeature.addHobby(newHobbyList);
 		}
 
-		if (form.getBirthday() != null) {
-			int age = LocalDate.now().getYear() - Integer.parseInt(form.getBirthday().substring(0, 4)) + 1;
-			user.updateBirthday(form.getBirthday());
-			userAiFeature.updateAge(age);
+		if (form.getAge() != null) {
+			userAiFeature.updateAge(Integer.parseInt(form.getAge()));
 		}
 
 		if (form.getUsername() != null) {
