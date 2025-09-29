@@ -155,6 +155,11 @@ public class ChatService {
             boolean isPicker = chatRoom.getPicker().getId().equals(me.getId());
 
             ChatMessage lastMsg = lastMessageMap.get(chatRoom.getId());
+
+            if (!isPicker && lastMsg == null) {
+                continue;
+            }
+
             String lastMessage = (lastMsg != null)
                 ? new String(Base64.getDecoder().decode(lastMsg.getContent()), StandardCharsets.UTF_8)
                 : null;
