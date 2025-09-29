@@ -24,4 +24,23 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     // lastReadAt이 null인 경우 대비: 내가 보낸 것 제외 전체 메시지 개수
     long countByChatRoomAndSenderNot(ChatRoom chatRoom, Users sender);
+
+    // 각 채팅방별 마지막 메시지
+    @Query("SELECT m FROM ChatMessage m " +
+        "WHERE m.chatRoom IN :chatRooms " +
+        "AND m.createdAt = (" +
+        "  SELECT MAX(m2.createdAt) FROM ChatMessage m2 WHERE m2.chatRoom = m.chatRoom" +
+        ")")
+    List<ChatMessage> findLastMessages(@Param("chatRooms") List<ChatRoom> chatRooms);
+
+    // 안 읽은 메시지 개수 (lastReadAt 고려)
+    @Query("SELECT m.chatRoom.id, COUNT(m) " +
+        "FROM ChatMessage m " +
+        "WHERE m.chatRoom IN :chatRooms " +
+        "AND m.sender <> :me " +
+        "AND (:lastReadAt IS NULL OR m.createdAt > :lastReadAt) " +
+        "GROUP BY m.chatRoom.id")
+    List<Object[]> countUnreadMessagesBatch(@Param("chatRooms") List<ChatRoom> chatRooms,
+        @Param("lastReadAt") LocalDateTime lastReadAt,
+        @Param("me") Users me);
 }

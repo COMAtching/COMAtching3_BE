@@ -401,23 +401,7 @@ public class UserService {
 		List<String> hobbyResList = hobbyRepository.findAllByUserAiFeature(user.getUserAiFeature()).stream()
 			.map(Hobby::getHobbyName)
 			.toList();
-		return UserInfoRes.builder()
-			.username(user.getUsername())
-			.age(user.getUserAiFeature().getAge())
-			.university(user.getUniversity().getUniversityName())
-			.major(user.getUserAiFeature().getMajor())
-			.contactId(user.getContactId())
-			.contactType(user.getContactType())
-			.hobbies(hobbyResList)
-			.mbti(user.getUserAiFeature().getMbti())
-			.contactFrequency(user.getUserAiFeature().getContactFrequency())
-			.song(user.getSong())
-			.comment(user.getComment())
-			.gender(user.getUserAiFeature().getGender())
-			.schoolAuth(user.isSchoolAuth())
-			.schoolEmail(user.getSchoolEmail())
-			.matchCount(user.getMatchCount())
-			.build();
+		return UserInfoRes.from(user, hobbyResList);
 	}
 
 	public UsernamePointRes getProfile() {
