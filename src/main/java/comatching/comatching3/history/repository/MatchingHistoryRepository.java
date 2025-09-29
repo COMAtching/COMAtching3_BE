@@ -16,6 +16,9 @@ public interface MatchingHistoryRepository extends JpaRepository<MatchingHistory
     @Query("SELECT mh FROM MatchingHistory mh WHERE mh.applier.id = :applierId ORDER BY mh.createdAt DESC")
     Optional<List<MatchingHistory>> findByApplierId(@Param("applierId") Long applierId);
 
+    @Query("SELECT mh FROM MatchingHistory mh WHERE mh.enemy.id = :enemy ORDER BY mh.createdAt DESC")
+    Optional<List<MatchingHistory>> findByEnemyId(@Param("enemyId") Long enemyId);
+
     Optional<List<MatchingHistory>> findByApplier(Users users);
 
     Long countByApplier(Users users);

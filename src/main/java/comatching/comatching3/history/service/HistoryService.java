@@ -69,4 +69,23 @@ public class HistoryService {
 				.collect(Collectors.toList());
 	}
 
+	public List<MatchHistoryRes> getMatchHistoryPickedMe() {
+		Users user = securityUtil.getCurrentUsersEntity();
+
+		List<MatchingHistory> matchingHistories = matchingHistoryRepository.findByEnemyId(user.getId())
+			.orElseThrow(()->{
+				throw new BusinessException(ResponseCode.MATCH_HISTORY_NOT_EXIST);
+			});
+
+		List<MatchHistoryRes> response = new ArrayList<>();
+
+		for(MatchingHistory matchingHistory : matchingHistories){
+			MatchHistoryRes res = new MatchHistoryRes();
+			res.updateFromUsers(matchingHistory.getApplier());
+			response.add(res);
+		}
+
+		return response;
+	}
+
 }

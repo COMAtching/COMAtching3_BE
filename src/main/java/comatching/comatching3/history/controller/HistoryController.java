@@ -30,6 +30,11 @@ public class HistoryController {
 		return Response.ok(historyService.inquiryMatchHistory());
 	}
 
+	@GetMapping("/auth/user/api/history/picked-me")
+	public Response<List<MatchHistoryRes>> getMatchHistoryPickedMe() {
+		return Response.ok(historyService.getMatchHistoryPickedMe());
+	}
+
 	/**
 	 * 관리자의 유저 포인트 내역 조회
 	 * @param uuid

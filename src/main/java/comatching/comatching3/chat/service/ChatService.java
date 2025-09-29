@@ -121,6 +121,12 @@ public class ChatService {
         List<ChatRoomListRes> results = new ArrayList<>();
 
         for (ChatRoom chatRoom : me.getAllChatRooms()) {
+            boolean isPicker = chatRoom.getPicker().getId().equals(me.getId());
+
+            if (!isPicker && chatRoom.getChatMessages().isEmpty()) {
+                continue;
+            }
+
             // 마지막 메시지 조회
             Optional<ChatMessage> lastMessageOpt = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom);
 
