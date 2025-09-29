@@ -44,10 +44,10 @@ public class TempChargeService {
 			throw new BusinessException(ResponseCode.ALREADY_REQUEST_CHARGE);
 		}
 
-		int dailyChargeLimit = 30000;
-		if (user.getPayedPoint() > dailyChargeLimit) {
-			throw new BusinessException(ResponseCode.ENOUGH_DAILY_CHARGE);
-		}
+		// int dailyChargeLimit = 30000;
+		// if (user.getPayedPoint() > dailyChargeLimit) {
+		// 	throw new BusinessException(ResponseCode.ENOUGH_DAILY_CHARGE);
+		// }
 
 		ChargeRequest chargeRequest = ChargeRequest.builder()
 			.users(user)
