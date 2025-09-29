@@ -16,4 +16,5 @@ public class UserUpdateInfoReq {
 	private String mbti;
 	private String contactFrequency;
 	private String comments;
+	private String birthday;
 }

@@ -65,4 +65,6 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 	@Query("SELECT u FROM Users u JOIN u.userAiFeature uf WHERE uf.uuid = :uuid")
 	Optional<Users> findUsersByUuidForUpdate(@Param("uuid") byte[] uuid);
 
+	boolean existsByUsername(String username);
+
 }
