@@ -106,9 +106,15 @@ public class ChatService {
         List<ChatRoomListRes> results = new ArrayList<>();
 
         for (ChatRoom chatRoom : me.getAllChatRooms()) {
-            // 마지막 메시지
-            String lastMessage = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom)
+            // 마지막 메시지 조회
+            Optional<ChatMessage> lastMessageOpt = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom);
+
+            String lastMessage = lastMessageOpt
                 .map(m -> new String(Base64.getDecoder().decode(m.getContent()), StandardCharsets.UTF_8))
+                .orElse(null);
+
+            LocalDateTime lastMessageTimestamp = lastMessageOpt
+                .map(ChatMessage::getCreatedAt)
                 .orElse(null);
 
             // 마지막 읽은 시간
@@ -130,7 +136,12 @@ public class ChatService {
                 chatRoom.getPicked().getUserAiFeature().getAge()
             );
 
-            ChatRoomListRes res = new ChatRoomListRes(info, unreadCount, lastMessage);
+            ChatRoomListRes res = new ChatRoomListRes(
+                info,
+                unreadCount,
+                lastMessage,
+                lastMessageTimestamp
+            );
             results.add(res);
         }
 

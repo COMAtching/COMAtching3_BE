@@ -1,9 +1,11 @@
 package comatching.comatching3.chat.dto;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Base64;
 
 import comatching.comatching3.chat.domain.dto.ChatRoomInfoRes;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,15 +13,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class ChatRoomListRes {
 
 	private ChatRoomInfoRes chatRoomInfoRes;
 	private Long unreadCount;
 	private String lastMessage;
-
-	public ChatRoomListRes(ChatRoomInfoRes chatRoomInfoRes, Long unreadCount, String lastMessage) {
-		this.chatRoomInfoRes = chatRoomInfoRes;
-		this.unreadCount = unreadCount;
-		this.lastMessage = lastMessage;
-	}
+	private LocalDateTime lastMessageTimestamp;
 }
