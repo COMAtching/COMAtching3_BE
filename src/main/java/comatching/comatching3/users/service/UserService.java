@@ -249,7 +249,6 @@ public class UserService {
 
 	/**
 	 * 유저 정보 업데이트
-	 * todo: Hobby 대분류 관련 로직 추가
 	 */
 	@Transactional
 	public void updateUserInfo(UserUpdateInfoReq form) {
@@ -284,6 +283,12 @@ public class UserService {
 			hobbyRepository.saveAll(newHobbyList);
 
 			userAiFeature.addHobby(newHobbyList);
+		}
+
+		if (form.getBirthday() != null) {
+			int age = LocalDate.now().getYear() - Integer.parseInt(form.getBirthday().substring(0, 4)) + 1;
+			user.updateBirthday(form.getBirthday());
+			userAiFeature.updateAge(age);
 		}
 
 		if (form.getUsername() != null) {
@@ -496,6 +501,10 @@ public class UserService {
 		} else {
 			throw new BusinessException(ResponseCode.BAD_REQUEST);
 		}
+	}
+
+	public boolean checkUsernameDuplicated(String username) {
+		return usersRepository.existsByUsername(username);
 	}
 
 }
