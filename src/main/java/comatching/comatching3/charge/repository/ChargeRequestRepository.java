@@ -26,7 +26,7 @@ public interface ChargeRequestRepository extends JpaRepository<ChargeRequest, Lo
 
     Optional<ChargeRequest> findByOrderId(String orderId);
 
-    List<ChargeRequest> findAllByUsers(Users user);
+    List<ChargeRequest> findAllByUsersOrderByCreatedAtDesc(Users user);
 
     List<ChargeRequest> findAllByOrderStatusOrderByRequestAtDesc(OrderStatus status);
 
