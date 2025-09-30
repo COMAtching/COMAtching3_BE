@@ -15,4 +15,5 @@ public class PointRes {
 	String username;
 	String realName;
 	Long point;
+	int matchRemainCount;
 }

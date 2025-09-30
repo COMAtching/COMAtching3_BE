@@ -428,6 +428,7 @@ public class UserService {
 			.username(user.getUsername())
 			.realName(user.getRealName() == null ? null : user.getRealName())
 			.point(user.getPoint())
+			.matchRemainCount(30 - user.getMatchCount())
 			.build();
 	}
 
@@ -488,5 +489,12 @@ public class UserService {
 	public boolean checkUsernameDuplicated(String username) {
 		return usersRepository.existsByUsername(username);
 	}
+
+	public void updateRealName(String realName) {
+		Users user = securityUtil.getCurrentUsersEntity();
+
+		user.setRealName(realName);
+	}
+
 
 }
