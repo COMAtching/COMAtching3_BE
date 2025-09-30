@@ -110,7 +110,7 @@ public class TempChargeService {
 	public List<PayHistoryRes> getUserChargeHistoryTemp() {
 		Users user = securityUtil.getCurrentUsersEntity();
 
-		List<ChargeRequest> histories = chargeRequestRepository.findAllByUsers(user);
+		List<ChargeRequest> histories = chargeRequestRepository.findAllByUsersOrderByCreatedAtDesc(user);
 
 		return histories.stream().map(
 			history -> PayHistoryRes.builder()
@@ -129,7 +129,7 @@ public class TempChargeService {
 
 	public List<PayHistoryRes> getAdminChargeHistoryTemp(Users user) {
 
-		List<ChargeRequest> histories = chargeRequestRepository.findAllByUsers(user);
+		List<ChargeRequest> histories = chargeRequestRepository.findAllByUsersOrderByCreatedAtDesc(user);
 
 		return histories.stream().map(
 			history -> PayHistoryRes.builder()

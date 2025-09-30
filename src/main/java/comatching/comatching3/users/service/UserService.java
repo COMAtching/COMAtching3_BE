@@ -490,6 +490,7 @@ public class UserService {
 		return usersRepository.existsByUsername(username);
 	}
 
+	@Transactional
 	public void updateRealName(String realName) {
 		Users user = securityUtil.getCurrentUsersEntity();
 
