@@ -2,7 +2,6 @@ package comatching.comatching3.users.controller;
 
 import comatching.comatching3.admin.dto.request.EmailVerifyReq;
 import comatching.comatching3.admin.dto.response.EmailTokenRes;
-import comatching.comatching3.users.dto.request.BuyPickMeReq;
 import comatching.comatching3.users.dto.request.UserFeatureReq;
 import comatching.comatching3.users.dto.request.UserRegisterReq;
 import comatching.comatching3.users.dto.request.UserUpdateInfoReq;
@@ -200,6 +199,13 @@ public class UserController {
     @PatchMapping("/auth/user/api/remove")
     public Response<Void> removeUser(HttpServletRequest request, HttpServletResponse response) {
         userService.removeUser(request, response);
+        return Response.ok();
+    }
+
+    @PostMapping("/auth/user/name/{realName}")
+    public Response<Void> setRealName(@PathVariable String realName) {
+        userService.updateRealName(realName);
+
         return Response.ok();
     }
 }
