@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.joda.time.tz.DateTimeZoneBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import comatching.comatching3.charge.dto.request.TempChargeApprovalReq;
-import comatching.comatching3.charge.dto.request.TempChargeRequest;
 import comatching.comatching3.charge.dto.response.TempChargeRes;
 import comatching.comatching3.charge.entity.ChargeRequest;
 import comatching.comatching3.charge.repository.ChargeRequestRepository;
@@ -18,7 +16,6 @@ import comatching.comatching3.exception.BusinessException;
 import comatching.comatching3.pay.dto.req.OrderReq;
 import comatching.comatching3.pay.dto.res.PayHistoryRes;
 import comatching.comatching3.pay.enums.OrderStatus;
-import comatching.comatching3.pay.service.PayHistoryService;
 import comatching.comatching3.setting.service.SystemSettingService;
 import comatching.comatching3.users.entity.Users;
 import comatching.comatching3.util.ResponseCode;
@@ -110,7 +107,7 @@ public class TempChargeService {
 	public List<PayHistoryRes> getUserChargeHistoryTemp() {
 		Users user = securityUtil.getCurrentUsersEntity();
 
-		List<ChargeRequest> histories = chargeRequestRepository.findAllByUsersOrderByCreatedAtDesc(user);
+		List<ChargeRequest> histories = chargeRequestRepository.findAllByUsersOrderByCreatedAtAsc(user);
 
 		return histories.stream().map(
 			history -> PayHistoryRes.builder()
@@ -129,7 +126,7 @@ public class TempChargeService {
 
 	public List<PayHistoryRes> getAdminChargeHistoryTemp(Users user) {
 
-		List<ChargeRequest> histories = chargeRequestRepository.findAllByUsersOrderByCreatedAtDesc(user);
+		List<ChargeRequest> histories = chargeRequestRepository.findAllByUsersOrderByCreatedAtAsc(user);
 
 		return histories.stream().map(
 			history -> PayHistoryRes.builder()
