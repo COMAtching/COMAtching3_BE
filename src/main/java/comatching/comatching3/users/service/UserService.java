@@ -497,5 +497,11 @@ public class UserService {
 		user.setRealName(realName);
 	}
 
+	@Transactional
+	public void updateDontPickMe() {
+		Users user = securityUtil.getCurrentUsersEntity();
+		user.getUserAiFeature().updateDontPickMe();
+	}
+
 
 }
