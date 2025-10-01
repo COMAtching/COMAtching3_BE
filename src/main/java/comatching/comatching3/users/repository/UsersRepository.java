@@ -57,9 +57,15 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 	Page<Users> findAllByUniversityAndEmailContainingIgnoreCaseOrderByCreatedAtAsc(
 		University university, String email, Pageable pageable);
 
-	// 사용자명으로 검색하는 페이징 메서드
-	Page<Users> findAllByUniversityAndUsernameContainingIgnoreCaseOrderByCreatedAtAsc(
-		University university, String username, Pageable pageable);
+	// 사용자명, 입금자명으로 검색하는 페이징 메서드
+	@Query("SELECT u FROM Users u " +
+		"WHERE u.university = :university " +
+		"AND (LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+		"     OR LOWER(u.realName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+		"ORDER BY u.createdAt ASC")
+	Page<Users> searchByUsernameOrRealName(@Param("university") University university,
+		@Param("keyword") String keyword,
+		Pageable pageable);
 
 	Page<Users> findAllByUniversityAndRealNameContainingIgnoreCaseOrderByCreatedAtAsc(
 		University university, String username, Pageable pageable);
