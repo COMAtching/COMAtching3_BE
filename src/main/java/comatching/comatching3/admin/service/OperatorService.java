@@ -219,6 +219,7 @@ public class OperatorService {
 			.point(user.getPoint())
 			.warnCount(user.getWarningCount())
 			.registerAt(user.getCreatedAt())
+			.realName(user.getRealName())
 			.build());
 	}
 

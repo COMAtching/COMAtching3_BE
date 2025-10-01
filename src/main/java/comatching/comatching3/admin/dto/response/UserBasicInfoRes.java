@@ -19,4 +19,5 @@ public class UserBasicInfoRes {
 	private Long point;
 	private Integer warnCount;
 	private LocalDateTime registerAt;
+	private String realName;
 }
