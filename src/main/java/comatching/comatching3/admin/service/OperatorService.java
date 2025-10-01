@@ -202,7 +202,11 @@ public class OperatorService {
 			// 사용자명으로 검색
 			usersPage = usersRepository.findAllByUniversityAndUsernameContainingIgnoreCaseOrderByCreatedAtAsc(
 				university, keyword, pageable);
-		} else {
+		} else if ("realName".equalsIgnoreCase(searchType)) {
+			usersPage = usersRepository.findAllByUniversityAndRealNameContainingIgnoreCaseOrderByCreatedAtAsc(
+				university, keyword, pageable);
+		}
+		else {
 			// 잘못된 검색 유형일 경우 전체 조회
 			usersPage = usersRepository.findALlByUniversityOrderByCreatedAtAsc(pageable, university);
 		}
@@ -215,6 +219,7 @@ public class OperatorService {
 			.point(user.getPoint())
 			.warnCount(user.getWarningCount())
 			.registerAt(user.getCreatedAt())
+			.realName(user.getRealName())
 			.build());
 	}
 
