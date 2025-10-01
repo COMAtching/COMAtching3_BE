@@ -208,4 +208,11 @@ public class UserController {
 
         return Response.ok();
     }
+
+    @PostMapping("/auth/user/pick")
+    public Response<Void> updateDontPickMe() {
+        userService.updateDontPickMe();
+
+        return Response.ok();
+    }
 }

@@ -27,6 +27,7 @@ public interface UserAiFeatureRepository extends JpaRepository<UserAiFeature, Lo
 
 	@Query("SELECT u FROM UserAiFeature u LEFT JOIN FETCH u.hobbyList " +
 		"WHERE u.gender <> :gender " +
+		"AND u.dontPickMe = false " +
 		"AND u.users.id NOT IN (" +
 		"   SELECT mh.enemy.id FROM MatchingHistory mh WHERE mh.applier.id = :applierId " +
 		"   UNION " +
@@ -38,6 +39,7 @@ public interface UserAiFeatureRepository extends JpaRepository<UserAiFeature, Lo
 	@Query("SELECT u FROM UserAiFeature u LEFT JOIN FETCH u.hobbyList " +
 		"WHERE u.gender <> :gender " +
 		"AND u.major <> :major " +
+		"AND u.dontPickMe = false " +
 		"AND u.users.id NOT IN (" +
 		"   SELECT mh.enemy.id FROM MatchingHistory mh WHERE mh.applier.id = :applierId " +
 		"   UNION " +

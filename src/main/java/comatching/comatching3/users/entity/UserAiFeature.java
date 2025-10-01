@@ -44,6 +44,8 @@ public class UserAiFeature {
 
     private String major;
 
+    private boolean dontPickMe = false;
+
 
     @Builder
     public UserAiFeature(byte[] uuid, Users users) {
@@ -105,6 +107,10 @@ public class UserAiFeature {
 
     public void updateUuid(byte[] uuid) {
         this.uuid = uuid;
+    }
+
+    public void updateDontPickMe() {
+    	this.dontPickMe = !this.dontPickMe;
     }
 
 }
