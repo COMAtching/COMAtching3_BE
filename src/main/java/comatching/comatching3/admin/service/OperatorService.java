@@ -200,13 +200,9 @@ public class OperatorService {
 				university, keyword, pageable);
 		} else if ("username".equalsIgnoreCase(searchType)) {
 			// 사용자명으로 검색
-			usersPage = usersRepository.findAllByUniversityAndUsernameContainingIgnoreCaseOrderByCreatedAtAsc(
+			usersPage = usersRepository.searchByUsernameOrRealName(
 				university, keyword, pageable);
-		} else if ("realName".equalsIgnoreCase(searchType)) {
-			usersPage = usersRepository.findAllByUniversityAndRealNameContainingIgnoreCaseOrderByCreatedAtAsc(
-				university, keyword, pageable);
-		}
-		else {
+		} else {
 			// 잘못된 검색 유형일 경우 전체 조회
 			usersPage = usersRepository.findALlByUniversityOrderByCreatedAtAsc(pageable, university);
 		}
