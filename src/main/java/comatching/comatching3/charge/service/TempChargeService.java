@@ -149,7 +149,7 @@ public class TempChargeService {
 
 		Long point = user.getPoint();
 
-		if (point >= 1000) {
+		if (point >= 1000 || point == 0) {
 			throw new BusinessException(ResponseCode.OVER_1000);
 		} else if (user.isMake1000()) {
 			throw new BusinessException(ResponseCode.ALREADY_USE);

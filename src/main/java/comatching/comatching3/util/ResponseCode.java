@@ -73,7 +73,7 @@ public enum ResponseCode {
     WRONG_EVENT_STATUS(400, "EVT-005", HttpStatus.BAD_REQUEST, "WRONG EVENT STATUS"),
 
     // Charge
-    OVER_1000(400, "CHR-001", HttpStatus.BAD_REQUEST, "보유 포인트가 1000원 이상"),
+    OVER_1000(400, "CHR-001", HttpStatus.BAD_REQUEST, "천원버튼 사용불가능한 포인트"),
     ALREADY_USE(400, "CHR-002", HttpStatus.BAD_REQUEST, "이미 천원 버튼 사용"),
     BUTTON_NOT_ACTIVE(400, "CHR-003", HttpStatus.BAD_REQUEST, "천원 버튼 비활성화 상태"),
 
