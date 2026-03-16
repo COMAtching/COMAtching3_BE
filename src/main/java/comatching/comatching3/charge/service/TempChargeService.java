@@ -66,6 +66,10 @@ public class TempChargeService {
 		ChargeRequest chargeRequest = chargeRequestRepository.findByOrderId(request.getOrderId())
 			.orElseThrow(() -> new BusinessException(ResponseCode.BAD_REQUEST));
 
+		if (chargeRequest.getOrderStatus() != OrderStatus.ORDER_REQUEST) {
+			throw new BusinessException(ResponseCode.BAD_REQUEST);
+		}
+
 		Users user = chargeRequest.getUsers();
 
 		user.addPoint(chargeRequest.getPoint());
@@ -81,6 +85,10 @@ public class TempChargeService {
 	public void refundChargeRequest(TempChargeApprovalReq request) {
 		ChargeRequest chargeRequest = chargeRequestRepository.findByOrderId(request.getOrderId())
 			.orElseThrow(() -> new BusinessException(ResponseCode.BAD_REQUEST));
+
+		if (chargeRequest.getOrderStatus() != OrderStatus.ORDER_REQUEST) {
+			throw new BusinessException(ResponseCode.BAD_REQUEST);
+		}
 
 		chargeRequest.setApprovedAt(LocalDateTime.now());
 		chargeRequest.setOrderStatus(OrderStatus.ORDER_REFUND);
