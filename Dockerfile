@@ -20,7 +20,7 @@ COPY src /app/src
 RUN gradle bootJar --no-daemon
 
 # 실행 스테이지
-FROM openjdk:17-jdk-slim
+FROM amazoncorretto:17-alpine
 
 # 작업 디렉토리 설정
 WORKDIR /app
