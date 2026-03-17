@@ -498,9 +498,9 @@ public class UserService {
 	}
 
 	@Transactional
-	public void updateDontPickMe() {
+	public boolean updateDontPickMe() {
 		Users user = securityUtil.getCurrentUsersEntity();
-		user.getUserAiFeature().updateDontPickMe();
+		return user.getUserAiFeature().updateDontPickMe();
 	}
 
 

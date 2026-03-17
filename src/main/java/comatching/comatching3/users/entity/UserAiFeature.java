@@ -109,8 +109,9 @@ public class UserAiFeature {
         this.uuid = uuid;
     }
 
-    public void updateDontPickMe() {
+    public boolean updateDontPickMe() {
     	this.dontPickMe = !this.dontPickMe;
+        return this.dontPickMe;
     }
 
 }

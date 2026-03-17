@@ -210,9 +210,9 @@ public class UserController {
     }
 
     @PostMapping("/auth/user/pick")
-    public Response<Void> updateDontPickMe() {
-        userService.updateDontPickMe();
+    public Response<Boolean> updateDontPickMe() {
+        boolean dontPickMeStatus = userService.updateDontPickMe();
 
-        return Response.ok();
+        return Response.ok(dontPickMeStatus);
     }
 }
