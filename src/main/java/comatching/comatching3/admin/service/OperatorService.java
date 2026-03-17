@@ -209,6 +209,7 @@ public class OperatorService {
 
 		return usersPage.map(user -> UserBasicInfoRes.builder()
 			.uuid(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()))
+			.gender(user.getUserAiFeature().getGender().toString())
 			.username(user.getUsername())
 			.email(user.getEmail())
 			.provider(user.getProvider())
@@ -275,6 +276,7 @@ public class OperatorService {
 
 		return UserBasicInfoRes.builder()
 			.uuid(UUIDUtil.bytesToHex(user.getUserAiFeature().getUuid()))
+			.gender(user.getUserAiFeature().getGender().toString())
 			.username(user.getUsername())
 			.email(user.getEmail())
 			.provider(user.getProvider())

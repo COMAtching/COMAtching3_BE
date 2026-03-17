@@ -20,4 +20,5 @@ public class UserBasicInfoRes {
 	private Integer warnCount;
 	private LocalDateTime registerAt;
 	private String realName;
+	private String gender;
 }
